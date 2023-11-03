@@ -15,32 +15,8 @@
             "name": "App",
             "request": "launch",
             "mainClass": "client.App",
-            "projectName": "cse110-lab5_d0dfa5ee",
-            "vmArgs": "--module-path 'c:/Users/saman/Downloads/openjfx-21_windows-x64_bin-sdk/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.fxml"
-        },
-        {
-            "type": "java",
-            "name": "AudioRecorder",
-            "request": "launch",
-            "mainClass": "multithreading.AudioRecorder",
-            "projectName": "cse110-lab5_d0dfa5ee",
-            "vmArgs": "--module-path 'c:/Users/saman/Downloads/openjfx-21_windows-x64_bin-sdk/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.fxml"
-        },
-        {
-            "type": "java",
-            "name": "ThreadingNoThread",
-            "request": "launch",
-            "mainClass": "multithreading.ThreadingNoThread",
-            "projectName": "cse110-lab5_d0dfa5ee",
-            "vmArgs": "--module-path 'c:/Users/saman/Downloads/openjfx-21_windows-x64_bin-sdk/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.fxml"
-        },
-        {
-            "type": "java",
-            "name": "ThreadingWithThread",
-            "request": "launch",
-            "mainClass": "multithreading.ThreadingWithThread",
-            "projectName": "cse110-lab5_d0dfa5ee",
-            "vmArgs": "--module-path 'c:/Users/saman/Downloads/openjfx-21_windows-x64_bin-sdk/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.fxml"
+            "projectName": "cse110-project-team-39",
+            "vmArgs": "--module-path 'C:/Users/allen/Desktop/CSE110/CSE110-MiniProject/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",

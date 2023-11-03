@@ -15,14 +15,14 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        
+
         View view = new View();
         Model model = new Model();
         Controller controller = new Controller(view, model);
 
-        Scene scene = new Scene(view.getGrid(), 400, 200);
+        Scene scene = new Scene(view.getGrid(), 1200, 600);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("MyServerUI");
+        primaryStage.setTitle("PantryPal");
         primaryStage.show();
 
     }
