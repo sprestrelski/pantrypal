@@ -31,3 +31,5 @@ replay_pid*
 *.wav
 *.properties
 .vscode/launch.json
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
