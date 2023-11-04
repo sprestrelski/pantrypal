@@ -30,7 +30,10 @@ public class Controller {
     private void handleStopButton(ActionEvent event) {
         // Makes calls to View
         audioRecorder.stopRecording();
+        String response = model.performWhisperRequest();
+        view.setTranscriptLabel(response);
     }
+
     /*
      * private void handlePostButton(ActionEvent event) {
      * String language = view.getLanguage();

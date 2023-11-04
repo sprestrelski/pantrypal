@@ -12,7 +12,7 @@ import javax.swing.Action;
  */
 public class View {
     private Button startRecButton, stopRecButton;
-    private Label recordingLabel;
+    private Label recordingLabel, transcriptLabel;
     private GridPane grid;
 
     public View() {
@@ -38,33 +38,9 @@ public class View {
         grid.add(startRecButton, 0, 3); // start recording
         grid.add(stopRecButton, 1, 3); // stop
         grid.add(recordingLabel, 0, 4);
-        /*
-         * // old code :)
-         * Label languageLabel = new Label("Language:");
-         * languageField = new TextField();
-         * grid.add(languageLabel, 0, 0);
-         * grid.add(languageField, 1, 0);
-         * 
-         * Label yearLabel = new Label("Year:");
-         * yearField = new TextField();
-         * grid.add(yearLabel, 0, 1);
-         * grid.add(yearField, 1, 1);
-         * 
-         * Label queryLabel = new Label("Query:");
-         * queryField = new TextField();
-         * grid.add(queryLabel, 0, 2);
-         * grid.add(queryField, 1, 2);
-         * 
-         * postButton = new Button("Post");
-         * getButton = new Button("Get");
-         * putButton = new Button("Put");
-         * deleteButton = new Button("Delete");
-         * 
-         * grid.add(postButton, 0, 3);
-         * grid.add(getButton, 1, 3);
-         * grid.add(putButton, 0, 4);
-         * grid.add(deleteButton, 1, 4);
-         */
+
+        transcriptLabel = new Label("");
+        grid.add(transcriptLabel, 0, 5);
 
     }
 
@@ -74,6 +50,14 @@ public class View {
 
     public Label getRecordingLabel() {
         return recordingLabel;
+    }
+
+    public Label getTranscriptLabel() {
+        return transcriptLabel;
+    }
+
+    public void setTranscriptLabel(String transcript) {
+        transcriptLabel.setText(transcript);
     }
 
     public void setStartButtonAction(EventHandler<ActionEvent> eventHandler) {
