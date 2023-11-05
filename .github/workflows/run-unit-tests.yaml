@@ -19,7 +19,19 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+      
+      - name: Install Xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+        continue-on-error: true 
 
+      - name: Start Xvfb
+        run: |
+          Xvfb :99 -screen 0 1024x768x24 -ac &
+          export DISPLAY=:99
+        continue-on-error: true 
+        
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
 
