@@ -26,12 +26,6 @@ jobs:
           sudo apt-get install -y xvfb
         continue-on-error: true 
 
-      - name: Start Xvfb
-        run: |
-          Xvfb :99 -screen 0 1024x768x24 -ac &
-          export DISPLAY=:99
-        continue-on-error: true 
-        
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
 
@@ -40,7 +34,7 @@ jobs:
 
       # build everything (includes running unit tests)
       - name: Execute Gradle build
-        run: xvfb-run ./gradlew build
+        run: xvfb-run -a ./gradlew build
 
       # report the results
       - name: Publish Test Report
