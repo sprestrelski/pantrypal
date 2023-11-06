@@ -14,9 +14,8 @@
             "type": "java",
             "name": "App",
             "request": "launch",
-            "mainClass": "client.App",
-            "projectName": "cse110-lab5_d0dfa5ee",
-            "vmArgs": "--module-path 'c:/Users/saman/Downloads/openjfx-21_windows-x64_bin-sdk/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.fxml"
+            "mainClass": "View.java",
+            "vmArgs": "--module-path 'C:\\Users\\Christophian S\\Desktop\\javafx-sdk-21\\lib' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
@@ -24,7 +23,7 @@
             "request": "launch",
             "mainClass": "multithreading.AudioRecorder",
             "projectName": "cse110-lab5_d0dfa5ee",
-            "vmArgs": "--module-path 'c:/Users/saman/Downloads/openjfx-21_windows-x64_bin-sdk/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path 'C:\\Users\\Christophian S\\Desktop\\javafx-sdk-21\\lib' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
@@ -32,7 +31,7 @@
             "request": "launch",
             "mainClass": "multithreading.ThreadingNoThread",
             "projectName": "cse110-lab5_d0dfa5ee",
-            "vmArgs": "--module-path 'c:/Users/saman/Downloads/openjfx-21_windows-x64_bin-sdk/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path 'C:\\Users\\Christophian S\\Desktop\\javafx-sdk-21\\lib' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
@@ -40,7 +39,7 @@
             "request": "launch",
             "mainClass": "multithreading.ThreadingWithThread",
             "projectName": "cse110-lab5_d0dfa5ee",
-            "vmArgs": "--module-path 'c:/Users/saman/Downloads/openjfx-21_windows-x64_bin-sdk/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path 'C:\\Users\\Christophian S\\Desktop\\javafx-sdk-21\\lib' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
