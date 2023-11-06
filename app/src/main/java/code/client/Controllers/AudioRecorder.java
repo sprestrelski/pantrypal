@@ -8,6 +8,7 @@ public class AudioRecorder {
     private AudioFormat audioFormat;
     private TargetDataLine targetDataLine;
     private Label recordingLabel;
+    private boolean recordingState;
 
     public AudioRecorder(Label recordingLabel) {
         this.audioFormat = getAudioFormat();
@@ -77,5 +78,16 @@ public class AudioRecorder {
     public void stopRecording() {
         targetDataLine.stop();
         targetDataLine.close();
+    }
+
+    public boolean toggleRecording() {
+        if(recordingState) {
+            stopRecording();
+            recordingState = false;
+            return false;
+        }
+        startRecording();
+        recordingState = true;
+        return true;
     }
 }

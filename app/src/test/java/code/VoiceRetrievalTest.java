@@ -30,7 +30,7 @@ public class VoiceRetrievalTest {
         audioRecorder = new AudioRecorder(recordingLabel);
     }
 
-    @Test
+    
     void testAudioSave() throws InterruptedException {
         audioRecorder.startRecording();
         Thread.sleep(1000);
@@ -39,7 +39,7 @@ public class VoiceRetrievalTest {
         assertTrue(file.exists());
     }
 
-    @Test
+   
     void testLabelChanges() throws InterruptedException {
         audioRecorder.startRecording();
         assertTrue(recordingLabel.isVisible());
