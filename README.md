@@ -1,2 +1,2 @@
-# Lab5-Test
-CSE110FA23 Lab 5 - Creating your own HTTP Server and Multithreading
+# CSE 110 Project Team 39 Culinary Companion Crew
+PantryPals - the application that provides you with recipes that YOU have currently in your possession! 

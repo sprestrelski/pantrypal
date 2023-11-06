@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java
 # Edit at https://www.toptal.com/developers/gitignore?templates=java
 
+# VSCode
+.vscode
+
 ### Java ###
 # Compiled class file
 *.class
@@ -30,3 +33,6 @@ replay_pid*
 # End of https://www.toptal.com/developers/gitignore/api/java
 *.wav
 *.properties
+!.vscode/launch.json
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
