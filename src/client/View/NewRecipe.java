@@ -14,18 +14,18 @@ public class NewRecipe extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Create the main layout for the "New Recipe Setup" panel
+        
         VBox root = new VBox();
         root.setSpacing(20);
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #F0F8FF;");
 
-        // Add a title at the top
+        
         Text title = new Text("New Recipe Setup");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
         root.getChildren().add(title);
 
-        // Create a container for the setup options
+   
         VBox setupContainer = new VBox();
         setupContainer.setSpacing(10);
 
@@ -55,14 +55,14 @@ public class NewRecipe extends Application {
 
         setupContainer.getChildren().addAll(option1Container, option2Container);
 
-        // Add the setup container to the main layout
+    
         root.getChildren().add(setupContainer);
 
-        // Create a button to save the setup or perform any action
+     
         Button saveButton = new Button("Save Setup");
         root.getChildren().add(saveButton);
 
-        // Create a scene and set it on the stage
+
         Scene scene = new Scene(root, 700, 600);
         primaryStage.setTitle("New Recipe Setup");
         primaryStage.setScene(scene);
