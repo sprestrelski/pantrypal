@@ -1,41 +1,56 @@
 package code.client.Model;
 
-import javafx.scene.control.TextField;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class Recipe {
-    private TextField name;
+    private final String id;
+    private final String title;
+    private final List<String> ingredientList = new ArrayList<>();
+    private final List<String> instructionList = new ArrayList<>();
 
-    private TextField recipeDetails;
-    
-    Recipe() {
-        Font biggerFont = Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 22);
-        Font smallerFont = Font.font("georgia", FontWeight.SEMI_BOLD, FontPosture.REGULAR, 18);
-
-        name = new TextField();
-        name.setPromptText("Recipe Name");
-        name.setFont(biggerFont);
-
-        recipeDetails = new TextField();
-        recipeDetails.setFont(smallerFont);
-
+    public Recipe(String id, String title) {
+        this.id = id;
+        this.title = title;
     }
 
-    public String getRecipeName() {
-        return this.name.getText();
+    public String getId() {
+        return id;
     }
 
-    public String getRecipeDetails() {
-        return this.recipeDetails.getText();
+    public String getTitle() {
+        return title;
     }
 
-    public void setRecipeName(String name) {
-        this.name.setText(name);
+    public void addIngredient(String ingredient) {
+        ingredientList.add(ingredient);
     }
 
-    public void setRecipeDetails(String details) {
-        this.recipeDetails.setText(details);
+    public void addInstruction(String instruction) {
+        instructionList.add(instruction);
+    }
+
+    public Iterator<String> getIngredientIterator() {
+        return ingredientList.iterator();
+    }
+
+    public Iterator<String> getInstructionIterator() {
+        return instructionList.iterator();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("Title: ").append(title).append("\n");
+        strBuilder.append("Ingredients:\n");
+        for (String ingredient : ingredientList) {
+            strBuilder.append(ingredient).append("\n");
+        }
+        strBuilder.append("Instructions:\n");
+        for (String instruction : instructionList) {
+            strBuilder.append(instruction).append("\n");
+        }
+        return strBuilder.toString();
     }
 }
