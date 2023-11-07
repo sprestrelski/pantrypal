@@ -8,14 +8,15 @@
             "type": "java",
             "name": "Current File",
             "request": "launch",
-            "mainClass": "${file}"
+            "mainClass": "${file}",
+            "vmArgs": "--module-path 'C:/Users/allen/Desktop/CSE110/CSE110-MiniProject/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.base,javafx.fxml,javafx.graphics,javafx.media,javafx.web --add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED --add-exports javafx.base/com.sun.javafx.event=ALL-UNNAMED"
         },
         {
             "type": "java",
-            "name": "App",
+            "name": "Main",
             "request": "launch",
-            "mainClass": "View.java",
-            //"vmArgs": "--module-path 'C:\\Users\\Christophian S\\Desktop\\javafx-sdk-21\\lib' --add-modules javafx.controls,javafx.fxml"
+            "mainClass": "Main.java",
+            //"vmArgs": "--module-path '/Users/kesler_anderson/cse-110-project-team-39/lib' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",

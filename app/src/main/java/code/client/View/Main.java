@@ -1,8 +1,6 @@
 
 package code.client.View;
 
-import javafx.scene.layout.StackPane;
-
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -124,7 +122,6 @@ class Recipe extends HBox {
     }
 }
 
-
 class RecipeList extends VBox {
 
     RecipeList() {
@@ -168,8 +165,7 @@ class RecipeList extends VBox {
                 this.getChildren().add(recipe);
             }
             reader.close();
-        } 
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("Recipes could not be loaded.");
         }
         this.updateRecipeIndices();
@@ -185,8 +181,7 @@ class RecipeList extends VBox {
                 writer.newLine();
             }
             writer.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("Recipes could not be saved.");
         }
     }
@@ -283,6 +278,8 @@ class AppFrame extends BorderPane {
     private Footer footer;
     private RecipeList recipeList;
     private Button addButton, deleteButton, loadButton, saveButton, selectButton, sortButton, uploadButton;
+    private ArrayList<Scene> scenes;
+    private Stage primaryStage;
 
     AppFrame() {
         header = new Header();
@@ -306,6 +303,18 @@ class AppFrame extends BorderPane {
         addListeners();
     }
 
+    /**
+     * This method provides the UI holder with the different scenes that can be
+     * switched between.
+     * 
+     * @param primaryStage - Main stage that has the window
+     * @param scenes       - list of different scenes to switch between.
+     */
+    public void setScenes(Stage primaryStage, ArrayList<Scene> scenes) {
+        this.scenes = scenes;
+        this.primaryStage = primaryStage;
+    }
+
     public void addListeners() {
         addButton.setOnAction(e -> {
             Recipe recipe = new Recipe();
@@ -322,6 +331,7 @@ class AppFrame extends BorderPane {
             });
 
             recipeList.updateRecipeIndices();
+            primaryStage.setScene(scenes.get(1));
         });
 
         deleteButton.setOnAction(e -> {
@@ -347,9 +357,26 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         AppFrame root = new AppFrame();
+        Scene home = new Scene(root, 700, 600);
+
+        NewRecipeUI audioCapture = new NewRecipeUI();
+        Scene speaking = audioCapture.getScene();
+
+        DetailsAppFrame chatGPTed = new DetailsAppFrame();
+        Scene details = chatGPTed.getScene();
+
+        ArrayList<Scene> scenes = new ArrayList<Scene>();
+        scenes.add(home);
+        scenes.add(speaking);
+        scenes.add(details);
+
+        // Can create observer, subject interface here
+        root.setScenes(primaryStage, scenes);
+        audioCapture.setScenes(primaryStage, scenes);
+        chatGPTed.setScenes(primaryStage, scenes);
 
         primaryStage.setTitle("Recipe Management App");
-        primaryStage.setScene(new Scene(root, 700, 600));
+        primaryStage.setScene(home);
         primaryStage.setResizable(false);
         primaryStage.show();
     }
@@ -358,6 +385,3 @@ public class Main extends Application {
         launch(args);
     }
 }
-
-
-

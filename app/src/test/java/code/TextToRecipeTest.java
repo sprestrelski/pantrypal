@@ -9,7 +9,22 @@ import code.client.Model.TextToRecipe;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TextToRecipeTest {
+
     @Test
+    /**
+     * Integration test for provide recipe
+     */
+    public void testPromptBuild() {
+        ITextToRecipe textToRecipe = new TextToRecipe();
+        String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a meal. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
+        String response = textToRecipe.buildPrompt("I have rice, shrimp, chicken, and eggs. ");
+        assertEquals(prompt, response);
+    }
+
+    @Test
+    /**
+     * Unit tests for Recipe features
+     */
     public void testParseJSON() {
         ITextToRecipe textToRecipe = new TextToRecipe();
         String responseText = """
@@ -148,8 +163,8 @@ public class TextToRecipeTest {
     public void testParseDifferentLineSpacing() {
         ITextToRecipe textToRecipe = new TextToRecipe();
         String responseText = """
-                
-                
+
+
                 Savory Beef Pasta Bake
                 Ingredients:
                 - ½ pound of ground beef

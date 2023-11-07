@@ -94,11 +94,11 @@ public class TextToRecipe implements ITextToRecipe {
         return recipe;
     }
 
-    private String buildPrompt(String input) {
+    public String buildPrompt(String input) {
         StringBuilder prompt = new StringBuilder();
-        prompt.append("I am a student on a budget with a busy schedule and I need to quickly cook a meal.")
+        prompt.append("I am a student on a budget with a busy schedule and I need to quickly cook a meal. ")
                 .append(input)
-                .append("Make a recipe using only these ingredients plus condiments.")
+                .append("Make a recipe using only these ingredients plus condiments. ")
                 .append("Remember to first include a title, then a list of ingredients, and then a list of instructions.");
         return prompt.toString();
     }
