@@ -8,14 +8,15 @@
             "type": "java",
             "name": "Current File",
             "request": "launch",
-            "mainClass": "${file}"
+            "mainClass": "${file}",
+            "vmArgs": "--module-path '/Users/kesler_anderson/cse-110-project-team-39/lib' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
             "name": "App",
             "request": "launch",
             "mainClass": "View.java",
-            //"vmArgs": "--module-path 'C:\\Users\\Christophian S\\Desktop\\javafx-sdk-21\\lib' --add-modules javafx.controls,javafx.fxml"
+            //"vmArgs": "--module-path '/Users/kesler_anderson/cse-110-project-team-39/lib' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
