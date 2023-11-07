@@ -17,7 +17,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.*;
 // import javax.sound.sampled.*;
 
-class MealTypeSelection extends HBox {
+class MealTypeSelection extends VBox {
     private Label prompt;
     private Button recordButton;
     private ImageView microphone;
@@ -25,7 +25,7 @@ class MealTypeSelection extends HBox {
     //=================FIRST PROMPT=================//
     MealTypeSelection() {
         // Get a picture of a microphone for the voice recording button
-        File file = new File("microphone.png");
+        File file = new File("app/src/main/java/code/client/View/microphone.png");
         microphone = new ImageView(new Image(file.toURI().toString()));
         // Set the size of the microphone image
         microphone.setFitWidth(30);
@@ -38,10 +38,10 @@ class MealTypeSelection extends HBox {
         prompt.setStyle("-fx-font-size: 16;");
         // Set a textField for the meal type that was selected
         mealTypeField = new TextField();
+        mealTypeField.setPrefWidth(300);
         mealTypeField.setPromptText("Meal Type");
         // Add all of the elements to the MealTypeSelection
-        this.getChildren().addAll(prompt, mealTypeField, recordButton);
-        this.setAlignment(Pos.CENTER_RIGHT);
+        this.getChildren().addAll(recordButton, prompt, mealTypeField);
     }
     public TextField getMealType() {
         return mealTypeField;
@@ -51,7 +51,7 @@ class MealTypeSelection extends HBox {
     }
 }
 
-class IngredientsList extends HBox {
+class IngredientsList extends VBox {
     
     private Label prompt;
     private Button recordButton;
@@ -60,7 +60,7 @@ class IngredientsList extends HBox {
     //==============SECOND PROMPT=================//
     IngredientsList() {
         // Get a picture of a microphone for the voice recording button
-        File file = new File("microphone.png");
+        File file = new File("app/src/main/java/code/client/View/microphone.png");
         microphone = new ImageView(new Image(file.toURI().toString()));
         // Set the size of the microphone image
         microphone.setFitWidth(30);
@@ -73,11 +73,10 @@ class IngredientsList extends HBox {
         prompt.setStyle("-fx-font-size: 16;");
         // Set a textField for the meal type that was selected
         ingredientsField = new TextField();
+        ingredientsField.setPrefWidth(300);
         ingredientsField.setPromptText("Ingredients");
-
         // Add all of the elements to the MealTypeSelection
-        this.getChildren().addAll(prompt, ingredientsField, recordButton);
-        this.setAlignment(Pos.CENTER_LEFT);
+        this.getChildren().addAll(recordButton, prompt, ingredientsField);
     }
     public TextField getIngredients() {
         return ingredientsField;
@@ -119,10 +118,10 @@ class AppFrame extends BorderPane {
         header = new Header();
         mealTypeSelection = new MealTypeSelection();
         ingredientsList = new IngredientsList();
-
+        
         this.setTop(header);
-        this.setCenter(mealTypeSelection);
-        this.setCenter(ingredientsList);
+        this.setLeft(mealTypeSelection);
+        this.setRight(ingredientsList);
 
         recordButton1 = mealTypeSelection.getRecordButton();
         recordButton2 = ingredientsList.getRecordButton();
@@ -135,26 +134,39 @@ class AppFrame extends BorderPane {
         WhisperHandler audioProcessor = new WhisperHandler(API_ENDPOINT, TOKEN, MODEL);
         
         recordButton1.setOnAction(e -> {
-            recording = recorder.toggleRecording();
+            // recording = recorder.toggleRecording();
+
             if (!recording) {
+                recorder.startRecording();
+                recording = true;
+                
+            } else {
+                recorder.stopRecording();
+                recording = false;
                 try {
                     mealType = audioProcessor.processAudio();
                 } catch (IOException | URISyntaxException e2) {
                     e2.printStackTrace();
-                }
+                } 
                 mealTypeSelection.getMealType().setText(mealType);
             }
         });
 
         recordButton2.setOnAction(e -> {
-            recording = recorder.toggleRecording();
+            // recording = recorder.toggleRecording();
             if (!recording) {
+                recorder.startRecording();
+                recording = true;
+                
+            } else {
+                recorder.stopRecording();
+                recording = false;
                 try {
                     ingredients = audioProcessor.processAudio();
                 } catch (IOException | URISyntaxException e2) {
                     e2.printStackTrace();
-                }
-                ingredientsList.getIngredients().setText(ingredients);
+                } 
+                mealTypeSelection.getMealType().setText(ingredients);
             }
         });
     }
