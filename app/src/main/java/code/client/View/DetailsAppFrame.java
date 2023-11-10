@@ -9,11 +9,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class DetailsAppFrame {
-    private ArrayList<Scene> scenes;
+public class DetailsAppFrame implements IWindowUI {
+    private ArrayList<IWindowUI> scenes;
     private Stage primaryStage;
+    private RecipeDetailsUI currentRecipe;
 
-    public Scene getScene() {
+    public Scene getSceneWindow() {
         VBox root = new VBox();
         root.setSpacing(20);
         root.setAlignment(Pos.CENTER);
@@ -30,7 +31,7 @@ public class DetailsAppFrame {
         temp.addIngredient("2 tablespoons vegetable oil");
         temp.addInstruction("1. Heat the vegetable oil in a large pan over medium-high heat.");
 
-        RecipeDetailsUI details = new RecipeDetailsUI(temp);
+        RecipeDetailsUI details = currentRecipe;// new RecipeDetailsUI(temp);
 
         TextField title = details.getTitleField();
         title.setAlignment(Pos.CENTER);
@@ -43,6 +44,10 @@ public class DetailsAppFrame {
         return new Scene(root, 700, 600);
     }
 
+    public void setRecipeHolder(RecipeDetailsUI recipeHolder) {
+        currentRecipe = recipeHolder;
+    }
+
     /**
      * This method provides the UI holder with the different scenes that can be
      * switched between.
@@ -50,7 +55,7 @@ public class DetailsAppFrame {
      * @param primaryStage - Main stage that has the window
      * @param scenes       - list of different scenes to switch between.
      */
-    public void setScenes(Stage primaryStage, ArrayList<Scene> scenes) {
+    public void setScenes(Stage primaryStage, ArrayList<IWindowUI> scenes) {
         this.scenes = scenes;
         this.primaryStage = primaryStage;
     }
