@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import code.client.Model.Recipe;
+
 class ImageUploader {
     public static void uploadImage(Stage primaryStage, ImageView imageView) {
         FileChooser fileChooser = new FileChooser();
@@ -29,7 +31,7 @@ class ImageUploader {
     }
 }
 
-class Recipe extends HBox {
+class RecipeUI extends HBox {
     private ImageView recipeImage;
     private Label index, nameLabel;
     private GridPane recipeDetailsGrid;
@@ -37,7 +39,7 @@ class Recipe extends HBox {
     private Button selectButton, uploadButton;
     private boolean selected;
 
-    Recipe() {
+    RecipeUI() {
         selected = false;
 
         index = new Label();
@@ -133,15 +135,15 @@ class RecipeList extends VBox {
     public void updateRecipeIndices() {
         int index = 1;
         for (int i = 0; i < this.getChildren().size(); i++) {
-            if (this.getChildren().get(i) instanceof Recipe) {
-                ((Recipe) this.getChildren().get(i)).setRecipeIndex(index);
+            if (this.getChildren().get(i) instanceof RecipeUI) {
+                ((RecipeUI) this.getChildren().get(i)).setRecipeIndex(index);
                 index++;
             }
         }
     }
 
     public void removeSelectedRecipes() {
-        this.getChildren().removeIf(recipe -> recipe instanceof Recipe && ((Recipe) recipe).isSelected());
+        this.getChildren().removeIf(recipe -> recipe instanceof RecipeUI && ((RecipeUI) recipe).isSelected());
         this.updateRecipeIndices();
     }
 
@@ -153,7 +155,7 @@ class RecipeList extends VBox {
             reader.readLine();
             while ((line = reader.readLine()) != null) {
                 recipeInfo = line.split(", ");
-                Recipe recipe = new Recipe();
+                RecipeUI recipe = new RecipeUI();
                 recipe.getRecipeImage().setImage(new Image(new File("src/default_recipe.jpg").toURI().toString()));
                 recipe.getRecipeName().setText(recipeInfo[0]);
                 recipe.getUploadButton().setOnAction(e1 -> {
@@ -177,7 +179,7 @@ class RecipeList extends VBox {
             writer.write("Name, Ingredients, Instructions");
             writer.newLine();
             for (int i = 0; i < this.getChildren().size(); i++) {
-                writer.write(((Recipe) this.getChildren().get(i)).getRecipeName().getText() + ", ");
+                writer.write(((RecipeUI) this.getChildren().get(i)).getRecipeName().getText() + ", ");
                 writer.newLine();
             }
             writer.close();
@@ -187,25 +189,26 @@ class RecipeList extends VBox {
     }
 
     public void sortRecipes() {
-        ArrayList<Recipe> recipes = new ArrayList<Recipe>();
-        Recipe copy;
+        ArrayList<RecipeUI> recipes = new ArrayList<RecipeUI>();
+        RecipeUI copy;
         for (int i = 0; i < this.getChildren().size(); i++) {
-            copy = new Recipe();
-            copy.getRecipeName().setText(((Recipe) this.getChildren().get(i)).getRecipeName().getText());
-            copy.getRecipeImage().setImage(((Recipe) this.getChildren().get(i)).getRecipeImage().getImage());
+            copy = new RecipeUI();
+            copy.getRecipeName().setText(((RecipeUI) this.getChildren().get(i)).getRecipeName().getText());
+            copy.getRecipeImage().setImage(((RecipeUI) this.getChildren().get(i)).getRecipeImage().getImage());
             recipes.add(copy);
         }
 
-        Collections.sort(recipes, new Comparator<Recipe>() {
+        Collections.sort(recipes, new Comparator<RecipeUI>() {
             @Override
-            public int compare(Recipe r1, Recipe r2) {
+            public int compare(RecipeUI r1, RecipeUI r2) {
                 return r1.getRecipeName().getText().compareTo(r2.getRecipeName().getText());
             }
         });
 
         for (int i = 0; i < this.getChildren().size(); i++) {
-            ((Recipe) this.getChildren().get(i)).getRecipeName().setText(recipes.get(i).getRecipeName().getText());
-            ((Recipe) this.getChildren().get(i)).getRecipeImage().setImage(recipes.get(i).getRecipeImage().getImage());
+            ((RecipeUI) this.getChildren().get(i)).getRecipeName().setText(recipes.get(i).getRecipeName().getText());
+            ((RecipeUI) this.getChildren().get(i)).getRecipeImage()
+                    .setImage(recipes.get(i).getRecipeImage().getImage());
         }
     }
 }
@@ -273,12 +276,12 @@ class Header extends HBox {
     }
 }
 
-class AppFrame extends BorderPane {
+class AppFrame extends BorderPane implements IWindowUI {
     private Header header;
     private Footer footer;
     private RecipeList recipeList;
     private Button addButton, deleteButton, loadButton, saveButton, selectButton, sortButton, uploadButton;
-    private ArrayList<Scene> scenes;
+    private ArrayList<IWindowUI> scenes;
     private Stage primaryStage;
 
     AppFrame() {
@@ -303,6 +306,10 @@ class AppFrame extends BorderPane {
         addListeners();
     }
 
+    public Scene getSceneWindow() {
+        return new Scene(this, 700, 600);
+    }
+
     /**
      * This method provides the UI holder with the different scenes that can be
      * switched between.
@@ -310,14 +317,14 @@ class AppFrame extends BorderPane {
      * @param primaryStage - Main stage that has the window
      * @param scenes       - list of different scenes to switch between.
      */
-    public void setScenes(Stage primaryStage, ArrayList<Scene> scenes) {
+    public void setScenes(Stage primaryStage, ArrayList<IWindowUI> scenes) {
         this.scenes = scenes;
         this.primaryStage = primaryStage;
     }
 
     public void addListeners() {
         addButton.setOnAction(e -> {
-            Recipe recipe = new Recipe();
+            RecipeUI recipe = new RecipeUI();
             recipeList.getChildren().add(recipe);
 
             uploadButton = recipe.getUploadButton();
@@ -331,7 +338,7 @@ class AppFrame extends BorderPane {
             });
 
             recipeList.updateRecipeIndices();
-            primaryStage.setScene(scenes.get(1));
+            primaryStage.setScene(scenes.get(1).getSceneWindow());
         });
 
         deleteButton.setOnAction(e -> {
@@ -356,27 +363,27 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        AppFrame root = new AppFrame();
-        Scene home = new Scene(root, 700, 600);
+        AppFrame home = new AppFrame();
+        // Scene home = new Scene(root, 700, 600);
 
         NewRecipeUI audioCapture = new NewRecipeUI();
-        Scene speaking = audioCapture.getScene();
+        // Scene speaking = audioCapture.getScene();
 
-        DetailsAppFrame chatGPTed = new DetailsAppFrame();
-        Scene details = chatGPTed.getScene();
+        DetailsAppFrame details = new DetailsAppFrame();
+        // Scene details = chatGPTed.getScene();
 
-        ArrayList<Scene> scenes = new ArrayList<Scene>();
+        ArrayList<IWindowUI> scenes = new ArrayList<IWindowUI>();
         scenes.add(home);
-        scenes.add(speaking);
+        scenes.add(audioCapture);
         scenes.add(details);
-
+        details.setRecipeHolder(new RecipeDetailsUI(new Recipe("2", "Testing")));
         // Can create observer, subject interface here
-        root.setScenes(primaryStage, scenes);
+        home.setScenes(primaryStage, scenes);
         audioCapture.setScenes(primaryStage, scenes);
-        chatGPTed.setScenes(primaryStage, scenes);
+        details.setScenes(primaryStage, scenes);
 
         primaryStage.setTitle("Recipe Management App");
-        primaryStage.setScene(home);
+        primaryStage.setScene(home.getSceneWindow());
         primaryStage.setResizable(false);
         primaryStage.show();
     }
