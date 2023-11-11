@@ -16,8 +16,8 @@ public class TextToRecipeTest {
      */
     public void testPromptBuild() {
         ITextToRecipe textToRecipe = new TextToRecipe();
-        String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a meal. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
-        String response = textToRecipe.buildPrompt("I have rice, shrimp, chicken, and eggs. ");
+        String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Lunch. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
+        String response = textToRecipe.buildPrompt("Lunch.","I have rice, shrimp, chicken, and eggs.");
         assertEquals(prompt, response);
     }
 

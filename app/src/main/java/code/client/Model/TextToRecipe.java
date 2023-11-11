@@ -21,9 +21,9 @@ public class TextToRecipe implements ITextToRecipe {
     private static final double TEMPERATURE = 1.;
 
     @Override
-    public String getChatGPTResponse(String input) throws IOException, InterruptedException, URISyntaxException {
+    public String getChatGPTResponse(String typeOfMeal, String input) throws IOException, InterruptedException, URISyntaxException {
         // Set request parameters
-        String prompt = buildPrompt(input);
+        String prompt = buildPrompt(typeOfMeal, input);
 
         // Create a request body which you will pass into request object
         JSONObject requestBody = new JSONObject();
@@ -94,11 +94,12 @@ public class TextToRecipe implements ITextToRecipe {
         return recipe;
     }
 
-    public String buildPrompt(String input) {
+    public String buildPrompt(String typeOfMeal, String input) {
         StringBuilder prompt = new StringBuilder();
-        prompt.append("I am a student on a budget with a busy schedule and I need to quickly cook a meal. ")
+        prompt.append("I am a student on a budget with a busy schedule and I need to quickly cook a ")
+                .append(typeOfMeal + " ")
                 .append(input)
-                .append("Make a recipe using only these ingredients plus condiments. ")
+                .append(" Make a recipe using only these ingredients plus condiments. ")
                 .append("Remember to first include a title, then a list of ingredients, and then a list of instructions.");
         return prompt.toString();
     }

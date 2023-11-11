@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public interface ITextToRecipe {
-    String buildPrompt(String input);
+    String buildPrompt(String typeOfMeal, String input);
 
-    String getChatGPTResponse(String input) throws IOException, InterruptedException, URISyntaxException;
+    String getChatGPTResponse(String typeOfMeal, String input) throws IOException, InterruptedException, URISyntaxException;
 
     Recipe mapResponseToRecipe(String responseText);
 }
