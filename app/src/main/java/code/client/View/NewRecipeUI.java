@@ -148,7 +148,7 @@ class AppFrameMic extends BorderPane {
     private ArrayList<IWindowUI> scenes;
     private Stage primaryStage;
 
-    AppFrameMic() {
+    AppFrameMic() throws IOException, URISyntaxException {
         header = new Header();
         mealTypeSelection = new MealTypeSelection();
         ingredientsList = new IngredientsList();
@@ -191,7 +191,7 @@ class AppFrameMic extends BorderPane {
         this.primaryStage = primaryStage;
     }
 
-    public void addListeners() {
+    public void addListeners() throws IOException, URISyntaxException {
 
         AudioRecorder recorder = new AudioRecorder(new Label("Recording..."));
         WhisperHandler audioProcessor = new WhisperHandler(API_ENDPOINT, TOKEN, MODEL);
@@ -270,7 +270,7 @@ public class NewRecipeUI implements IWindowUI {
     private Stage primaryStage;
     private AppFrameMic root;
 
-    NewRecipeUI() {
+    NewRecipeUI() throws IOException, URISyntaxException {
         root = new AppFrameMic();
     }
 

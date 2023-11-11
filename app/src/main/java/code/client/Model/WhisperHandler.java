@@ -17,19 +17,24 @@ public class WhisperHandler {
     private String API_ENDPOINT;
     private String TOKEN;
     private String MODEL;
+    private CustomHttpConnection connection;
 
-    public WhisperHandler(String API_ENDPOINT, String TOKEN, String MODEL) {
+    public WhisperHandler(String API_ENDPOINT, String TOKEN, String MODEL) throws IOException, URISyntaxException {
         this.API_ENDPOINT = API_ENDPOINT;
         this.TOKEN = TOKEN;
         this.MODEL = MODEL;
+        this.connection = sendHttpRequest();
+    }
+
+    public WhisperHandler(String API_ENDPOINT, String TOKEN, String MODEL, CustomHttpConnection connection) {
+        this.API_ENDPOINT = API_ENDPOINT;
+        this.TOKEN = TOKEN;
+        this.MODEL = MODEL;
+        this.connection = connection;
     }
 
     // https://stackoverflow.com/questions/25334139/how-to-mock-a-url-connection
     public String processAudio() throws IOException, URISyntaxException {
-        // Create file object from file path
-        File file = new File("recording.wav");
-        HttpURLConnection connection = sendHttpRequest(file);
-
         // Get response code
         int responseCode = connection.getResponseCode();
         String response;
@@ -47,16 +52,17 @@ public class WhisperHandler {
         return response;
     }
 
-    private HttpURLConnection sendHttpRequest(File file) throws IOException, URISyntaxException {
-        URL url = new URI(API_ENDPOINT).toURL();
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setDoOutput(true);
-
+    public CustomHttpConnection sendHttpRequest() throws IOException, URISyntaxException {
         // Set up request headers
+        File file = new File("recording.wav");
+        CustomHttpConnection connection = new RealHttpConnection(API_ENDPOINT);
+
         String boundary = "Boundary-" + System.currentTimeMillis();
         connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
         connection.setRequestProperty("Authorization", "Bearer " + TOKEN);
+
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
 
         // Set up output stream to write request body
         OutputStream outputStream = connection.getOutputStream();
@@ -113,7 +119,7 @@ public class WhisperHandler {
     }
 
     // Helper method to handle a successful response
-    private static String handleSuccessResponse(HttpURLConnection connection)
+    private static String handleSuccessResponse(CustomHttpConnection connection)
             throws IOException, JSONException {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(connection.getInputStream()));
@@ -133,7 +139,7 @@ public class WhisperHandler {
     }
 
     // Helper method to handle an error response
-    private static String handleErrorResponse(HttpURLConnection connection)
+    private static String handleErrorResponse(CustomHttpConnection connection)
             throws IOException, JSONException {
         BufferedReader errorReader = new BufferedReader(
                 new InputStreamReader(connection.getErrorStream()));

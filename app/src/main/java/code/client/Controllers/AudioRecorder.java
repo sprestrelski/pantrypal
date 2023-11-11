@@ -81,7 +81,7 @@ public class AudioRecorder {
     }
 
     public boolean toggleRecording() {
-        if(recordingState) {
+        if (recordingState) {
             stopRecording();
             recordingState = false;
             return false;
