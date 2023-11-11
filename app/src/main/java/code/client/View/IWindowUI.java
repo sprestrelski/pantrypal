@@ -7,4 +7,6 @@ import javafx.stage.Stage;
 
 public interface IWindowUI {
     public Scene getSceneWindow();
+
+    public void setRoot(Scene scene);
 }

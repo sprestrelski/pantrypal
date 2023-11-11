@@ -5,6 +5,7 @@ import code.client.Model.*;
 import javafx.geometry.Pos;
 import java.io.File;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
@@ -147,8 +148,10 @@ class AppFrameMic extends BorderPane {
     // Scene Transitions
     private ArrayList<IWindowUI> scenes;
     private Stage primaryStage;
+    private Scene mainScene;
+    private RecipeUI newRecipe;
 
-    AppFrameMic() {
+    AppFrameMic() throws URISyntaxException, IOException {
         header = new Header();
         mealTypeSelection = new MealTypeSelection();
         ingredientsList = new IngredientsList();
@@ -179,6 +182,10 @@ class AppFrameMic extends BorderPane {
         addListeners();
     }
 
+    public void storeNewRecipeUI(RecipeUI recipeUI) {
+        newRecipe = recipeUI;
+    }
+
     /**
      * This method provides the UI holder with the different scenes that can be
      * switched between.
@@ -191,9 +198,15 @@ class AppFrameMic extends BorderPane {
         this.primaryStage = primaryStage;
     }
 
-    public void addListeners() {
+    public void setMain(Scene main) {
+        mainScene = main;
+    }
+
+    public void addListeners() throws URISyntaxException, IOException {
 
         AudioRecorder recorder = new AudioRecorder(new Label("Recording..."));
+
+        File file = new File("recording.wav");
         WhisperHandler audioProcessor = new WhisperHandler(API_ENDPOINT, TOKEN, MODEL);
 
         recordButton1.setOnAction(e -> {
@@ -206,6 +219,7 @@ class AppFrameMic extends BorderPane {
                 recorder.stopRecording();
                 recording = false;
                 try {
+                    audioProcessor.sendHttpRequest(file);
                     mealType = audioProcessor.processAudio();
                 } catch (IOException | URISyntaxException e2) {
                     e2.printStackTrace();
@@ -224,6 +238,7 @@ class AppFrameMic extends BorderPane {
                 recorder.stopRecording();
                 recording = false;
                 try {
+                    audioProcessor.sendHttpRequest(file);
                     ingredients = audioProcessor.processAudio();
                 } catch (IOException | URISyntaxException e2) {
                     e2.printStackTrace();
@@ -247,15 +262,20 @@ class AppFrameMic extends BorderPane {
              * "whisper-1");
              */
             try {
+
                 String audioOutput = ingredients;// audio.processAudio();
                 String responseText = caller.getChatGPTResponse(audioOutput);
                 Recipe recipe = caller.mapResponseToRecipe(responseText);
                 RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
+
                 // gets the DetailsAppFrame
                 DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
                 details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
+                details.setRecipeUI(newRecipe);
 
-                primaryStage.setScene(details.getSceneWindow());
+                details.setMain(mainScene);
+                details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
+                // primaryStage.setScene(details.getSceneWindow());
             } catch (Exception e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -269,9 +289,14 @@ public class NewRecipeUI implements IWindowUI {
     private ArrayList<IWindowUI> scenes;
     private Stage primaryStage;
     private AppFrameMic root;
+    private Scene mainScene;
 
-    NewRecipeUI() {
+    NewRecipeUI() throws URISyntaxException, IOException {
         root = new AppFrameMic();
+    }
+
+    public void storeNewRecipeUI(RecipeUI recipeUI) {
+        root.storeNewRecipeUI(recipeUI);
     }
 
     public Scene getSceneWindow() {
@@ -289,5 +314,15 @@ public class NewRecipeUI implements IWindowUI {
      */
     public void setScenes(Stage primaryStage, ArrayList<IWindowUI> scenes) {
         root.setScenes(primaryStage, scenes);
+    }
+
+    @Override
+    public void setRoot(Scene scene) {
+        // TODO Auto-generated method stub
+        scene.setRoot(root);
+    }
+
+    public void setMain(Scene main) {
+        root.setMain(main);
     }
 }

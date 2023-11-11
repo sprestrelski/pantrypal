@@ -47,7 +47,7 @@ public class WhisperHandler {
         return response;
     }
 
-    private HttpURLConnection sendHttpRequest(File file) throws IOException, URISyntaxException {
+    public HttpURLConnection sendHttpRequest(File file) throws IOException, URISyntaxException {
         URL url = new URI(API_ENDPOINT).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
