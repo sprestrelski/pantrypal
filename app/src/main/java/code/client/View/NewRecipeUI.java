@@ -5,12 +5,9 @@ import code.client.Model.*;
 import javafx.geometry.Pos;
 import java.io.File;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -147,7 +144,6 @@ class AppFrameMic extends BorderPane {
 
     // Scene Transitions
     private ArrayList<IWindowUI> scenes;
-    private Stage primaryStage;
     private Scene mainScene;
     private RecipeUI newRecipe;
 
@@ -190,12 +186,10 @@ class AppFrameMic extends BorderPane {
      * This method provides the UI holder with the different scenes that can be
      * switched between.
      * 
-     * @param primaryStage - Main stage that has the window
-     * @param scenes       - list of different scenes to switch between.
+     * @param scenes - list of different scenes to switch between.
      */
-    public void setScenes(Stage primaryStage, ArrayList<IWindowUI> scenes) {
+    public void setScenes(ArrayList<IWindowUI> scenes) {
         this.scenes = scenes;
-        this.primaryStage = primaryStage;
     }
 
     public void setMain(Scene main) {
@@ -255,29 +249,26 @@ class AppFrameMic extends BorderPane {
         saveButton.setOnAction(e -> {
 
             ITextToRecipe caller = new TextToRecipe();
-            /*
-             * WhisperHandler audio = new WhisperHandler(
-             * "https://api.openai.com/v1/audio/transcriptions",
-             * "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",
-             * "whisper-1");
-             */
             try {
 
-                String audioOutput = ingredients;// audio.processAudio();
-                String responseText = caller.getChatGPTResponse(audioOutput);
-                Recipe recipe = caller.mapResponseToRecipe(responseText);
-                RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
+                /*
+                 * String audioOutput = ingredients;// audio.processAudio();
+                 * String responseText = caller.getChatGPTResponse(audioOutput);
+                 * Recipe recipe = caller.mapResponseToRecipe(responseText);
+                 * RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
+                 */
 
                 // gets the DetailsAppFrame
                 DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
-                details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
+
+                /*
+                 * details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
+                 */
                 details.setRecipeUI(newRecipe);
 
-                details.setMain(mainScene);
                 details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
-                // primaryStage.setScene(details.getSceneWindow());
+
             } catch (Exception e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
 
@@ -286,10 +277,7 @@ class AppFrameMic extends BorderPane {
 }
 
 public class NewRecipeUI implements IWindowUI {
-    private ArrayList<IWindowUI> scenes;
-    private Stage primaryStage;
     private AppFrameMic root;
-    private Scene mainScene;
 
     NewRecipeUI() throws URISyntaxException, IOException {
         root = new AppFrameMic();
@@ -309,20 +297,15 @@ public class NewRecipeUI implements IWindowUI {
      * This method provides the UI holder with the different scenes that can be
      * switched between.
      * 
-     * @param primaryStage - Main stage that has the window
-     * @param scenes       - list of different scenes to switch between.
+     * @param scenes - list of different scenes to switch between.
      */
-    public void setScenes(Stage primaryStage, ArrayList<IWindowUI> scenes) {
-        root.setScenes(primaryStage, scenes);
+    public void setScenes(ArrayList<IWindowUI> scenes) {
+        root.setScenes(scenes);
     }
 
     @Override
     public void setRoot(Scene scene) {
-        // TODO Auto-generated method stub
         scene.setRoot(root);
-    }
-
-    public void setMain(Scene main) {
-        root.setMain(main);
+        root.setMain(scene);
     }
 }

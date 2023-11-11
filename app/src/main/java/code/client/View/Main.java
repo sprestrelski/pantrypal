@@ -12,6 +12,8 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import java.io.*;
+import java.net.URISyntaxException;
+
 import javafx.geometry.Pos;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -299,8 +301,7 @@ class AppFrame extends BorderPane {
     private RecipeList recipeList;
     private Button addButton, deleteButton, loadButton, saveButton, selectButton, sortButton, uploadButton;
     private ArrayList<IWindowUI> scenes;
-    private Stage primaryStage;
-    public Scene mainScene;
+    private Scene mainScene;
 
     AppFrame() {
         header = new Header();
@@ -342,10 +343,24 @@ class AppFrame extends BorderPane {
             });
 
             recipeList.updateRecipeIndices();
-            NewRecipeUI audioPrompt = (NewRecipeUI) scenes.get(1);
-            audioPrompt.storeNewRecipeUI(recipe);
-            // primaryStage.setScene(audioPrompt.getSceneWindow());
-            audioPrompt.setRoot(mainScene);
+            NewRecipeUI audioPrompt;
+
+            /*
+             * Create a new audio prompting window each time.
+             */
+            try {
+                audioPrompt = new NewRecipeUI(); // (NewRecipeUI) scenes.get(1);
+                audioPrompt.storeNewRecipeUI(recipe);
+
+                scenes.set(1, audioPrompt);
+                audioPrompt.setScenes(scenes);
+
+                audioPrompt.setRoot(mainScene);
+
+            } catch (Exception e3) {
+                e3.printStackTrace();
+            }
+
         });
 
         deleteButton.setOnAction(e -> {
@@ -369,16 +384,18 @@ class AppFrame extends BorderPane {
      * This method provides the UI holder with the different scenes that can be
      * switched between.
      * 
-     * @param primaryStage - Main stage that has the window
-     * @param scenes       - list of different scenes to switch between.
+     * @param scenes - list of different scenes to switch between.
      */
-    public void setScenes(Stage primaryStage, ArrayList<IWindowUI> scenes) {
+    public void setScenes(ArrayList<IWindowUI> scenes) {
         this.scenes = scenes;
-        this.primaryStage = primaryStage;
     }
 
     public AppFrame getRoot() {
         return this;
+    }
+
+    public void setMain(Scene main) {
+        mainScene = main;
     }
 }
 
@@ -391,7 +408,6 @@ class HomeScreen implements IWindowUI {
         holder = new Scene(home, 700, 600);
     }
 
-    @Override
     public Scene getSceneWindow() {
         return holder;
     }
@@ -400,22 +416,18 @@ class HomeScreen implements IWindowUI {
      * This method provides the UI holder with the different scenes that can be
      * switched between.
      * 
-     * @param primaryStage - Main stage that has the window
-     * @param scenes       - list of different scenes to switch between.
+     * @param scenes - list of different scenes to switch between.
      */
-    public void setScenes(Stage primaryStage, ArrayList<IWindowUI> scenes) {
-        home.setScenes(primaryStage, scenes);
+    public void setScenes(ArrayList<IWindowUI> scenes) {
+        home.setScenes(scenes);
     }
 
     @Override
     public void setRoot(Scene scene) {
-        // TODO Auto-generated method stub
         scene.setRoot(home);
+        home.setMain(scene);
     }
 
-    public void setMain(Scene scene) {
-        home.mainScene = scene;
-    }
 }
 
 public class Main extends Application {
@@ -439,18 +451,15 @@ public class Main extends Application {
         scenes.add(details);
         details.setRecipeHolder(new RecipeDetailsUI(new Recipe("2", "Testing")));
         // Can create observer, subject interface here
-        home.setScenes(primaryStage, scenes);
-        audioCapture.setScenes(primaryStage, scenes);
-        details.setScenes(primaryStage, scenes);
+        home.setScenes(scenes);
+        audioCapture.setScenes(scenes);
+        details.setScenes(scenes);
 
         primaryStage.setTitle("Recipe Management App");
         // primaryStage.setScene(home.getSceneWindow());
 
         Scene main = home.getSceneWindow();
-        // home.setRoot(main);
-        home.setMain(main);
-        audioCapture.setMain(main);
-        details.setMain(main);
+        home.setRoot(main);
 
         primaryStage.setScene(main);
         primaryStage.setResizable(false);

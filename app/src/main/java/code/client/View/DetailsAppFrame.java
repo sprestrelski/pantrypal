@@ -12,30 +12,45 @@ import javafx.stage.Stage;
 
 public class DetailsAppFrame implements IWindowUI {
     private ArrayList<IWindowUI> scenes;
-    private Stage primaryStage;
     private Scene mainScene;
 
     private RecipeDetailsUI currentRecipe;
     private RecipeUI recipeUI;
     private Button backToHomeButton;
-    VBox root;
+    VBox detailedUI;
 
     DetailsAppFrame() {
+
+        detailedUI = new VBox();
+        detailedUI.setSpacing(20);
+        detailedUI.setAlignment(Pos.CENTER);
+        detailedUI.setStyle("-fx-background-color: #F0F8FF;");
+
         String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF; -fx-font-weight: bold; -fx-font: 11 arial;";
         backToHomeButton = new Button("Back to List");
         backToHomeButton.setStyle(defaultButtonStyle);
         backToHomeButton.setAlignment(Pos.TOP_LEFT);
+
         addListeners();
     }
 
-    public Scene getSceneWindow() {
-        return new Scene(root, 700, 600);
-    }
-
+    /**
+     * This method is used to modify what recipe is shown when showing this UI
+     * display.
+     * 
+     * @param recipeHolder - A given recipe in a formatted manner.
+     */
     public void setRecipeHolder(RecipeDetailsUI recipeHolder) {
         currentRecipe = recipeHolder;
     }
 
+    /**
+     * This method is used to store the provided recipe and its title
+     * in the actual list in the home screen.
+     * 
+     * @param recipeUI - the UI element that stores the recipe name in the Home
+     *                 Recipe List
+     */
     public void setRecipeUI(RecipeUI recipeUI) {
         this.recipeUI = recipeUI;
     }
@@ -47,9 +62,8 @@ public class DetailsAppFrame implements IWindowUI {
      * @param primaryStage - Main stage that has the window
      * @param scenes       - list of different scenes to switch between.
      */
-    public void setScenes(Stage primaryStage, ArrayList<IWindowUI> scenes) {
+    public void setScenes(ArrayList<IWindowUI> scenes) {
         this.scenes = scenes;
-        this.primaryStage = primaryStage;
     }
 
     public void addListeners() {
@@ -59,21 +73,16 @@ public class DetailsAppFrame implements IWindowUI {
     }
 
     public void returnToHome() {
-        // primaryStage.setScene(scenes.get(0).getSceneWindow());
-        scenes.get(0).setRoot(mainScene);
+        HomeScreen home = (HomeScreen) scenes.get(0);
+        home.setRoot(mainScene);
     }
 
-    @Override
-    public void setRoot(Scene scene) {
-        // TODO Auto-generated method stub
-        root = new VBox();
-        root.setSpacing(20);
-        root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #F0F8FF;");
-
-        VBox setupContainer = new VBox();
-        setupContainer.setSpacing(10);
-
+    /**
+     * This method is used for testing. It's a mock recipe that can be formatted.
+     * 
+     * @return recipe
+     */
+    private RecipeDetailsUI getMockedRecipe() {
         // Hardcoded value for now, recipe value for it should be changing
         Recipe temp = new Recipe("1", "Fried Chicken and Egg Fried Rice");
         temp.addIngredient("2 chicken breasts, diced");
@@ -81,23 +90,30 @@ public class DetailsAppFrame implements IWindowUI {
         temp.addIngredient("2 cups cooked rice");
         temp.addIngredient("2 tablespoons vegetable oil");
         temp.addInstruction("1. Heat the vegetable oil in a large pan over medium-high heat.");
+        return new RecipeDetailsUI(temp);
+    }
 
-        RecipeDetailsUI details = currentRecipe;// new RecipeDetailsUI(temp);
+    @Override
+    public void setRoot(Scene scene) {
+        // Resets the UI everytime
+        detailedUI.getChildren().clear();
+
+        VBox setupContainer = new VBox();
+        setupContainer.setSpacing(10);
+
+        RecipeDetailsUI details = getMockedRecipe(); // currentRecipe;
         recipeUI.setRecipe(details.getRecipe()); // Adds recipe details from chatGPT to the main UI window
 
         TextField title = details.getTitleField();
         title.setAlignment(Pos.CENTER);
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
-        root.getChildren().addAll(backToHomeButton, title);
+        detailedUI.getChildren().addAll(backToHomeButton, title);
 
         setupContainer.getChildren().add(details);
-        root.getChildren().add(setupContainer);
+        detailedUI.getChildren().add(setupContainer);
 
         // Changes the User Screen
-        scene.setRoot(root);
-    }
-
-    public void setMain(Scene main) {
-        mainScene = main;
+        scene.setRoot(detailedUI);
+        mainScene = scene;
     }
 }
