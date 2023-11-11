@@ -1,18 +1,15 @@
 package code.client.Controllers;
 
-import javafx.scene.control.Label;
 import java.io.*;
 import javax.sound.sampled.*;
 
 public class AudioRecorder {
     private AudioFormat audioFormat;
     private TargetDataLine targetDataLine;
-    private Label recordingLabel;
     private boolean recordingState;
 
-    public AudioRecorder(Label recordingLabel) {
+    public AudioRecorder() {
         this.audioFormat = getAudioFormat();
-        this.recordingLabel = recordingLabel;
     }
 
     private AudioFormat getAudioFormat() {
@@ -54,7 +51,6 @@ public class AudioRecorder {
                             targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
                             targetDataLine.open(audioFormat);
                             targetDataLine.start();
-                            recordingLabel.setVisible(true);
 
                             // the AudioInputStream that will be used to write the audio data to a file
                             AudioInputStream audioInputStream = new AudioInputStream(
@@ -66,7 +62,6 @@ public class AudioRecorder {
                                     audioInputStream,
                                     AudioFileFormat.Type.WAVE,
                                     audioFile);
-                            recordingLabel.setVisible(false);
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
@@ -81,7 +76,7 @@ public class AudioRecorder {
     }
 
     public boolean toggleRecording() {
-        if(recordingState) {
+        if (recordingState) {
             stopRecording();
             recordingState = false;
             return false;
