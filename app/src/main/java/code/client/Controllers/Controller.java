@@ -4,16 +4,13 @@ import code.client.Controllers.AudioRecorder;
 import code.client.View.View;
 import javafx.event.ActionEvent;
 
-/*
- * Modify t
- */
 public class Controller {
     private View view;
     private AudioRecorder audioRecorder;
 
     public Controller(View view) {
         this.view = view;
-        this.audioRecorder = new AudioRecorder(view.getRecordingLabel());
+        this.audioRecorder = new AudioRecorder();
 
         // recording buttons
         this.view.setStartButtonAction(this::handleStartButton);
