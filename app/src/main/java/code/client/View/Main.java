@@ -5,8 +5,8 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+// import javafx.scene.image.Image;
+// import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.layout.*;
@@ -19,108 +19,55 @@ import java.util.Comparator;
 
 import code.client.Model.Recipe;
 
-class ImageUploader {
-    public static void uploadImage(Stage primaryStage, ImageView imageView) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
-        File selectedFile = fileChooser.showOpenDialog(primaryStage);
-        if (selectedFile != null) {
-            Image image = new Image(selectedFile.toURI().toString());
-            imageView.setImage(image);
-        }
-    }
-}
-
 class RecipeUI extends HBox {
-    private ImageView recipeImage;
-    private Label index, nameLabel;
-    private GridPane recipeDetailsGrid;
-    private TextField nameField;
-    private Button selectButton, uploadButton;
-    private boolean selected;
+    private Label recipeIndex;
+    private Button deleteButton, detailsButton;
+    private String recipeName, recipeIngredients, recipeInstructions;
 
     RecipeUI() {
-        selected = false;
-
-        index = new Label();
-        index.setText("");
-        index.setPrefSize(30, 120);
-        index.setAlignment(Pos.CENTER);
-        index.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
-        this.getChildren().add(index);
-
-        recipeDetailsGrid = new GridPane();
-        recipeDetailsGrid.setPrefSize(350, 120);
-        recipeDetailsGrid.setAlignment(Pos.CENTER);
-        recipeDetailsGrid.setVgap(10);
-        recipeDetailsGrid.setHgap(10);
-        recipeDetailsGrid.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
-
-        uploadButton = new Button("Upload Image");
-        uploadButton.setPrefSize(100, 100);
-        uploadButton.setPrefHeight(Double.MAX_VALUE);
-        uploadButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
-        this.getChildren().add(uploadButton);
-
-        recipeImage = new ImageView();
-        recipeImage.setFitWidth(120);
-        recipeImage.setFitHeight(120);
-        File file = new File("src/default_recipe.jpg");
-        Image image = new Image(file.toURI().toString());
-        recipeImage.setImage(image);
-        this.getChildren().add(recipeImage);
-
-        nameLabel = new Label("Recipe Name:");
-        nameField = new TextField();
-        nameField.setPromptText("Name");
-        recipeDetailsGrid.add(nameLabel, 0, 0);
-        recipeDetailsGrid.add(nameField, 1, 0);
-
-        this.getChildren().add(recipeDetailsGrid);
-
-        selectButton = new Button("Select");
-        selectButton.setPrefSize(100, 120);
-        selectButton.setPrefHeight(Double.MAX_VALUE);
-        selectButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
-        this.getChildren().add(selectButton);
+        // Index of the recipe in the recipe list
+        recipeIndex = new Label();
+        recipeIndex.setPrefSize(30, 100);
+        recipeIndex.setAlignment(Pos.CENTER);
+        recipeIndex.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
+        // Button to enter detailed recipe display
+        detailsButton = new Button();
+        detailsButton.setPrefSize(570, 100);
+        detailsButton.setAlignment(Pos.CENTER_LEFT);
+        detailsButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
+        // Button to delete unwanted recipes from the recipe list
+        deleteButton = new Button("Delete");
+        deleteButton.setPrefSize(100, 100);
+        deleteButton.setAlignment(Pos.CENTER);
+        deleteButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
+        // Add all the elements to the recipe UI
+        this.getChildren().addAll(recipeIndex, detailsButton, deleteButton);
+        // Initialize the name, ingredients, and instructions to be empty strings
+        recipeName = recipeIngredients = recipeInstructions = "";
     }
 
     public void setRecipeIndex(int num) {
-        this.index.setText(num + "");
+        this.recipeIndex.setText(num + "");
     }
 
-    public Button getUploadButton() {
-        return this.uploadButton;
+    public Button getDetailsButton() {
+        return this.detailsButton;
     }
 
-    public ImageView getRecipeImage() {
-        return this.recipeImage;
+    public Button getDeleteButton() {
+        return this.deleteButton;
     }
 
-    public TextField getRecipeName() {
-        return this.nameField;
+    public String getRecipeName() {
+        return this.recipeName;
     }
 
-    public Button getSelectButton() {
-        return this.selectButton;
+    public String getRecipeIngredients() {
+        return this.recipeIngredients;
     }
 
-    public boolean isSelected() {
-        return this.selected;
-    }
-
-    public void toggleSelected() {
-        if (selected == false) {
-            selected = true;
-            for (int i = 0; i < this.getChildren().size(); i++) {
-                this.getChildren().get(i).setStyle("-fx-background-color: #9EBCE2; -fx-border-width: 0;");
-            }
-        } else {
-            selected = false;
-            for (int i = 0; i < this.getChildren().size(); i++) {
-                this.getChildren().get(i).setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
-            }
-        }
+    public String getRecipeInstructions() {
+        return this.recipeInstructions;
     }
 }
 
@@ -132,6 +79,9 @@ class RecipeList extends VBox {
         this.setStyle("-fx-background-color: #F0F8FF;");
     }
 
+    /*
+     * Update the indices of the recipes in the list whenever a new recipe is added or removed
+     */
     public void updateRecipeIndices() {
         int index = 1;
         for (int i = 0; i < this.getChildren().size(); i++) {
@@ -142,8 +92,11 @@ class RecipeList extends VBox {
         }
     }
 
-    public void removeSelectedRecipes() {
-        this.getChildren().removeIf(recipe -> recipe instanceof RecipeUI && ((RecipeUI) recipe).isSelected());
+    /*
+     * Remove a recipe from the recipe list whenever the delete button is clicked
+     */
+    public void removeRecipe(int index) {
+        this.getChildren().remove(index - 1);
         this.updateRecipeIndices();
     }
 
@@ -152,16 +105,15 @@ class RecipeList extends VBox {
             BufferedReader reader = new BufferedReader(new FileReader("recipes.csv"));
             String line;
             String[] recipeInfo;
-            reader.readLine();
+            reader.readLine(); // skip the line with the delimeter specifier
+            reader.readLine(); // skip the line with the csv column labels
             while ((line = reader.readLine()) != null) {
-                recipeInfo = line.split(", ");
+                recipeInfo = line.split("| ");
                 RecipeUI recipe = new RecipeUI();
-                recipe.getRecipeImage().setImage(new Image(new File("src/default_recipe.jpg").toURI().toString()));
-                recipe.getRecipeName().setText(recipeInfo[0]);
-                recipe.getUploadButton().setOnAction(e1 -> {
-                    ImageUploader.uploadImage(new Stage(), recipe.getRecipeImage());
-                });
-                recipe.getSelectButton().setOnAction(e2 -> {
+                recipe.getRecipeName() = recipeInfo[0];
+                recipe.getRecipeIngredients() = recipeInfo[1];
+                recipe.getRecipeInstructions() = recipeInfo[2];
+                recipe.getDeleteButton().setOnAction(e -> {
                     recipe.toggleSelected();
                 });
                 this.getChildren().add(recipe);
@@ -176,90 +128,47 @@ class RecipeList extends VBox {
     public void saveRecipes() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("recipes.csv"));
-            writer.write("Name, Ingredients, Instructions");
-            writer.newLine();
+            writer.write("sep=|\n");
+            writer.write("Recipe Name| Ingredients| Instructions\n");
             for (int i = 0; i < this.getChildren().size(); i++) {
-                writer.write(((RecipeUI) this.getChildren().get(i)).getRecipeName().getText() + ", ");
-                writer.newLine();
+                writer.write(((RecipeUI) this.getChildren().get(i)).getRecipeName() + "| ");
+                writer.write(((RecipeUI) this.getChildren().get(i)).getRecipeIngredients() + "| ");
+                writer.write(((RecipeUI) this.getChildren().get(i)).getRecipeInstructions() + "\n");
             }
             writer.close();
         } catch (IOException e) {
             System.out.println("Recipes could not be saved.");
         }
     }
-
-    public void sortRecipes() {
-        ArrayList<RecipeUI> recipes = new ArrayList<RecipeUI>();
-        RecipeUI copy;
-        for (int i = 0; i < this.getChildren().size(); i++) {
-            copy = new RecipeUI();
-            copy.getRecipeName().setText(((RecipeUI) this.getChildren().get(i)).getRecipeName().getText());
-            copy.getRecipeImage().setImage(((RecipeUI) this.getChildren().get(i)).getRecipeImage().getImage());
-            recipes.add(copy);
-        }
-
-        Collections.sort(recipes, new Comparator<RecipeUI>() {
-            @Override
-            public int compare(RecipeUI r1, RecipeUI r2) {
-                return r1.getRecipeName().getText().compareTo(r2.getRecipeName().getText());
-            }
-        });
-
-        for (int i = 0; i < this.getChildren().size(); i++) {
-            ((RecipeUI) this.getChildren().get(i)).getRecipeName().setText(recipes.get(i).getRecipeName().getText());
-            ((RecipeUI) this.getChildren().get(i)).getRecipeImage()
-                    .setImage(recipes.get(i).getRecipeImage().getImage());
-        }
-    }
 }
 
 class Footer extends HBox {
-    private Button addButton;
-    private Button deleteButton;
-    private Button loadButton;
-    private Button saveButton;
-    private Button sortButton;
+    // Buttons for creating a new recipe and saving the current recipe list
+    private Button newButton, saveButton;
 
     Footer() {
+        
         this.setPrefSize(700, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
         this.setSpacing(15);
 
         String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF; -fx-font-weight: bold; -fx-font: 11 arial;";
 
-        addButton = new Button("New Recipe");
-        addButton.setStyle(defaultButtonStyle);
-        deleteButton = new Button("Delete Selected");
-        deleteButton.setStyle(defaultButtonStyle);
-        loadButton = new Button("Load Recipes");
-        loadButton.setStyle(defaultButtonStyle);
+        newButton = new Button("New Recipe");
+        newButton.setStyle(defaultButtonStyle);
         saveButton = new Button("Save Recipes");
         saveButton.setStyle(defaultButtonStyle);
-        sortButton = new Button("Sort Recipes (By Name)");
-        sortButton.setStyle(defaultButtonStyle);
 
-        this.getChildren().addAll(addButton, deleteButton, loadButton, saveButton, sortButton);
+        this.getChildren().addAll(newButton, saveButton);
         this.setAlignment(Pos.CENTER);
     }
 
-    public Button getAddButton() {
-        return addButton;
-    }
-
-    public Button getDeleteButton() {
-        return deleteButton;
-    }
-
-    public Button getLoadButton() {
-        return loadButton;
+    public Button getNewButton() {
+        return newButton;
     }
 
     public Button getSaveButton() {
         return saveButton;
-    }
-
-    public Button getSortButton() {
-        return sortButton;
     }
 }
 
@@ -280,7 +189,7 @@ class AppFrame extends BorderPane implements IWindowUI {
     private Header header;
     private Footer footer;
     private RecipeList recipeList;
-    private Button addButton, deleteButton, loadButton, saveButton, selectButton, sortButton, uploadButton;
+    private Button deleteButton, newButton, recipeButton, saveButton;
     private ArrayList<IWindowUI> scenes;
     private Stage primaryStage;
 
@@ -297,11 +206,8 @@ class AppFrame extends BorderPane implements IWindowUI {
         this.setCenter(scroller);
         this.setBottom(footer);
 
-        addButton = footer.getAddButton();
-        deleteButton = footer.getDeleteButton();
-        loadButton = footer.getLoadButton();
+        newButton = footer.getNewButton();
         saveButton = footer.getSaveButton();
-        sortButton = footer.getSortButton();
 
         addListeners();
     }
@@ -323,19 +229,16 @@ class AppFrame extends BorderPane implements IWindowUI {
     }
 
     public void addListeners() {
-        addButton.setOnAction(e -> {
+        newButton.setOnAction(e -> {
             RecipeUI recipe = new RecipeUI();
             recipeList.getChildren().add(recipe);
 
-            uploadButton = recipe.getUploadButton();
-            uploadButton.setOnAction(e1 -> {
-                ImageUploader.uploadImage(new Stage(), recipe.getRecipeImage());
+            deleteButton = recipe.getDeleteButton();
+            deleteButton.setOnAction(e2 -> {
+                recipeList.toggleSelected();
             });
 
-            selectButton = recipe.getSelectButton();
-            selectButton.setOnAction(e2 -> {
-                recipe.toggleSelected();
-            });
+            recipeButton = recipe.getRe
 
             recipeList.updateRecipeIndices();
             primaryStage.setScene(scenes.get(1).getSceneWindow());

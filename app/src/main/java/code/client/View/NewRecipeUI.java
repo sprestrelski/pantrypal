@@ -2,6 +2,7 @@ package code.client.View;
 
 import code.client.Controllers.*;
 import code.client.Model.*;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import java.io.File;
 import java.io.IOException;
@@ -15,8 +16,11 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 // import javax.sound.sampled.*;
+
+
 
 class MealTypeSelection extends GridPane {
     private Label prompt;
@@ -33,17 +37,24 @@ class MealTypeSelection extends GridPane {
         File file = new File("app/src/main/java/code/client/View/microphone.png");
         microphone = new ImageView(new Image(file.toURI().toString()));
         // Set the size of the microphone image
-        microphone.setFitWidth(30);
-        microphone.setFitHeight(30);
+        microphone.setFitWidth(50);
+        microphone.setFitHeight(50);
+        microphone.setScaleX(1.5);
+        microphone.setScaleY(1.5);
         // Create a recording button
         recordButton = new Button();
         recordButton.setGraphic(microphone);
         // Set the user prompt for meal type selection
         prompt = new Label("Select Meal Type (Breakfast, Lunch, or Dinner)");
         prompt.setStyle("-fx-font-size: 16;");
+        prompt.setTextFill(Color.web("#ADD8E6"));
         // Set a textField for the meal type that was selected
         mealTypeField = new TextField();
         mealTypeField.setPromptText("Meal Type");
+        mealTypeField.setStyle("-fx-font-size: 16"); //CHANGE 1 (FONT)
+        mealTypeField.setPrefWidth(300);
+        mealTypeField.setPrefHeight(50);
+        
         // Add all of the elements to the MealTypeSelection
         this.add(recordButton, 0, 0);
         this.add(prompt, 1, 0);
@@ -75,17 +86,24 @@ class IngredientsList extends GridPane {
         File file = new File("app/src/main/java/code/client/View/microphone.png");
         microphone = new ImageView(new Image(file.toURI().toString()));
         // Set the size of the microphone image
-        microphone.setFitWidth(30);
-        microphone.setFitHeight(30);
+        microphone.setFitWidth(50);
+        microphone.setFitHeight(50);
+        microphone.setScaleX(1.5);
+        microphone.setScaleY(1.5);
         // Create a recording button
         recordButton = new Button();
         recordButton.setGraphic(microphone);
         // Set the user prompt for meal type selection
         prompt = new Label("Please List Your Ingredients");
         prompt.setStyle("-fx-font-size: 16;");
+        prompt.setTextFill(Color.web("#ADD8E6")); //CHANGE 2 (COLOR)
         // Set a textField for the meal type that was selected
         ingredientsField = new TextField();
         ingredientsField.setPromptText("Ingredients");
+        ingredientsField.setStyle("-fx-font-size: 16"); //change
+        ingredientsField.setPrefWidth(300); // CHANGE 3 (WIDTH OF PROMPT)
+        ingredientsField.setPrefHeight(50); // CHANGE
+        
         // Add all of the elements to the MealTypeSelection
         this.add(recordButton, 0, 0);
         this.add(prompt, 1, 0);
@@ -109,6 +127,10 @@ class GPTRecipe extends GridPane {
         this.setVgap(20);
         recipeLabel = new Label("Here Is Your Recipe");
         recipeField = new TextField();
+        recipeField.setPrefWidth(500); // change
+        recipeField.setPrefHeight(200); // change
+        recipeLabel.setStyle("-fx-font-size: 16"); // change
+        recipeLabel.setTextFill(Color.web("#ADD8E6")); // change
         this.add(recipeLabel, 0, 0);
         this.add(recipeField, 0, 1);
     }
@@ -149,6 +171,14 @@ class AppFrameMic extends BorderPane {
     private Stage primaryStage;
 
     AppFrameMic() {
+        Button backButton = new Button("Back");
+        // backButton.setOnAction(e -> goBack());
+        HBox backButtonContainer = new HBox(backButton);
+        backButtonContainer.setPadding(new Insets(10)); // padding
+
+        // Set the top of the BorderPane to contain the back button
+        this.setTop(backButtonContainer);
+        
         header = new Header();
         mealTypeSelection = new MealTypeSelection();
         ingredientsList = new IngredientsList();
