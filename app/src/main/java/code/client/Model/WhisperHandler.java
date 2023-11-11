@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import org.json.JSONObject;
 import org.json.JSONException;
 
@@ -23,7 +21,6 @@ public class WhisperHandler {
         this.API_ENDPOINT = API_ENDPOINT;
         this.TOKEN = TOKEN;
         this.MODEL = MODEL;
-        this.connection = sendHttpRequest();
     }
 
     public WhisperHandler(String API_ENDPOINT, String TOKEN, String MODEL, CustomHttpConnection connection) {
@@ -52,11 +49,13 @@ public class WhisperHandler {
         return response;
     }
 
+    public void setHttpConnection(CustomHttpConnection connection) {
+        this.connection = connection;
+    }
+
     public CustomHttpConnection sendHttpRequest() throws IOException, URISyntaxException {
         // Set up request headers
         File file = new File("recording.wav");
-        CustomHttpConnection connection = new RealHttpConnection(API_ENDPOINT);
-
         String boundary = "Boundary-" + System.currentTimeMillis();
         connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
         connection.setRequestProperty("Authorization", "Bearer " + TOKEN);
@@ -66,7 +65,7 @@ public class WhisperHandler {
 
         // Set up output stream to write request body
         OutputStream outputStream = connection.getOutputStream();
-
+        System.out.println(outputStream);
         // Write model parameter to request body
         writeParameterToOutputStream(outputStream, "model", MODEL, boundary);
 
@@ -129,7 +128,6 @@ public class WhisperHandler {
             response.append(inputLine);
         }
         in.close();
-
         JSONObject responseJson = new JSONObject(response.toString());
 
         String generatedText = responseJson.getString("text");

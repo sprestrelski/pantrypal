@@ -193,7 +193,7 @@ class AppFrameMic extends BorderPane {
 
     public void addListeners() throws IOException, URISyntaxException {
 
-        AudioRecorder recorder = new AudioRecorder(new Label("Recording..."));
+        AudioRecorder recorder = new AudioRecorder();
         WhisperHandler audioProcessor = new WhisperHandler(API_ENDPOINT, TOKEN, MODEL);
 
         recordButton1.setOnAction(e -> {
@@ -206,6 +206,8 @@ class AppFrameMic extends BorderPane {
                 recorder.stopRecording();
                 recording = false;
                 try {
+                    audioProcessor.setHttpConnection(new RealHttpConnection(API_ENDPOINT));
+                    audioProcessor.sendHttpRequest();
                     mealType = audioProcessor.processAudio();
                 } catch (IOException | URISyntaxException e2) {
                     e2.printStackTrace();
@@ -224,6 +226,8 @@ class AppFrameMic extends BorderPane {
                 recorder.stopRecording();
                 recording = false;
                 try {
+                    audioProcessor.setHttpConnection(new RealHttpConnection(API_ENDPOINT));
+                    audioProcessor.sendHttpRequest();
                     ingredients = audioProcessor.processAudio();
                 } catch (IOException | URISyntaxException e2) {
                     e2.printStackTrace();
