@@ -12,6 +12,7 @@ public class RecipeDetailsUI extends HBox {
     private final TextField titleTextField;
     private final TextArea ingredientTextArea;
     private final TextArea instructionTextArea;
+    private Recipe recipe;
 
     public RecipeDetailsUI(Recipe recipe) {
         titleTextField = new TextField();
@@ -19,6 +20,7 @@ public class RecipeDetailsUI extends HBox {
         instructionTextArea = new TextArea();
 
         titleTextField.setText(recipe.getTitle());
+        this.recipe = recipe;
 
         StringBuilder ingredientBuilder = new StringBuilder();
         Iterator<String> ingredientIterator = recipe.getIngredientIterator();
@@ -41,5 +43,9 @@ public class RecipeDetailsUI extends HBox {
 
     public TextField getTitleField() {
         return titleTextField;
+    }
+
+    public Recipe getRecipe() {
+        return this.recipe;
     }
 }

@@ -12,6 +12,8 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import java.io.*;
+import java.net.URISyntaxException;
+
 import javafx.geometry.Pos;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +40,7 @@ class RecipeUI extends HBox {
     private TextField nameField;
     private Button selectButton, uploadButton;
     private boolean selected;
+    private Recipe recipe;
 
     RecipeUI() {
         selected = false;
@@ -78,7 +81,8 @@ class RecipeUI extends HBox {
 
         this.getChildren().add(recipeDetailsGrid);
 
-        selectButton = new Button("Select");
+        // selectButton = new Button("Select");
+        selectButton = new Button("Delete2");
         selectButton.setPrefSize(100, 120);
         selectButton.setPrefHeight(Double.MAX_VALUE);
         selectButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
@@ -87,6 +91,11 @@ class RecipeUI extends HBox {
 
     public void setRecipeIndex(int num) {
         this.index.setText(num + "");
+    }
+
+    public void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
+        this.nameField.setText(recipe.getTitle());
     }
 
     public Button getUploadButton() {
@@ -109,6 +118,7 @@ class RecipeUI extends HBox {
         return this.selected;
     }
 
+    // change to delete, not needed
     public void toggleSelected() {
         if (selected == false) {
             selected = true;
@@ -142,9 +152,18 @@ class RecipeList extends VBox {
         }
     }
 
+    // public void removeSelectedRecipes() {
+    // this.getChildren().removeIf(recipe -> recipe instanceof RecipeUI &&
+    // ((RecipeUI) recipe).isSelected());
+    // this.updateRecipeIndices();
+    // }
     public void removeSelectedRecipes() {
-        this.getChildren().removeIf(recipe -> recipe instanceof RecipeUI && ((RecipeUI) recipe).isSelected());
+        // this.getChildren().removeIf(recipe -> recipe instanceof RecipeUI &&
+        // ((RecipeUI) recipe).isSelected());
+        this.getChildren().removeIf(recipe -> recipe instanceof RecipeUI);
+
         this.updateRecipeIndices();
+
     }
 
     public void loadRecipes() {
@@ -227,7 +246,7 @@ class Footer extends HBox {
 
         String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF; -fx-font-weight: bold; -fx-font: 11 arial;";
 
-        addButton = new Button("New Recipe");
+        addButton = new Button("New Recipe"); // Creating a new recipe.
         addButton.setStyle(defaultButtonStyle);
         deleteButton = new Button("Delete Selected");
         deleteButton.setStyle(defaultButtonStyle);
@@ -276,13 +295,13 @@ class Header extends HBox {
     }
 }
 
-class AppFrame extends BorderPane implements IWindowUI {
+class AppFrame extends BorderPane {
     private Header header;
     private Footer footer;
     private RecipeList recipeList;
     private Button addButton, deleteButton, loadButton, saveButton, selectButton, sortButton, uploadButton;
     private ArrayList<IWindowUI> scenes;
-    private Stage primaryStage;
+    private Scene mainScene;
 
     AppFrame() {
         header = new Header();
@@ -302,24 +321,7 @@ class AppFrame extends BorderPane implements IWindowUI {
         loadButton = footer.getLoadButton();
         saveButton = footer.getSaveButton();
         sortButton = footer.getSortButton();
-
         addListeners();
-    }
-
-    public Scene getSceneWindow() {
-        return new Scene(this, 700, 600);
-    }
-
-    /**
-     * This method provides the UI holder with the different scenes that can be
-     * switched between.
-     * 
-     * @param primaryStage - Main stage that has the window
-     * @param scenes       - list of different scenes to switch between.
-     */
-    public void setScenes(Stage primaryStage, ArrayList<IWindowUI> scenes) {
-        this.scenes = scenes;
-        this.primaryStage = primaryStage;
     }
 
     public void addListeners() {
@@ -333,12 +335,32 @@ class AppFrame extends BorderPane implements IWindowUI {
             });
 
             selectButton = recipe.getSelectButton();
+            // selectButton.setOnAction(e2 -> {
+            // recipe.toggleSelected();
+            // });
             selectButton.setOnAction(e2 -> {
-                recipe.toggleSelected();
+                recipeList.removeSelectedRecipes();
             });
 
             recipeList.updateRecipeIndices();
-            primaryStage.setScene(scenes.get(1).getSceneWindow());
+            NewRecipeUI audioPrompt;
+
+            /*
+             * Create a new audio prompting window each time.
+             */
+            try {
+                audioPrompt = new NewRecipeUI(); // (NewRecipeUI) scenes.get(1);
+                audioPrompt.storeNewRecipeUI(recipeList, recipe);
+
+                scenes.set(1, audioPrompt);
+                audioPrompt.setScenes(scenes);
+
+                audioPrompt.setRoot(mainScene);
+
+            } catch (Exception e3) {
+                e3.printStackTrace();
+            }
+
         });
 
         deleteButton.setOnAction(e -> {
@@ -357,14 +379,64 @@ class AppFrame extends BorderPane implements IWindowUI {
             recipeList.sortRecipes();
         });
     }
+
+    /**
+     * This method provides the UI holder with the different scenes that can be
+     * switched between.
+     * 
+     * @param scenes - list of different scenes to switch between.
+     */
+    public void setScenes(ArrayList<IWindowUI> scenes) {
+        this.scenes = scenes;
+    }
+
+    public AppFrame getRoot() {
+        return this;
+    }
+
+    public void setMain(Scene main) {
+        mainScene = main;
+    }
+}
+
+class HomeScreen implements IWindowUI {
+    private AppFrame home;
+    Scene holder;
+
+    HomeScreen() {
+        home = new AppFrame();
+        holder = new Scene(home, 700, 600);
+    }
+
+    public Scene getSceneWindow() {
+        return holder;
+    }
+
+    /**
+     * This method provides the UI holder with the different scenes that can be
+     * switched between.
+     * 
+     * @param scenes - list of different scenes to switch between.
+     */
+    public void setScenes(ArrayList<IWindowUI> scenes) {
+        home.setScenes(scenes);
+    }
+
+    @Override
+    public void setRoot(Scene scene) {
+        scene.setRoot(home);
+        home.setMain(scene);
+    }
+
 }
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        AppFrame home = new AppFrame();
+        // AppFrame home = new AppFrame();
         // Scene home = new Scene(root, 700, 600);
+        HomeScreen home = new HomeScreen();
 
         NewRecipeUI audioCapture = new NewRecipeUI();
         // Scene speaking = audioCapture.getScene();
@@ -373,17 +445,23 @@ public class Main extends Application {
         // Scene details = chatGPTed.getScene();
 
         ArrayList<IWindowUI> scenes = new ArrayList<IWindowUI>();
+
         scenes.add(home);
         scenes.add(audioCapture);
         scenes.add(details);
         details.setRecipeHolder(new RecipeDetailsUI(new Recipe("2", "Testing")));
         // Can create observer, subject interface here
-        home.setScenes(primaryStage, scenes);
-        audioCapture.setScenes(primaryStage, scenes);
-        details.setScenes(primaryStage, scenes);
+        home.setScenes(scenes);
+        audioCapture.setScenes(scenes);
+        details.setScenes(scenes);
 
         primaryStage.setTitle("Recipe Management App");
-        primaryStage.setScene(home.getSceneWindow());
+        // primaryStage.setScene(home.getSceneWindow());
+
+        Scene main = home.getSceneWindow();
+        home.setRoot(main);
+
+        primaryStage.setScene(main);
         primaryStage.setResizable(false);
         primaryStage.show();
     }
