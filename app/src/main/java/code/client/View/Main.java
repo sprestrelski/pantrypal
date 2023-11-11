@@ -350,7 +350,7 @@ class AppFrame extends BorderPane {
              */
             try {
                 audioPrompt = new NewRecipeUI(); // (NewRecipeUI) scenes.get(1);
-                audioPrompt.storeNewRecipeUI(recipe);
+                audioPrompt.storeNewRecipeUI(recipeList, recipe);
 
                 scenes.set(1, audioPrompt);
                 audioPrompt.setScenes(scenes);

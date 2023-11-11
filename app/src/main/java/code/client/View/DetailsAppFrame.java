@@ -101,7 +101,7 @@ public class DetailsAppFrame implements IWindowUI {
         VBox setupContainer = new VBox();
         setupContainer.setSpacing(10);
 
-        RecipeDetailsUI details = getMockedRecipe(); // currentRecipe;
+        RecipeDetailsUI details = currentRecipe;// getMockedRecipe();
         recipeUI.setRecipe(details.getRecipe()); // Adds recipe details from chatGPT to the main UI window
 
         TextField title = details.getTitleField();
