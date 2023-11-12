@@ -152,7 +152,6 @@ public class DetailsAppFrame implements IWindowUI {
         title.setAlignment(Pos.CENTER);
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
         detailedUI.getChildren().addAll(backToHomeButton, title);
-
         setupContainer.getChildren().add(details);
         detailedUI.getChildren().addAll(setupContainer, saveButton, editButton);
     }
@@ -161,12 +160,14 @@ public class DetailsAppFrame implements IWindowUI {
     public void setRoot(Scene scene) {
 
         // used for testing
-        currentRecipe = getMockedRecipe();
-        RecipeDetailsUI details = getMockedRecipe();
+        /*
+         * currentRecipe = getMockedRecipe();
+         * RecipeDetailsUI details = getMockedRecipe();
+         */
         // used for testing
 
         // Actual code
-        // RecipeDetailsUI details = currentRecipe;
+        RecipeDetailsUI details = currentRecipe;
 
         displayUpdate(details);
         // Changes the User Screen

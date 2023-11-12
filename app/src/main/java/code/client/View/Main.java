@@ -5,11 +5,14 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import java.io.*;
+import java.net.URISyntaxException;
+
 import javafx.geometry.Pos;
 import java.util.ArrayList;
 import java.util.Collections;

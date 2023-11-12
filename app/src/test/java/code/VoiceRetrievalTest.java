@@ -1,55 +1,56 @@
 package code;
 
-import javafx.scene.control.Label;
-
 import java.io.*;
+import java.net.URISyntaxException;
+
 import org.junit.jupiter.api.Test;
 
-import code.client.Controllers.AudioRecorder;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import javafx.application.Platform;
+import code.client.Model.CustomHttpConnection;
+import code.client.Model.WhisperHandler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * Work In Progress Voice Retrieval Unit Test
- */
 public class VoiceRetrievalTest {
-    private AudioRecorder audioRecorder;
-    private Label recordingLabel;
 
-    @BeforeAll
-    static void initJfxRuntime() {
-        Platform.startup(() -> {
-        });
+    /*
+     * Integration Tests
+     */
+    @Test
+    void testSuccessfulProcessAudio() throws IOException, URISyntaxException {
+        CustomHttpConnection connection = new MockHttpConnection(200,
+                new ByteArrayInputStream("{\"text\":\"Breakfast.\"}".getBytes()), new ByteArrayOutputStream());
+        WhisperHandler audioProcessor = new WhisperHandler("API_ENDPOINT", "TOKEN", "MODEL", connection);
+        String response = audioProcessor.processAudio();
+        assertEquals("Breakfast.", response);
+
+        audioProcessor.setHttpConnection(new MockHttpConnection(200,
+                new ByteArrayInputStream("{\"text\":\"Chicken, cheese.\"}".getBytes()), null));
+        response = audioProcessor.processAudio();
+        assertEquals("Chicken, cheese.", response);
+
     }
 
-    @BeforeEach
-    void setUp() {
-        recordingLabel = new Label("Recording");
-        audioRecorder = new AudioRecorder(recordingLabel);
+    @Test
+    void testFailedProcessAudio() throws IOException, URISyntaxException {
+        CustomHttpConnection connection = new MockHttpConnection(404,
+                new ByteArrayInputStream("Error text".getBytes()),
+                null);
+        WhisperHandler audioProcessor = new WhisperHandler("API_ENDPOINT", "TOKEN", "MODEL", connection);
+        String response = audioProcessor.processAudio();
+        assertEquals("Error text", response);
     }
 
-    void testAudioSave() throws InterruptedException {
-        audioRecorder.startRecording();
-        Thread.sleep(1000);
-        audioRecorder.stopRecording();
-        File file = new File("recording.wav");
-        assertTrue(file.exists());
-    }
+    /*
+     * Unit tests
+     */
+    @Test
+    void testMockHttpCreation() throws IOException {
+        CustomHttpConnection connection = new MockHttpConnection(200, new ByteArrayInputStream("hello".getBytes()),
+                null);
+        int responseCode = connection.getResponseCode();
+        assertEquals(responseCode, 200);
+        assertEquals(connection.getInputStream(), connection.getErrorStream());
 
-    void testLabelChanges() throws InterruptedException {
-        audioRecorder.startRecording();
-        assertTrue(recordingLabel.isVisible());
-        Thread.sleep(1000);
-
-        audioRecorder.stopRecording();
-        assertFalse(recordingLabel.isVisible());
     }
 
 }
