@@ -3,21 +3,25 @@ package code.client.View;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 
 import java.util.Iterator;
 
 import code.client.Model.Recipe;
 
 public class RecipeDetailsUI extends HBox {
-    private final TextField titleTextField;
-    private final TextArea ingredientTextArea;
-    private final TextArea instructionTextArea;
+    private TextField titleTextField;
+    private TextArea ingredientTextArea;
+    private TextArea instructionTextArea;
     private Recipe recipe;
 
     public RecipeDetailsUI(Recipe recipe) {
         titleTextField = new TextField();
         ingredientTextArea = new TextArea();
         instructionTextArea = new TextArea();
+        titleTextField.setEditable(false);
+        ingredientTextArea.setEditable(false);
+        instructionTextArea.setEditable(false);
 
         titleTextField.setText(recipe.getTitle());
         this.recipe = recipe;
@@ -43,6 +47,12 @@ public class RecipeDetailsUI extends HBox {
 
     public TextField getTitleField() {
         return titleTextField;
+    }
+
+    public void setEditable(boolean status) {
+        titleTextField.setEditable(status);
+        ingredientTextArea.setEditable(status);
+        instructionTextArea.setEditable(status);
     }
 
     public Recipe getRecipe() {

@@ -1,6 +1,7 @@
 package code.client.Model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,6 +22,22 @@ public class Recipe {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getAllIngredients() {
+        return String.join(";;", ingredientList);
+    }
+
+    public String getAllInstructions() {
+        return String.join(";;", instructionList);
+    }
+
+    public void setAllIngredients(String ingredients) {
+        ingredientList.addAll(Arrays.asList(ingredients.split(";;")));
+    }
+
+    public void setAllInstructions(String instructions) {
+        instructionList.addAll(Arrays.asList(instructions.split(";;")));
     }
 
     public void addIngredient(String ingredient) {
