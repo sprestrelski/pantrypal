@@ -3,11 +3,13 @@ package code.client.View;
 import java.util.ArrayList;
 
 import code.client.Model.Recipe;
+import javafx.animation.PauseTransition;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 public class DetailsAppFrame implements IWindowUI {
     private ArrayList<IWindowUI> scenes;
@@ -90,16 +92,19 @@ public class DetailsAppFrame implements IWindowUI {
         saveButton.setOnAction(e -> {
             // Takes the values of the provided recipe and applying it to the updated
             // textfield recipes.
-            /*
-             * Recipe providedRecipe = currentRecipe.getRecipe();
-             * Recipe current = new Recipe("0", currentRecipe.getTitleField().getText());
-             * current.setAllIngredients(providedRecipe.getAllIngredients());
-             * current.setAllInstructions(providedRecipe.getAllInstructions());
-             * 
-             * recipeUI.setRecipe(current);
-             * list.saveRecipes();
-             */
-            System.out.println("Saved: " + currentRecipe.getTitleField().getText());
+            saveButton.setStyle("-fx-background-color: #00FFFF; -fx-border-width: 0;");
+            Recipe providedRecipe = currentRecipe.getRecipe();
+            Recipe current = new Recipe("0", currentRecipe.getTitleField().getText());
+            current.setAllIngredients(providedRecipe.getAllIngredients());
+            current.setAllInstructions(providedRecipe.getAllInstructions());
+
+            recipeUI.setRecipe(current);
+            list.saveRecipes();
+
+            PauseTransition pause = new PauseTransition(Duration.seconds(1));
+            pause.setOnFinished(f -> saveButton.setStyle(defaultButtonStyle));
+            pause.play();
+            // System.out.println("Saved: " + currentRecipe.getTitleField().getText());
         });
 
         editButton.setOnAction(e -> {

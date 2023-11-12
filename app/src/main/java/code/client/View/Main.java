@@ -109,42 +109,6 @@ class RecipeList extends VBox {
     }
 
     /*
-     * Load recipes from a file called "recipes.csv"
-     */
-    public void loadRecipes() {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("recipes.csv"));
-            String line;
-            String[] recipeInfo;
-            reader.readLine(); // skip the line with the delimeter specifier
-            reader.readLine(); // skip the line with the csv column labels
-            int counter = 0;
-            while ((line = reader.readLine()) != null) {
-                System.out.println("Line: " + line);
-                RecipeUI recipe = new RecipeUI();
-                recipeInfo = line.split("| ");
-                recipe.getDeleteButton().setOnAction(e -> {
-                    this.removeRecipe(recipe.getRecipeIndex());
-                });
-                System.out.println("Size: " + recipeInfo.length + "Title: " + recipeInfo[0]);
-                System.out.println("Ingredients: " + recipeInfo[1]);
-                System.out.println("Instructions: " + recipeInfo[2]);
-                // TODO recreate Recipe using delimiters of "\n". Done ? need to test
-                Recipe temp = new Recipe(Integer.toString(counter), recipeInfo[0]);
-                temp.setAllIngredients(recipeInfo[1]);
-                temp.setAllInstructions(recipeInfo[2]);
-                recipe.setRecipe(temp);
-                this.getChildren().add(recipe);
-                counter++;
-            }
-            reader.close();
-        } catch (IOException e) {
-            System.out.println("Recipes could not be loaded.");
-        }
-        this.updateRecipeIndices();
-    }
-
-    /*
      * Save recipes to a file called "recipes.csv"
      */
     public void saveRecipes() {
@@ -162,6 +126,7 @@ class RecipeList extends VBox {
             System.out.println("Recipes could not be saved.");
         }
     }
+
 }
 
 class Footer extends HBox {
@@ -212,7 +177,7 @@ class AppFrame extends BorderPane {
     AppFrame() {
         header = new Header();
         recipeList = new RecipeList();
-        recipeList.loadRecipes();
+        loadRecipes();
         footer = new Footer();
 
         ScrollPane scroller = new ScrollPane(recipeList);
@@ -225,14 +190,70 @@ class AppFrame extends BorderPane {
 
         newButton = footer.getNewButton();
 
-        addListeners();
+        addListeners(null);
     }
 
     public Scene getSceneWindow() {
         return new Scene(this, 700, 600);
     }
 
-    public void addListeners() {
+    /*
+     * Load recipes from a file called "recipes.csv"
+     */
+    public void loadRecipes() {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("recipes.csv"));
+            String line;
+            String[] recipeInfo;
+            reader.readLine(); // skip the line with the delimeter specifier
+            reader.readLine(); // skip the line with the csv column labels
+            int counter = 0;
+            while ((line = reader.readLine()) != null) {
+                // System.out.println("Line: " + line);
+                RecipeUI recipe = new RecipeUI();
+                recipeInfo = line.split("\\| ");
+                /*
+                 * System.out.println("Size: " + recipeInfo.length + "Title: " + recipeInfo[0]);
+                 * System.out.println("Ingredients: " + recipeInfo[1]);
+                 * System.out.println("Instructions: " + recipeInfo[2]);
+                 */
+                // TODO recreate Recipe using delimiters of ";;". Done ? need to test
+                Recipe temp = new Recipe(Integer.toString(counter), recipeInfo[0]);
+                temp.setAllIngredients(recipeInfo[1]);
+                temp.setAllInstructions(recipeInfo[2]);
+                recipe.setRecipe(temp);
+                recipeList.getChildren().add(recipe);
+                addListeners(recipe);
+                counter++;
+            }
+            reader.close();
+        } catch (IOException e) {
+            System.out.println("Recipes could not be loaded.");
+        }
+        recipeList.updateRecipeIndices();
+    }
+
+    public void addListeners(RecipeUI savedRecipe) {
+        if (savedRecipe != null) {
+            detailsButton = savedRecipe.getDetailsButton();
+            detailsButton.setOnAction(read -> {
+                // TODO: Add a way to switch to detailed recipe view
+
+                DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
+
+                details.setRecipeHolder(new RecipeDetailsUI(savedRecipe.getRecipe())); // should have RecipeDetailsUI
+                details.storeNewRecipeUI(recipeList, savedRecipe);
+
+                details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
+
+            });
+
+            deleteButton = savedRecipe.getDeleteButton();
+            deleteButton.setOnAction(delete -> {
+                recipeList.getChildren().remove(savedRecipe);
+            });
+            return;
+        }
         newButton.setOnAction(create -> {
             RecipeUI recipe = new RecipeUI();
             recipeList.getChildren().add(0, recipe);
@@ -252,7 +273,7 @@ class AppFrame extends BorderPane {
 
             deleteButton = recipe.getDeleteButton();
             deleteButton.setOnAction(delete -> {
-                recipeList.removeRecipe(recipe.getRecipeIndex());
+                recipeList.getChildren().remove(recipe);
             });
 
             recipeList.updateRecipeIndices();
@@ -343,7 +364,7 @@ public class Main extends Application {
         scenes.add(home);
         scenes.add(audioCapture);
         scenes.add(details);
-        details.setRecipeHolder(new RecipeDetailsUI(new Recipe("2", "Testing")));
+        // details.setRecipeHolder(new RecipeDetailsUI(new Recipe("2", "Testing")));
         // Can create observer, subject interface here
         home.setScenes(scenes);
         audioCapture.setScenes(scenes);
