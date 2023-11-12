@@ -5,8 +5,6 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-// import javafx.scene.image.Image;
-// import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.layout.*;
@@ -22,7 +20,7 @@ import code.client.Model.Recipe;
 class RecipeUI extends HBox {
     private Label recipeIndex;
     private Button deleteButton, detailsButton;
-    private String recipeName, recipeIngredients, recipeInstructions;
+    private Recipe recipe;
 
     RecipeUI() {
         // Index of the recipe in the recipe list
@@ -42,12 +40,23 @@ class RecipeUI extends HBox {
         deleteButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
         // Add all the elements to the recipe UI
         this.getChildren().addAll(recipeIndex, detailsButton, deleteButton);
-        // Initialize the name, ingredients, and instructions to be empty strings
-        recipeName = recipeIngredients = recipeInstructions = "";
+    }
+
+    public Recipe getRecipe() {
+        return this.recipe;
+    }
+
+    public void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
+        this.detailsButton.setText(recipe.getTitle());
+    }
+
+    public int getRecipeIndex() {
+        return Integer.parseInt(this.recipeIndex.getText());
     }
 
     public void setRecipeIndex(int num) {
-        this.recipeIndex.setText(num + "");
+        this.recipeIndex.setText(Integer.toString(num));
     }
 
     public Button getDetailsButton() {
@@ -59,15 +68,15 @@ class RecipeUI extends HBox {
     }
 
     public String getRecipeName() {
-        return this.recipeName;
+        return this.recipe.getTitle();
     }
 
     public String getRecipeIngredients() {
-        return this.recipeIngredients;
+        return this.recipe.getAllIngredients();
     }
 
     public String getRecipeInstructions() {
-        return this.recipeInstructions;
+        return this.recipe.getAllInstructions();
     }
 }
 
@@ -80,14 +89,13 @@ class RecipeList extends VBox {
     }
 
     /*
-     * Update the indices of the recipes in the list whenever a new recipe is added or removed
+     * Update the indices of the recipes in the list whenever a new recipe is added
+     * or removed
      */
     public void updateRecipeIndices() {
-        int index = 1;
         for (int i = 0; i < this.getChildren().size(); i++) {
             if (this.getChildren().get(i) instanceof RecipeUI) {
-                ((RecipeUI) this.getChildren().get(i)).setRecipeIndex(index);
-                index++;
+                ((RecipeUI) this.getChildren().get(i)).setRecipeIndex(i + 1);
             }
         }
     }
@@ -100,6 +108,9 @@ class RecipeList extends VBox {
         this.updateRecipeIndices();
     }
 
+    /*
+     * Load recipes from a file called "recipes.csv"
+     */
     public void loadRecipes() {
         try {
             BufferedReader reader = new BufferedReader(new FileReader("recipes.csv"));
@@ -107,16 +118,20 @@ class RecipeList extends VBox {
             String[] recipeInfo;
             reader.readLine(); // skip the line with the delimeter specifier
             reader.readLine(); // skip the line with the csv column labels
+            int counter = 0;
             while ((line = reader.readLine()) != null) {
-                recipeInfo = line.split("| ");
                 RecipeUI recipe = new RecipeUI();
-                recipe.getRecipeName() = recipeInfo[0];
-                recipe.getRecipeIngredients() = recipeInfo[1];
-                recipe.getRecipeInstructions() = recipeInfo[2];
+                recipeInfo = line.split("| ");
                 recipe.getDeleteButton().setOnAction(e -> {
-                    recipe.toggleSelected();
+                    this.removeRecipe(recipe.getRecipeIndex());
                 });
+                // TODO recreate Recipe using delimiters of "\n". Done ? need to test
+                Recipe temp = new Recipe(Integer.toString(counter), recipeInfo[0]);
+                temp.setAllIngredients(recipeInfo[1]);
+                temp.setAllInstructions(recipeInfo[2]);
+                recipe.setRecipe(temp);
                 this.getChildren().add(recipe);
+                counter++;
             }
             reader.close();
         } catch (IOException e) {
@@ -125,11 +140,14 @@ class RecipeList extends VBox {
         this.updateRecipeIndices();
     }
 
+    /*
+     * Save recipes to a file called "recipes.csv"
+     */
     public void saveRecipes() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("recipes.csv"));
-            writer.write("sep=|\n");
-            writer.write("Recipe Name| Ingredients| Instructions\n");
+            writer.write("sep=|\n"); // use "|" as a delimeter for the csv files
+            writer.write("Recipe Name| Ingredients| Instructions\n"); // add labels for the columns of the csv file
             for (int i = 0; i < this.getChildren().size(); i++) {
                 writer.write(((RecipeUI) this.getChildren().get(i)).getRecipeName() + "| ");
                 writer.write(((RecipeUI) this.getChildren().get(i)).getRecipeIngredients() + "| ");
@@ -143,11 +161,11 @@ class RecipeList extends VBox {
 }
 
 class Footer extends HBox {
-    // Buttons for creating a new recipe and saving the current recipe list
-    private Button newButton, saveButton;
+    // Button for creating a new recipe
+    private Button newButton;
 
     Footer() {
-        
+
         this.setPrefSize(700, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
         this.setSpacing(15);
@@ -156,19 +174,13 @@ class Footer extends HBox {
 
         newButton = new Button("New Recipe");
         newButton.setStyle(defaultButtonStyle);
-        saveButton = new Button("Save Recipes");
-        saveButton.setStyle(defaultButtonStyle);
 
-        this.getChildren().addAll(newButton, saveButton);
+        this.getChildren().addAll(newButton);
         this.setAlignment(Pos.CENTER);
     }
 
     public Button getNewButton() {
-        return newButton;
-    }
-
-    public Button getSaveButton() {
-        return saveButton;
+        return this.newButton;
     }
 }
 
@@ -185,13 +197,13 @@ class Header extends HBox {
     }
 }
 
-class AppFrame extends BorderPane implements IWindowUI {
+class AppFrame extends BorderPane {
     private Header header;
     private Footer footer;
     private RecipeList recipeList;
-    private Button deleteButton, newButton, recipeButton, saveButton;
+    private Button deleteButton, detailsButton, newButton;
     private ArrayList<IWindowUI> scenes;
-    private Stage primaryStage;
+    private Scene mainScene;
 
     AppFrame() {
         header = new Header();
@@ -207,7 +219,6 @@ class AppFrame extends BorderPane implements IWindowUI {
         this.setBottom(footer);
 
         newButton = footer.getNewButton();
-        saveButton = footer.getSaveButton();
 
         addListeners();
     }
@@ -216,58 +227,105 @@ class AppFrame extends BorderPane implements IWindowUI {
         return new Scene(this, 700, 600);
     }
 
+    public void addListeners() {
+        newButton.setOnAction(create -> {
+            RecipeUI recipe = new RecipeUI();
+            recipeList.getChildren().add(0, recipe);
+
+            detailsButton = recipe.getDetailsButton();
+            detailsButton.setOnAction(read -> {
+                // TODO: Add a way to switch to detailed recipe view
+
+                DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
+
+                details.setRecipeHolder(new RecipeDetailsUI(recipe.getRecipe())); // should have RecipeDetailsUI
+                details.storeNewRecipeUI(recipeList, recipe);
+
+                details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
+
+            });
+
+            deleteButton = recipe.getDeleteButton();
+            deleteButton.setOnAction(delete -> {
+                recipeList.removeRecipe(recipe.getRecipeIndex());
+            });
+
+            recipeList.updateRecipeIndices();
+            // TODO SCENE TRANSITION HERE
+            NewRecipeUI audioPrompt;
+            /*
+             * Create a new audio prompting window each time.
+             */
+            try {
+                audioPrompt = new NewRecipeUI(); // (NewRecipeUI) scenes.get(1);
+                audioPrompt.storeNewRecipeUI(recipeList, recipe);
+
+                scenes.set(1, audioPrompt);
+                audioPrompt.setScenes(scenes);
+
+                audioPrompt.setRoot(mainScene);
+
+            } catch (Exception e3) {
+                e3.printStackTrace();
+            }
+        });
+    }
+
     /**
      * This method provides the UI holder with the different scenes that can be
      * switched between.
      * 
-     * @param primaryStage - Main stage that has the window
-     * @param scenes       - list of different scenes to switch between.
+     * @param scenes - list of different scenes to switch between.
      */
-    public void setScenes(Stage primaryStage, ArrayList<IWindowUI> scenes) {
+    public void setScenes(ArrayList<IWindowUI> scenes) {
         this.scenes = scenes;
-        this.primaryStage = primaryStage;
     }
 
-    public void addListeners() {
-        newButton.setOnAction(e -> {
-            RecipeUI recipe = new RecipeUI();
-            recipeList.getChildren().add(recipe);
-
-            deleteButton = recipe.getDeleteButton();
-            deleteButton.setOnAction(e2 -> {
-                recipeList.toggleSelected();
-            });
-
-            recipeButton = recipe.getRe
-
-            recipeList.updateRecipeIndices();
-            primaryStage.setScene(scenes.get(1).getSceneWindow());
-        });
-
-        deleteButton.setOnAction(e -> {
-            recipeList.removeSelectedRecipes();
-        });
-
-        loadButton.setOnAction(e -> {
-            recipeList.loadRecipes();
-        });
-
-        saveButton.setOnAction(e -> {
-            recipeList.saveRecipes();
-        });
-
-        sortButton.setOnAction(e -> {
-            recipeList.sortRecipes();
-        });
+    public AppFrame getRoot() {
+        return this;
     }
+
+    public void setMain(Scene main) {
+        mainScene = main;
+    }
+}
+
+class HomeScreen implements IWindowUI {
+    private AppFrame home;
+    Scene holder;
+
+    HomeScreen() {
+        home = new AppFrame();
+        holder = new Scene(home, 700, 600);
+    }
+
+    public Scene getSceneWindow() {
+        return holder;
+    }
+
+    /**
+     * This method provides the UI holder with the different scenes that can be
+     * switched between.
+     * 
+     * @param scenes - list of different scenes to switch between.
+     */
+    public void setScenes(ArrayList<IWindowUI> scenes) {
+        home.setScenes(scenes);
+    }
+
+    @Override
+    public void setRoot(Scene scene) {
+        scene.setRoot(home);
+        home.setMain(scene);
+    }
+
 }
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        AppFrame home = new AppFrame();
-        // Scene home = new Scene(root, 700, 600);
+        HomeScreen home = new HomeScreen();
 
         NewRecipeUI audioCapture = new NewRecipeUI();
         // Scene speaking = audioCapture.getScene();
@@ -276,17 +334,23 @@ public class Main extends Application {
         // Scene details = chatGPTed.getScene();
 
         ArrayList<IWindowUI> scenes = new ArrayList<IWindowUI>();
+
         scenes.add(home);
         scenes.add(audioCapture);
         scenes.add(details);
         details.setRecipeHolder(new RecipeDetailsUI(new Recipe("2", "Testing")));
         // Can create observer, subject interface here
-        home.setScenes(primaryStage, scenes);
-        audioCapture.setScenes(primaryStage, scenes);
-        details.setScenes(primaryStage, scenes);
+        home.setScenes(scenes);
+        audioCapture.setScenes(scenes);
+        details.setScenes(scenes);
 
-        primaryStage.setTitle("Recipe Management App");
-        primaryStage.setScene(home.getSceneWindow());
+        primaryStage.setTitle("PantryPal");
+        // primaryStage.setScene(home.getSceneWindow());
+
+        Scene main = home.getSceneWindow();
+        home.setRoot(main);
+
+        primaryStage.setScene(main);
         primaryStage.setResizable(false);
         primaryStage.show();
     }

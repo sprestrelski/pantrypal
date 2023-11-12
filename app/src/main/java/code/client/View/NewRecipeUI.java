@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -20,13 +18,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 // import javax.sound.sampled.*;
 
-
-
 class MealTypeSelection extends GridPane {
     private Label prompt;
     private Button recordButton;
     private ImageView microphone;
-    private TextField mealTypeField;
+    private TextArea mealTypeArea;
 
     // =================FIRST PROMPT=================//
     MealTypeSelection() {
@@ -39,30 +35,31 @@ class MealTypeSelection extends GridPane {
         // Set the size of the microphone image
         microphone.setFitWidth(50);
         microphone.setFitHeight(50);
-        microphone.setScaleX(1.5);
-        microphone.setScaleY(1.5);
+        microphone.setScaleX(1.2);
+        microphone.setScaleY(1.2);
         // Create a recording button
         recordButton = new Button();
         recordButton.setGraphic(microphone);
         // Set the user prompt for meal type selection
         prompt = new Label("Select Meal Type (Breakfast, Lunch, or Dinner)");
         prompt.setStyle("-fx-font-size: 16;");
-        prompt.setTextFill(Color.web("#ADD8E6"));
+        prompt.setTextFill(Color.web("#FF0000"));
         // Set a textField for the meal type that was selected
-        mealTypeField = new TextField();
-        mealTypeField.setPromptText("Meal Type");
-        mealTypeField.setStyle("-fx-font-size: 16"); //CHANGE 1 (FONT)
-        mealTypeField.setPrefWidth(300);
-        mealTypeField.setPrefHeight(50);
-        
+        mealTypeArea = new TextArea();
+        mealTypeArea.setPromptText("Meal Type");
+        mealTypeArea.setStyle("-fx-font-size: 16"); // CHANGE 1 (FONT)
+        mealTypeArea.setPrefWidth(300);
+        mealTypeArea.setPrefHeight(50);
+        mealTypeArea.setEditable(false);
+
         // Add all of the elements to the MealTypeSelection
         this.add(recordButton, 0, 0);
         this.add(prompt, 1, 0);
-        this.add(mealTypeField, 0, 1);
+        this.add(mealTypeArea, 0, 1);
     }
 
-    public TextField getMealType() {
-        return mealTypeField;
+    public TextArea getMealType() {
+        return mealTypeArea;
     }
 
     public Button getRecordButton() {
@@ -75,7 +72,7 @@ class IngredientsList extends GridPane {
     private Label prompt;
     private Button recordButton;
     private ImageView microphone;
-    private TextField ingredientsField;
+    private TextArea ingredientsArea;
 
     // ==============SECOND PROMPT=================//
     IngredientsList() {
@@ -88,30 +85,31 @@ class IngredientsList extends GridPane {
         // Set the size of the microphone image
         microphone.setFitWidth(50);
         microphone.setFitHeight(50);
-        microphone.setScaleX(1.5);
-        microphone.setScaleY(1.5);
+        microphone.setScaleX(1.2);
+        microphone.setScaleY(1.2);
         // Create a recording button
         recordButton = new Button();
         recordButton.setGraphic(microphone);
         // Set the user prompt for meal type selection
         prompt = new Label("Please List Your Ingredients");
         prompt.setStyle("-fx-font-size: 16;");
-        prompt.setTextFill(Color.web("#ADD8E6")); //CHANGE 2 (COLOR)
+        prompt.setTextFill(Color.web("#FF0000")); // CHANGE 2 (COLOR)
         // Set a textField for the meal type that was selected
-        ingredientsField = new TextField();
-        ingredientsField.setPromptText("Ingredients");
-        ingredientsField.setStyle("-fx-font-size: 16"); //change
-        ingredientsField.setPrefWidth(300); // CHANGE 3 (WIDTH OF PROMPT)
-        ingredientsField.setPrefHeight(50); // CHANGE
-        
+        ingredientsArea = new TextArea();
+        ingredientsArea.setPromptText("Ingredients");
+        ingredientsArea.setStyle("-fx-font-size: 16"); // change
+        ingredientsArea.setPrefWidth(300); // CHANGE 3 (WIDTH OF PROMPT)
+        ingredientsArea.setPrefHeight(50); // CHANGE
+        ingredientsArea.setEditable(false);
+
         // Add all of the elements to the MealTypeSelection
         this.add(recordButton, 0, 0);
         this.add(prompt, 1, 0);
-        this.add(ingredientsField, 0, 1);
+        this.add(ingredientsArea, 0, 1);
     }
 
-    public TextField getIngredients() {
-        return ingredientsField;
+    public TextArea getIngredients() {
+        return ingredientsArea;
     }
 
     public Button getRecordButton() {
@@ -119,22 +117,22 @@ class IngredientsList extends GridPane {
     }
 }
 
-class GPTRecipe extends GridPane {
-    private Label recipeLabel;
-    private TextField recipeField;
+// class GPTRecipe extends GridPane {
+// private Label recipeLabel;
+// private TextField recipeField;
 
-    GPTRecipe() {
-        this.setVgap(20);
-        recipeLabel = new Label("Here Is Your Recipe");
-        recipeField = new TextField();
-        recipeField.setPrefWidth(500); // change
-        recipeField.setPrefHeight(200); // change
-        recipeLabel.setStyle("-fx-font-size: 16"); // change
-        recipeLabel.setTextFill(Color.web("#ADD8E6")); // change
-        this.add(recipeLabel, 0, 0);
-        this.add(recipeField, 0, 1);
-    }
-}
+// GPTRecipe() {
+// this.setVgap(20);
+// // recipeLabel = new Label("Here Is Your Recipe");
+// // recipeField = new TextField();
+// // recipeField.setPrefWidth(500); // change
+// // recipeField.setPrefHeight(200); // change
+// // recipeLabel.setStyle("-fx-font-size: 16"); // change
+// // recipeLabel.setTextFill(Color.web("#FF0000")); // change
+// this.add(recipeLabel, 0, 0);
+// this.add(recipeField, 0, 1);
+// }
+// }
 
 class HeaderMic extends HBox {
     HeaderMic() {
@@ -160,29 +158,32 @@ class AppFrameMic extends BorderPane {
     private String recipeSteps; // stores the recipe steps generated by ChatGPT
     // AppFrameMic elements
     private GridPane recipeCreationGrid;
-    private Header header;
+    private HeaderMic header;
     private MealTypeSelection mealTypeSelection;
     private IngredientsList ingredientsList;
-    private GPTRecipe gptrecipe;
-    private Button recordButton1, recordButton2, createButton, saveButton;
+    // private GPTRecipe gptrecipe;
+    private Button recordButton1, recordButton2, createButton, saveButton, backButton;
 
     // Scene Transitions
     private ArrayList<IWindowUI> scenes;
-    private Stage primaryStage;
+    private Scene mainScene;
+    private RecipeUI newRecipe;
+    private RecipeList list;
 
     AppFrameMic() {
-        Button backButton = new Button("Back");
+        backButton = new Button("Back"); // not used yet (Back button)
         // backButton.setOnAction(e -> goBack());
         HBox backButtonContainer = new HBox(backButton);
         backButtonContainer.setPadding(new Insets(10)); // padding
 
         // Set the top of the BorderPane to contain the back button
         this.setTop(backButtonContainer);
-        
-        header = new Header();
+        this.setStyle("-fx-background-color: #DAE5EA;"); // If want to change
+        // background color
+        header = new HeaderMic();
         mealTypeSelection = new MealTypeSelection();
         ingredientsList = new IngredientsList();
-        gptrecipe = new GPTRecipe();
+        // gptrecipe = new GPTRecipe();
 
         recipeCreationGrid = new GridPane();
         recipeCreationGrid.setAlignment(Pos.CENTER);
@@ -192,7 +193,7 @@ class AppFrameMic extends BorderPane {
 
         recipeCreationGrid.add(mealTypeSelection, 0, 0);
         recipeCreationGrid.add(ingredientsList, 0, 1);
-        recipeCreationGrid.add(gptrecipe, 0, 2);
+        // recipeCreationGrid.add(gptrecipe, 0, 2);
 
         this.setTop(header);
         this.setCenter(recipeCreationGrid);
@@ -200,8 +201,8 @@ class AppFrameMic extends BorderPane {
         recordButton1 = mealTypeSelection.getRecordButton();
         recordButton2 = ingredientsList.getRecordButton();
 
-        createButton = new Button("Create Recipe");
-        recipeCreationGrid.add(createButton, 0, 3);
+        // createButton = new Button("Create Recipe");
+        // recipeCreationGrid.add(createButton, 0, 3);
 
         saveButton = new Button("Save Setup");
         recipeCreationGrid.add(saveButton, 0, 4);
@@ -209,16 +210,23 @@ class AppFrameMic extends BorderPane {
         addListeners();
     }
 
+    public void storeNewRecipeUI(RecipeList list, RecipeUI recipeUI) {
+        newRecipe = recipeUI;
+        this.list = list;
+    }
+
     /**
      * This method provides the UI holder with the different scenes that can be
      * switched between.
      * 
-     * @param primaryStage - Main stage that has the window
-     * @param scenes       - list of different scenes to switch between.
+     * @param scenes - list of different scenes to switch between.
      */
-    public void setScenes(Stage primaryStage, ArrayList<IWindowUI> scenes) {
+    public void setScenes(ArrayList<IWindowUI> scenes) {
         this.scenes = scenes;
-        this.primaryStage = primaryStage;
+    }
+
+    public void setMain(Scene main) {
+        mainScene = main;
     }
 
     public void addListeners() {
@@ -265,29 +273,32 @@ class AppFrameMic extends BorderPane {
         // createButton.setOnAction(e -> {
 
         // });
+        backButton.setOnAction(e -> {
+            list.getChildren().remove(newRecipe);
 
+            HomeScreen home = (HomeScreen) scenes.get(0);
+            home.setRoot(mainScene);
+        });
         // CHANGE SCENE TO DETAILED RECIPE DISPLAY
         saveButton.setOnAction(e -> {
 
             ITextToRecipe caller = new TextToRecipe();
-            /*
-             * WhisperHandler audio = new WhisperHandler(
-             * "https://api.openai.com/v1/audio/transcriptions",
-             * "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",
-             * "whisper-1");
-             */
             try {
+
                 String audioOutput = ingredients;// audio.processAudio();
                 String responseText = caller.getChatGPTResponse(audioOutput);
                 Recipe recipe = caller.mapResponseToRecipe(responseText);
                 RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
+
                 // gets the DetailsAppFrame
                 DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
-                details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
 
-                primaryStage.setScene(details.getSceneWindow());
+                details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
+                details.storeNewRecipeUI(list, newRecipe);
+
+                details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
+
             } catch (Exception e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
 
@@ -296,12 +307,14 @@ class AppFrameMic extends BorderPane {
 }
 
 public class NewRecipeUI implements IWindowUI {
-    private ArrayList<IWindowUI> scenes;
-    private Stage primaryStage;
     private AppFrameMic root;
 
-    NewRecipeUI() {
+    NewRecipeUI() throws URISyntaxException, IOException {
         root = new AppFrameMic();
+    }
+
+    public void storeNewRecipeUI(RecipeList list, RecipeUI recipeUI) {
+        root.storeNewRecipeUI(list, recipeUI);
     }
 
     public Scene getSceneWindow() {
@@ -314,10 +327,15 @@ public class NewRecipeUI implements IWindowUI {
      * This method provides the UI holder with the different scenes that can be
      * switched between.
      * 
-     * @param primaryStage - Main stage that has the window
-     * @param scenes       - list of different scenes to switch between.
+     * @param scenes - list of different scenes to switch between.
      */
-    public void setScenes(Stage primaryStage, ArrayList<IWindowUI> scenes) {
-        root.setScenes(primaryStage, scenes);
+    public void setScenes(ArrayList<IWindowUI> scenes) {
+        root.setScenes(scenes);
+    }
+
+    @Override
+    public void setRoot(Scene scene) {
+        scene.setRoot(root);
+        root.setMain(scene);
     }
 }
