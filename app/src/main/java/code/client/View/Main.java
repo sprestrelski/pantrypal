@@ -127,6 +127,25 @@ class RecipeList extends VBox {
         }
     }
 
+    /*
+     * Save recipes to a string via the same method as file write.
+     */
+    public String saveRecipesToString() {
+        String file = "";
+        try {
+            file += "sep=|\n"; // use "|" as a delimeter for the csv files
+            file += "Recipe Name| Ingredients| Instructions\n"; // add labels for the columns of the csv file
+            for (int i = 0; i < this.getChildren().size(); i++) {
+                file += (((RecipeUI) this.getChildren().get(i)).getRecipeName() + "| ");
+                file += (((RecipeUI) this.getChildren().get(i)).getRecipeIngredients() + "| ");
+                file += (((RecipeUI) this.getChildren().get(i)).getRecipeInstructions() + "\n");
+            }
+        } catch (Exception e) {
+            System.out.println("Recipes could not be saved.");
+        }
+        return file;
+    }
+
 }
 
 class Footer extends HBox {
@@ -235,49 +254,16 @@ class AppFrame extends BorderPane {
 
     public void addListeners(RecipeUI savedRecipe) {
         if (savedRecipe != null) {
-            detailsButton = savedRecipe.getDetailsButton();
-            detailsButton.setOnAction(read -> {
-                // TODO: Add a way to switch to detailed recipe view
-
-                DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
-
-                details.setRecipeHolder(new RecipeDetailsUI(savedRecipe.getRecipe())); // should have RecipeDetailsUI
-                details.storeNewRecipeUI(recipeList, savedRecipe);
-
-                details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
-
-            });
-
-            deleteButton = savedRecipe.getDeleteButton();
-            deleteButton.setOnAction(delete -> {
-                recipeList.getChildren().remove(savedRecipe);
-            });
+            addListenersInRecipe(savedRecipe);
             return;
         }
         newButton.setOnAction(create -> {
             RecipeUI recipe = new RecipeUI();
             recipeList.getChildren().add(0, recipe);
 
-            detailsButton = recipe.getDetailsButton();
-            detailsButton.setOnAction(read -> {
-                // TODO: Add a way to switch to detailed recipe view
-
-                DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
-
-                details.setRecipeHolder(new RecipeDetailsUI(recipe.getRecipe())); // should have RecipeDetailsUI
-                details.storeNewRecipeUI(recipeList, recipe);
-
-                details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
-
-            });
-
-            deleteButton = recipe.getDeleteButton();
-            deleteButton.setOnAction(delete -> {
-                recipeList.getChildren().remove(recipe);
-            });
+            addListenersInRecipe(recipe);
 
             recipeList.updateRecipeIndices();
-            // TODO SCENE TRANSITION HERE
             NewRecipeUI audioPrompt;
             /*
              * Create a new audio prompting window each time.
@@ -297,6 +283,27 @@ class AppFrame extends BorderPane {
         });
     }
 
+    public void addListenersInRecipe(RecipeUI recipe) {
+            detailsButton = recipe.getDetailsButton();
+            detailsButton.setOnAction(read -> {
+                // TODO: Add a way to switch to detailed recipe view
+
+                DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
+
+                details.setRecipeHolder(new RecipeDetailsUI(recipe.getRecipe())); // should have RecipeDetailsUI
+                details.storeNewRecipeUI(recipeList, recipe);
+
+                details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
+
+            });
+
+            deleteButton = recipe.getDeleteButton();
+            deleteButton.setOnAction(delete -> {
+                recipeList.getChildren().remove(recipe);
+                recipeList.saveRecipes();
+            });
+
+    }
     /**
      * This method provides the UI holder with the different scenes that can be
      * switched between.
