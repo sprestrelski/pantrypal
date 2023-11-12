@@ -117,22 +117,22 @@ class IngredientsList extends GridPane {
     }
 }
 
-// class GPTRecipe extends GridPane {
-// private Label recipeLabel;
-// private TextField recipeField;
+class GPTRecipe extends GridPane {
+    private Label recipeLabel;
+    private TextField recipeField;
 
-// GPTRecipe() {
-// this.setVgap(20);
-// // recipeLabel = new Label("Here Is Your Recipe");
-// // recipeField = new TextField();
-// // recipeField.setPrefWidth(500); // change
-// // recipeField.setPrefHeight(200); // change
-// // recipeLabel.setStyle("-fx-font-size: 16"); // change
-// // recipeLabel.setTextFill(Color.web("#FF0000")); // change
-// this.add(recipeLabel, 0, 0);
-// this.add(recipeField, 0, 1);
-// }
-// }
+    GPTRecipe() {
+        this.setVgap(20);
+        recipeLabel = new Label("Here Is Your Recipe");
+        recipeField = new TextField();
+        recipeField.setPrefWidth(500); // change
+        recipeField.setPrefHeight(200); // change
+        recipeLabel.setStyle("-fx-font-size: 16"); // change
+        recipeLabel.setTextFill(Color.web("#FF0000")); // change
+        this.add(recipeLabel, 0, 0);
+        this.add(recipeField, 0, 1);
+    }
+}
 
 class HeaderMic extends HBox {
     HeaderMic() {
@@ -161,7 +161,7 @@ class AppFrameMic extends BorderPane {
     private HeaderMic header;
     private MealTypeSelection mealTypeSelection;
     private IngredientsList ingredientsList;
-    // private GPTRecipe gptrecipe;
+    private GPTRecipe gptrecipe;
     private Button recordButton1, recordButton2, createButton, saveButton, backButton;
 
     // Scene Transitions
@@ -183,7 +183,7 @@ class AppFrameMic extends BorderPane {
         header = new HeaderMic();
         mealTypeSelection = new MealTypeSelection();
         ingredientsList = new IngredientsList();
-        // gptrecipe = new GPTRecipe();
+        gptrecipe = new GPTRecipe();
 
         recipeCreationGrid = new GridPane();
         recipeCreationGrid.setAlignment(Pos.CENTER);
@@ -193,7 +193,7 @@ class AppFrameMic extends BorderPane {
 
         recipeCreationGrid.add(mealTypeSelection, 0, 0);
         recipeCreationGrid.add(ingredientsList, 0, 1);
-        // recipeCreationGrid.add(gptrecipe, 0, 2);
+        recipeCreationGrid.add(gptrecipe, 0, 2);
 
         this.setTop(header);
         this.setCenter(recipeCreationGrid);
