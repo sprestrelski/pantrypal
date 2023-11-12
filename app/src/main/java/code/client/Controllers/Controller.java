@@ -1,22 +1,16 @@
 package code.client.Controllers;
 
 import code.client.Controllers.AudioRecorder;
-import code.client.Model.Model;
 import code.client.View.View;
 import javafx.event.ActionEvent;
 
-/*
- * Modify t
- */
 public class Controller {
     private View view;
-    private Model model;
     private AudioRecorder audioRecorder;
 
-    public Controller(View view, Model model) {
+    public Controller(View view) {
         this.view = view;
-        this.model = model;
-        this.audioRecorder = new AudioRecorder(view.getRecordingLabel());
+        this.audioRecorder = new AudioRecorder();
 
         // recording buttons
         this.view.setStartButtonAction(this::handleStartButton);

@@ -58,6 +58,7 @@ public class TextToRecipe implements ITextToRecipe {
 
     @Override
     public Recipe mapResponseToRecipe(String responseText) {
+        // System.out.println(responseText);
         String[] tokenArr = responseText.split("\n");
         List<String> tokenList = new ArrayList<>(Arrays.asList(tokenArr));
         int i = 0;

@@ -161,6 +161,7 @@ class AppFrameMic extends BorderPane {
     private HeaderMic header;
     private MealTypeSelection mealTypeSelection;
     private IngredientsList ingredientsList;
+    private GPTRecipe gptrecipe;
     private Button recordButton1, recordButton2, createButton, saveButton, backButton;
 
     // Scene Transitions
@@ -169,7 +170,7 @@ class AppFrameMic extends BorderPane {
     private RecipeUI newRecipe;
     private RecipeList list;
 
-    AppFrameMic() {
+    AppFrameMic() throws URISyntaxException, IOException {
         backButton = new Button("Back"); // not used yet (Back button)
         // backButton.setOnAction(e -> goBack());
         HBox backButtonContainer = new HBox(backButton);
@@ -180,6 +181,7 @@ class AppFrameMic extends BorderPane {
         header = new HeaderMic();
         mealTypeSelection = new MealTypeSelection();
         ingredientsList = new IngredientsList();
+        gptrecipe = new GPTRecipe();
 
         recipeCreationGrid = new GridPane();
         recipeCreationGrid.setAlignment(Pos.CENTER);
@@ -201,8 +203,10 @@ class AppFrameMic extends BorderPane {
         // recipeCreationGrid.add(createButton, 0, 3);
 
         saveButton = new Button("Save Setup");
-        recipeCreationGrid.add(saveButton, 0, 4);
+        recipeCreationGrid.add(saveButton, 0, 5);
 
+        backButton = new Button("Back to List");
+        recipeCreationGrid.add(backButton, 0, 0);
         addListeners();
     }
 
@@ -225,9 +229,9 @@ class AppFrameMic extends BorderPane {
         mainScene = main;
     }
 
-    public void addListeners() {
+    public void addListeners() throws IOException, URISyntaxException {
 
-        AudioRecorder recorder = new AudioRecorder(new Label("Recording..."));
+        AudioRecorder recorder = new AudioRecorder();
         WhisperHandler audioProcessor = new WhisperHandler(API_ENDPOINT, TOKEN, MODEL);
 
         recordButton1.setOnAction(e -> {
@@ -240,6 +244,8 @@ class AppFrameMic extends BorderPane {
                 recorder.stopRecording();
                 recording = false;
                 try {
+                    audioProcessor.setHttpConnection(new RealHttpConnection(API_ENDPOINT));
+                    audioProcessor.sendHttpRequest();
                     mealType = audioProcessor.processAudio();
                 } catch (IOException | URISyntaxException e2) {
                     e2.printStackTrace();
@@ -258,6 +264,8 @@ class AppFrameMic extends BorderPane {
                 recorder.stopRecording();
                 recording = false;
                 try {
+                    audioProcessor.setHttpConnection(new RealHttpConnection(API_ENDPOINT));
+                    audioProcessor.sendHttpRequest();
                     ingredients = audioProcessor.processAudio();
                 } catch (IOException | URISyntaxException e2) {
                     e2.printStackTrace();
@@ -281,19 +289,15 @@ class AppFrameMic extends BorderPane {
             ITextToRecipe caller = new TextToRecipe();
             try {
 
-                /*
-                 * String audioOutput = ingredients;// audio.processAudio();
-                 * String responseText = caller.getChatGPTResponse(audioOutput);
-                 * Recipe recipe = caller.mapResponseToRecipe(responseText);
-                 * RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
-                 */
+                String audioOutput = ingredients;// audio.processAudio();
+                String responseText = caller.getChatGPTResponse(audioOutput);
+                Recipe recipe = caller.mapResponseToRecipe(responseText);
+                RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
 
                 // gets the DetailsAppFrame
                 DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
-
-                // details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
+                details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
                 details.storeNewRecipeUI(list, newRecipe);
-
                 details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
 
             } catch (Exception e1) {
@@ -326,14 +330,17 @@ public class NewRecipeUI implements IWindowUI {
      * switched between.
      * 
      * @param scenes - list of different scenes to switch between.
+     * @param scenes - list of different scenes to switch between.
      */
-    public void setScenes(ArrayList<IWindowUI> scenes) {
-        root.setScenes(scenes);
-    }
 
     @Override
     public void setRoot(Scene scene) {
         scene.setRoot(root);
         root.setMain(scene);
     }
+
+    public void setScenes(ArrayList<IWindowUI> scenes) {
+        root.setScenes(scenes);
+    }
+
 }
