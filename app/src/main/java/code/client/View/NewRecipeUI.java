@@ -35,8 +35,8 @@ class MealTypeSelection extends GridPane {
         // Set the size of the microphone image
         microphone.setFitWidth(50);
         microphone.setFitHeight(50);
-        microphone.setScaleX(1.2);
-        microphone.setScaleY(1.2);
+        microphone.setScaleX(1);
+        microphone.setScaleY(1);
         // Create a recording button
         recordButton = new Button();
         recordButton.setGraphic(microphone);
@@ -85,8 +85,8 @@ class IngredientsList extends GridPane {
         // Set the size of the microphone image
         microphone.setFitWidth(50);
         microphone.setFitHeight(50);
-        microphone.setScaleX(1.2);
-        microphone.setScaleY(1.2);
+        microphone.setScaleX(1);
+        microphone.setScaleY(1);
         // Create a recording button
         recordButton = new Button();
         recordButton.setGraphic(microphone);
@@ -161,7 +161,6 @@ class AppFrameMic extends BorderPane {
     private HeaderMic header;
     private MealTypeSelection mealTypeSelection;
     private IngredientsList ingredientsList;
-    private GPTRecipe gptrecipe;
     private Button recordButton1, recordButton2, createButton, saveButton, backButton;
 
     // Scene Transitions
@@ -174,26 +173,23 @@ class AppFrameMic extends BorderPane {
         backButton = new Button("Back"); // not used yet (Back button)
         // backButton.setOnAction(e -> goBack());
         HBox backButtonContainer = new HBox(backButton);
-        backButtonContainer.setPadding(new Insets(10)); // padding
+        backButtonContainer.setPadding(new Insets(1)); // padding
 
-        // Set the top of the BorderPane to contain the back button
-        this.setTop(backButtonContainer);
         this.setStyle("-fx-background-color: #DAE5EA;"); // If want to change
         // background color
         header = new HeaderMic();
         mealTypeSelection = new MealTypeSelection();
         ingredientsList = new IngredientsList();
-        gptrecipe = new GPTRecipe();
 
         recipeCreationGrid = new GridPane();
         recipeCreationGrid.setAlignment(Pos.CENTER);
-        recipeCreationGrid.setVgap(20);
-        recipeCreationGrid.setHgap(20);
+        recipeCreationGrid.setVgap(10);
+        recipeCreationGrid.setHgap(10);
         recipeCreationGrid.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
 
-        recipeCreationGrid.add(mealTypeSelection, 0, 0);
-        recipeCreationGrid.add(ingredientsList, 0, 1);
-        recipeCreationGrid.add(gptrecipe, 0, 2);
+        recipeCreationGrid.add(backButtonContainer, 0, 0);
+        recipeCreationGrid.add(mealTypeSelection, 0, 1);
+        recipeCreationGrid.add(ingredientsList, 0, 2);
 
         this.setTop(header);
         this.setCenter(recipeCreationGrid);
@@ -285,15 +281,17 @@ class AppFrameMic extends BorderPane {
             ITextToRecipe caller = new TextToRecipe();
             try {
 
-                String audioOutput = ingredients;// audio.processAudio();
-                String responseText = caller.getChatGPTResponse(audioOutput);
-                Recipe recipe = caller.mapResponseToRecipe(responseText);
-                RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
+                /*
+                 * String audioOutput = ingredients;// audio.processAudio();
+                 * String responseText = caller.getChatGPTResponse(audioOutput);
+                 * Recipe recipe = caller.mapResponseToRecipe(responseText);
+                 * RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
+                 */
 
                 // gets the DetailsAppFrame
                 DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
 
-                details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
+                // details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
                 details.storeNewRecipeUI(list, newRecipe);
 
                 details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen

@@ -25,19 +25,19 @@ public class Recipe {
     }
 
     public String getAllIngredients() {
-        return String.join("\n", ingredientList);
+        return String.join(";;", ingredientList);
     }
 
     public String getAllInstructions() {
-        return String.join("\n", instructionList);
+        return String.join(";;", instructionList);
     }
 
     public void setAllIngredients(String ingredients) {
-        ingredientList.addAll(Arrays.asList(ingredients.split("\n")));
+        ingredientList.addAll(Arrays.asList(ingredients.split(";;")));
     }
 
     public void setAllInstructions(String instructions) {
-        instructionList.addAll(Arrays.asList(instructions.split("\n")));
+        instructionList.addAll(Arrays.asList(instructions.split(";;")));
     }
 
     public void addIngredient(String ingredient) {

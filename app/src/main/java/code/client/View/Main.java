@@ -120,11 +120,15 @@ class RecipeList extends VBox {
             reader.readLine(); // skip the line with the csv column labels
             int counter = 0;
             while ((line = reader.readLine()) != null) {
+                System.out.println("Line: " + line);
                 RecipeUI recipe = new RecipeUI();
                 recipeInfo = line.split("| ");
                 recipe.getDeleteButton().setOnAction(e -> {
                     this.removeRecipe(recipe.getRecipeIndex());
                 });
+                System.out.println("Size: " + recipeInfo.length + "Title: " + recipeInfo[0]);
+                System.out.println("Ingredients: " + recipeInfo[1]);
+                System.out.println("Instructions: " + recipeInfo[2]);
                 // TODO recreate Recipe using delimiters of "\n". Done ? need to test
                 Recipe temp = new Recipe(Integer.toString(counter), recipeInfo[0]);
                 temp.setAllIngredients(recipeInfo[1]);
@@ -208,6 +212,7 @@ class AppFrame extends BorderPane {
     AppFrame() {
         header = new Header();
         recipeList = new RecipeList();
+        recipeList.loadRecipes();
         footer = new Footer();
 
         ScrollPane scroller = new ScrollPane(recipeList);
