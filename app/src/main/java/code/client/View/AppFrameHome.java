@@ -94,22 +94,13 @@ public class AppFrameHome extends BorderPane {
             reader.readLine(); // skip the line with the csv column labels
             int counter = 0;
             while ((line = reader.readLine()) != null) {
-                // System.out.println("Line: " + line);
-                RecipeUI recipe = new RecipeUI();
                 recipeInfo = line.split("\\| ");
-                /*
-                 * System.out.println("Size: " + recipeInfo.length + "Title: " + recipeInfo[0]);
-                 * System.out.println("Ingredients: " + recipeInfo[1]);
-                 * System.out.println("Instructions: " + recipeInfo[2]);
-                 */
-                // TODO recreate Recipe using delimiters of ";;". Done ? need to test
                 Recipe temp = new Recipe(Integer.toString(counter), recipeInfo[0]);
                 temp.setAllIngredients(recipeInfo[1]);
                 temp.setAllInstructions(recipeInfo[2]);
-                recipe.setRecipe(temp);
-                recipeList.getChildren().add(recipe);
-                addListeners(recipe);
+                recipeList.getRecipeDB().add(temp);
                 counter++;
+                updateDisplay();
             }
             reader.close();
         } catch (IOException e) {
@@ -125,7 +116,7 @@ public class AppFrameHome extends BorderPane {
         }
         newButton.setOnAction(create -> {
             RecipeUI recipe = new RecipeUI();
-            recipeList.getChildren().add(0, recipe);
+            //recipeList.getChildren().add(0, recipe);
 
             addListenersInRecipe(recipe);
 
@@ -165,8 +156,10 @@ public class AppFrameHome extends BorderPane {
 
             deleteButton = recipe.getDeleteButton();
             deleteButton.setOnAction(delete -> {
-                recipeList.getChildren().remove(recipe);
+                //recipeList.getChildren().remove(recipe);
+                recipeList.getRecipeDB().remove(recipe.getRecipe());
                 recipeList.saveRecipes();
+                recipeList.update();
             });
 
     }
@@ -190,6 +183,10 @@ public class AppFrameHome extends BorderPane {
 
     public void updateDisplay() {
         recipeList.update();
+        for(int i = 0; i < recipeList.getChildren().size(); i++) {
+            RecipeUI currRecipe = (RecipeUI) recipeList.getChildren().get(i);
+            addListenersInRecipe(currRecipe);
+        }
         this.setCenter(recipeList);
     }
 }

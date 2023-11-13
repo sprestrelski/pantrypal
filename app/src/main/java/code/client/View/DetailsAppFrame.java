@@ -108,10 +108,8 @@ public class DetailsAppFrame implements IWindowUI {
             current.setAllInstructions(providedRecipe.getAllInstructions());
 
             recipeUI.setRecipe(current);
-            list.saveRecipes();
-            //**************************** */
             list.getRecipeDB().add(providedRecipe);
-            //**************************** */
+            list.saveRecipes();
 
             PauseTransition pause = new PauseTransition(Duration.seconds(1));
             pause.setOnFinished(f -> saveButton.setStyle(defaultButtonStyle));
@@ -132,13 +130,15 @@ public class DetailsAppFrame implements IWindowUI {
         });
 
         deleteButton.setOnAction(e -> {
+            
             deleteRecipe();
             returnToHome();
         });
     }
 
+
     public void deleteRecipe() {
-        list.getChildren().remove(recipeUI);
+        list.getRecipeDB().remove(recipeUI.getRecipe());
         list.saveRecipes();
     }
     public void returnToHome() {
@@ -163,7 +163,7 @@ public class DetailsAppFrame implements IWindowUI {
     }
 
     public void displayUpdate(RecipeDetailsUI details) {
-        recipeUI.setRecipe(details.getRecipe()); // Adds recipe details from chatGPT to the main UI window
+        //recipeUI.setRecipe(details.getRecipe()); // Adds recipe details from chatGPT to the main UI window
         // Resets the UI everytime
         detailedUI.getChildren().clear();
 
@@ -181,14 +181,14 @@ public class DetailsAppFrame implements IWindowUI {
     public void setRoot(Scene scene) {
 
         // used for testing
-        /*
-         * currentRecipe = getMockedRecipe();
-         * RecipeDetailsUI details = getMockedRecipe();
-         */
+        
+         currentRecipe = getMockedRecipe();
+         RecipeDetailsUI details = getMockedRecipe();
+         
         // used for testing
 
         // Actual code
-        RecipeDetailsUI details = currentRecipe;
+        //RecipeDetailsUI details = currentRecipe;
 
         displayUpdate(details);
         // Changes the User Screen

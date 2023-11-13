@@ -31,6 +31,7 @@ public class HomeScreen implements IWindowUI {
     @Override
     public void setRoot(Scene scene) {
         scene.setRoot(home);
+        home.updateDisplay();
         home.setMain(scene);
     }
 
