@@ -288,9 +288,9 @@ class AppFrameMic extends BorderPane {
 
             ITextToRecipe caller = new TextToRecipe();
             try {
-
-                String audioOutput = ingredients;// audio.processAudio();
-                String responseText = caller.getChatGPTResponse(audioOutput);
+                String audioOutput1 = mealType;
+                String audioOutput2 = ingredients;// audio.processAudio();
+                String responseText = caller.getChatGPTResponse(audioOutput1, audioOutput2);
                 Recipe recipe = caller.mapResponseToRecipe(responseText);
                 RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
 

@@ -8,7 +8,46 @@ import code.client.Model.TextToRecipe;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 public class TextToRecipeTest {
+    private static class MockGPT implements ITextToRecipe {
+
+        @Override
+        public String buildPrompt(String typeOfMeal, String input) {
+            return """
+            I am a student on a budget with a busy schedule and I need to quickly cook a Lunch.
+            I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments.
+            Remember to first include a title, then a list of ingredients, and then a list of instructions.
+            """;
+        }
+
+        @Override
+        public String getChatGPTResponse(String typeOfMeal, String input)
+                throws IOException, InterruptedException, URISyntaxException {
+            return """
+                Fried Chicken
+
+                Ingredients:
+
+                - 2 chicken breasts, diced
+
+                Instructions:
+
+                1. Enjoy!
+                """;
+        }
+
+        @Override
+        public Recipe mapResponseToRecipe(String responseText) {
+            Recipe recipe = new Recipe("1", "Fried Chicken and Egg Fried Rice");
+            recipe.addIngredient("- 2 chicken breasts, diced");
+            recipe.addInstruction("1. Enjoy!");
+            return recipe;
+        }
+
+    }
 
     @Test
     /**
@@ -16,8 +55,8 @@ public class TextToRecipeTest {
      */
     public void testPromptBuild() {
         ITextToRecipe textToRecipe = new TextToRecipe();
-        String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a meal. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
-        String response = textToRecipe.buildPrompt("I have rice, shrimp, chicken, and eggs. ");
+        String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Lunch. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
+        String response = textToRecipe.buildPrompt("Lunch.","I have rice, shrimp, chicken, and eggs.");
         assertEquals(prompt, response);
     }
 
