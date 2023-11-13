@@ -21,24 +21,14 @@ public class RecipeWriter {
 
         while (ingredientIter.hasNext()) {
             ingredient = ingredientIter.next();
-            if (ingredientIter.hasNext()) {
-                strBuilder.append(ingredient).append(";;");
-            }
-            else {
-                strBuilder.append(ingredient);
-            }
+            strBuilder.append(ingredient).append(";;");
         }
 
         strBuilder.append("| ");
 
         while (instructionIter.hasNext()) {
             instruction = instructionIter.next();
-            if (instructionIter.hasNext()) {
-                strBuilder.append(instruction).append(";;");
-            }
-            else {
-                strBuilder.append(instruction);
-            }
+            strBuilder.append(instruction).append(";;");
         }
 
         strBuilder.append("\n");

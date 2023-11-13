@@ -156,6 +156,7 @@ public class RequestHandler implements HttpHandler {
             Reader reader = new FileReader(CSV_FILE);
             RecipeReader recipeReader = new RecipeReader(reader);
             recipeDb = recipeReader.readRecipeDb();
+            System.out.println("Recipes loaded");
         } catch (IOException e) {
             System.out.println("Recipes could not be loaded.");
         }

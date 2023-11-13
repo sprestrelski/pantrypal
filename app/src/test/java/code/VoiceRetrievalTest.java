@@ -26,7 +26,7 @@ public class VoiceRetrievalTest {
         String response = audioProcessor.processAudio();
         assertEquals("Breakfast.", response);
 
-        audioProcessor.setHttpConnection(
+        audioProcessor.setConnection(
                 new MockHttpConnection(
                         200,
                         new ByteArrayInputStream("{\"text\":\"Chicken, cheese.\"}".getBytes()),

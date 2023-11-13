@@ -6,18 +6,20 @@ import java.io.*;
 import code.client.Model.IRecipeDb;
 import code.client.Model.Recipe;
 import code.client.Model.RecipeDb;
+import code.client.Model.RecipeReader;
 import code.client.Model.RecipeWriter;
 
 // TODO: SERVER Controller that sends a GET(db) request for the recipeDB.
 public class RecipeListUI extends VBox {
     private static final String CSV_FILE = "recipes.csv";
-    private final IRecipeDb recipeDb = new RecipeDb();
+    private IRecipeDb recipeDb = new RecipeDb();
     private RecipeWriter recipeWriter;
 
     RecipeListUI() throws IOException {
         this.setSpacing(5);
         this.setPrefSize(700, 600);
         this.setStyle("-fx-background-color: #F0F8FF;");
+        loadRecipes();
     }
 
     /*
@@ -70,6 +72,20 @@ public class RecipeListUI extends VBox {
             RecipeUI temp = new RecipeUI();
             temp.setRecipe(recipe);
             this.getChildren().add(temp);
+        }
+    }
+
+    /*
+     * Load recipes from a file called "recipes.csv" to RecipeDb
+     */
+    public void loadRecipes() {
+        try {
+            Reader reader = new FileReader(CSV_FILE);
+            RecipeReader recipeReader = new RecipeReader(reader);
+            recipeDb = recipeReader.readRecipeDb();
+            System.out.println("Recipes loaded");
+        } catch (IOException e) {
+            System.out.println("Recipes could not be loaded.");
         }
     }
 }

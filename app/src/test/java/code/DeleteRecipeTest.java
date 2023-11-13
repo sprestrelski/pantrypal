@@ -37,8 +37,8 @@ public class DeleteRecipeTest {
         recipeDb.add(r3);
     }
 
-    /**
-     * * Test case: Deleting all of the recipes in the list
+    /***
+     * Test case: Deleting all of the recipes in the list
      * Expected result: The recipe list becomes empty
      */
     @Test

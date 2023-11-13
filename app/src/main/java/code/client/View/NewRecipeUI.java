@@ -30,26 +30,26 @@ class MealTypeSelection extends GridPane {
         // Set the preferred vertical and horizontal gaps
         this.setVgap(20);
         this.setHgap(20);
-        
+
         // Get a picture of a microphone for the voice recording button
         File file = new File("app/src/main/java/code/client/View/microphone.png");
         microphone = new ImageView(new Image(file.toURI().toString()));
-        
+
         // Set the size of the microphone image
         microphone.setFitWidth(50);
         microphone.setFitHeight(50);
         microphone.setScaleX(1);
         microphone.setScaleY(1);
-        
+
         // Create a recording button
         recordButton = new Button();
         recordButton.setGraphic(microphone);
-        
+
         // Set the user prompt for meal type selection
         prompt = new Label("Select Meal Type (Breakfast, Lunch, or Dinner)");
         prompt.setStyle("-fx-font-size: 16;");
         prompt.setTextFill(Color.web("#FF0000"));
-        
+
         // Set a textField for the meal type that was selected
         mealTypeArea = new TextArea();
         mealTypeArea.setPromptText("Meal Type");
@@ -259,14 +259,14 @@ class AppFrameMic extends BorderPane {
             } else {
                 recorder.stopRecording();
                 recording = false;
-                
+
                 try {
                     whisperService.setConnection(new RealHttpConnection(WhisperService.API_ENDPOINT));
                     ingredients = whisperService.processAudio();
                 } catch (IOException | URISyntaxException exception) {
                     exception.printStackTrace();
                 }
-                
+
                 ingredientsList.getIngredients().setText(ingredients);
             }
         });
@@ -282,8 +282,17 @@ class AppFrameMic extends BorderPane {
 
         // CHANGE SCENE TO DETAILED RECIPE DISPLAY
         saveButton.setOnAction(e -> {
+            ITextToRecipe caller = new ChatGPTService();
             try {
+                String audioOutput1 = mealType;
+                String audioOutput2 = ingredients;// audio.processAudio();
+                String responseText = caller.getChatGPTResponse(audioOutput1, audioOutput2);
+                Recipe recipe = caller.mapResponseToRecipe(responseText);
+                RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
+
+                // gets the DetailsAppFrame
                 DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
+                details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
                 details.storeNewRecipeUI(list, newRecipe);
                 details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
 

@@ -194,13 +194,13 @@ public class DetailsAppFrame implements IWindowUI {
 
         // used for testing
 
-        currentRecipe = getMockedRecipe();
-        RecipeDetailsUI details = getMockedRecipe();
+        // currentRecipe = getMockedRecipe();
+        // RecipeDetailsUI details = getMockedRecipe();
 
         // used for testing
 
         // Actual code
-        // RecipeDetailsUI details = currentRecipe;
+        RecipeDetailsUI details = currentRecipe;
 
         displayUpdate(details);
         // Changes the User Screen

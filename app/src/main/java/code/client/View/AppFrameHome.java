@@ -67,7 +67,7 @@ public class AppFrameHome extends BorderPane {
         recipeList = new RecipeListUI();
         updateDisplay();
         footer = new Footer();
-
+        recipeList.loadRecipes();
         ScrollPane scroller = new ScrollPane(recipeList);
         scroller.setFitToWidth(true);
         scroller.setFitToHeight(true);
@@ -92,7 +92,7 @@ public class AppFrameHome extends BorderPane {
         }
         newButton.setOnAction(create -> {
             RecipeUI recipe = new RecipeUI();
-            //recipeList.getChildren().add(0, recipe);
+            // recipeList.getChildren().add(0, recipe);
 
             addListenersInRecipe(recipe);
 
@@ -121,7 +121,6 @@ public class AppFrameHome extends BorderPane {
         detailsButton.setOnAction(read -> {
             DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
 
-            
             details.setRecipeHolder(new RecipeDetailsUI(recipe.getRecipe())); // should have RecipeDetailsUI
             details.storeNewRecipeUI(recipeList, recipe);
 
@@ -131,12 +130,13 @@ public class AppFrameHome extends BorderPane {
 
         deleteButton = recipe.getDeleteButton();
         deleteButton.setOnAction(delete -> {
-            recipeList.getRecipeDB().remove(recipe.getRecipe());        // TODO: SERVER DELETE REQUEST
+            recipeList.getRecipeDB().remove(recipe.getRecipe()); // TODO: SERVER DELETE REQUEST
             recipeList.saveRecipes();
             recipeList.update();
         });
 
     }
+
     /**
      * This method provides the UI holder with the different scenes that can be
      * switched between.
@@ -161,11 +161,11 @@ public class AppFrameHome extends BorderPane {
 
     public void updateDisplay() {
         recipeList.update();
-        for(int i = 0; i < recipeList.getChildren().size(); i++) {
+        for (int i = 0; i < recipeList.getChildren().size(); i++) {
             RecipeUI currRecipe = (RecipeUI) recipeList.getChildren().get(i);
             addListenersInRecipe(currRecipe);
         }
         this.setCenter(recipeList);
     }
-}
 
+}

@@ -42,7 +42,7 @@ public class WhisperService extends VoiceToText {
         return response;
     }
 
-    public void setHttpConnection(IHttpConnection connection) {
+    public void setConnection(IHttpConnection connection) {
         this.connection = connection;
     }
 
