@@ -11,7 +11,6 @@ public class WhisperService extends VoiceToText {
     public static final String API_KEY = "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";
     public static final String MODEL = "whisper-1";
     public static final String AUDIO_FILE = "recording.wav";
-    private IHttpConnection connection;
 
     public WhisperService() {
     }
@@ -22,9 +21,6 @@ public class WhisperService extends VoiceToText {
 
     // https://stackoverflow.com/questions/25334139/how-to-mock-a-url-connection
     public String processAudio() throws IOException, URISyntaxException {
-        // Send Http request
-        sendHttpRequest();
-
         // Get response code
         int responseCode = connection.getResponseCode();
         String response;
@@ -42,11 +38,7 @@ public class WhisperService extends VoiceToText {
         return response;
     }
 
-    public void setConnection(IHttpConnection connection) {
-        this.connection = connection;
-    }
-
-    private IHttpConnection sendHttpRequest() throws IOException, URISyntaxException {
+    public IHttpConnection sendHttpRequest() throws IOException, URISyntaxException {
         // Set up request headers
         File file = new File(AUDIO_FILE);
         String boundary = "Boundary-" + System.currentTimeMillis();

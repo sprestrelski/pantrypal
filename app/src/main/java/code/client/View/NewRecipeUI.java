@@ -243,6 +243,7 @@ class AppFrameMic extends BorderPane {
 
                 try {
                     whisperService.setConnection(new RealHttpConnection(WhisperService.API_ENDPOINT));
+                    whisperService.sendHttpRequest();
                     mealType = whisperService.processAudio();
                 } catch (IOException | URISyntaxException exception) {
                     exception.printStackTrace();
@@ -262,6 +263,7 @@ class AppFrameMic extends BorderPane {
 
                 try {
                     whisperService.setConnection(new RealHttpConnection(WhisperService.API_ENDPOINT));
+                    whisperService.sendHttpRequest();
                     ingredients = whisperService.processAudio();
                 } catch (IOException | URISyntaxException exception) {
                     exception.printStackTrace();
