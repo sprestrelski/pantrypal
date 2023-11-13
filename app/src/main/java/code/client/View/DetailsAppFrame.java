@@ -18,7 +18,7 @@ public class DetailsAppFrame implements IWindowUI {
     private RecipeDetailsUI currentRecipe;
     private RecipeUI recipeUI;
     private RecipeList list;
-    private Button backToHomeButton, editButton, saveButton;
+    private Button backToHomeButton, editButton, saveButton, deleteButton;
     VBox detailedUI;
     private boolean editable = false;
     private String defaultButtonStyle, onStyle, offStyle;
@@ -45,6 +45,10 @@ public class DetailsAppFrame implements IWindowUI {
         editButton = new Button("Edit");
         editButton.setStyle(offStyle);
         editButton.setAlignment(Pos.BOTTOM_LEFT);
+
+        deleteButton = new Button("Delete");
+        deleteButton.setStyle(defaultButtonStyle);
+        deleteButton.setAlignment(Pos.BOTTOM_RIGHT);
 
         // Default recipe
         currentRecipe = getMockedRecipe();
@@ -118,8 +122,17 @@ public class DetailsAppFrame implements IWindowUI {
             displayUpdate(currentRecipe);
             // System.out.println("Edit on");
         });
+
+        deleteButton.setOnAction(e -> {
+            deleteRecipe();
+            returnToHome();
+        });
     }
 
+    public void deleteRecipe() {
+        list.getChildren().remove(recipeUI);
+        list.saveRecipes();
+    }
     public void returnToHome() {
         HomeScreen home = (HomeScreen) scenes.get(0);
         home.setRoot(mainScene);
@@ -153,7 +166,7 @@ public class DetailsAppFrame implements IWindowUI {
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
         detailedUI.getChildren().addAll(backToHomeButton, title);
         setupContainer.getChildren().add(details);
-        detailedUI.getChildren().addAll(setupContainer, saveButton, editButton);
+        detailedUI.getChildren().addAll(setupContainer, saveButton, editButton,deleteButton);
     }
 
     @Override
