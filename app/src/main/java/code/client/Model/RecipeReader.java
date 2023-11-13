@@ -14,10 +14,10 @@ public class RecipeReader {
 
     private Recipe readRecipe(String recipeStr) throws IOException {
         String[] recipeTokens = recipeStr.split("\\| ");
-        String[] ingredientTokens = recipeTokens[2].split(";;");
-        String[] instructionTokens = recipeTokens[3].split(";;");
-        Recipe recipe = new Recipe(recipeTokens[1]);
-        recipe.setID(UUID.fromString(recipeTokens[0]));
+        String[] ingredientTokens = recipeTokens[1].split(";;");
+        String[] instructionTokens = recipeTokens[2].split(";;");
+        Recipe recipe = new Recipe(recipeTokens[0]);
+        recipe.setID(UUID.nameUUIDFromBytes(recipeTokens[0].getBytes()));
 
         for (String ingredient : ingredientTokens) {
             recipe.addIngredient(ingredient);
