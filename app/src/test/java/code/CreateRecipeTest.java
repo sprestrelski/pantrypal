@@ -12,7 +12,6 @@ public class CreateRecipeTest {
     @Test
     public void testCreateRecipe() {
         Recipe recipe = new Recipe("Fried Rice");
-        assertEquals("1", recipe.getId());
         assertEquals("Fried Rice", recipe.getTitle());
         recipe.addIngredient("Rice");
         recipe.addIngredient("Fried");

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public abstract class VoiceToText {
-    private IHttpConnection connection;
+    protected IHttpConnection connection;
 
     public VoiceToText() {
     }
@@ -22,4 +22,6 @@ public abstract class VoiceToText {
     }
 
     public abstract String processAudio() throws IOException, URISyntaxException;
+
+    public abstract IHttpConnection sendHttpRequest() throws IOException, URISyntaxException;
 }
