@@ -10,9 +10,12 @@ import java.io.*;
 
 import javafx.geometry.Pos;
 import java.util.ArrayList;
+import java.util.UUID;
+
 import code.client.Model.*;
 import code.client.View.*;
 import code.client.Controllers.*;
+import javafx.event.*;
 
 class Footer extends HBox {
     // Button for creating a new recipe
@@ -62,7 +65,7 @@ public class AppFrameHome extends BorderPane {
     AppFrameHome() throws IOException {
         header = new Header();
         recipeList = new RecipeListUI();
-        loadRecipes();
+        updateDisplay();
         footer = new Footer();
 
         ScrollPane scroller = new ScrollPane(recipeList);
@@ -80,33 +83,6 @@ public class AppFrameHome extends BorderPane {
 
     public Scene getSceneWindow() {
         return new Scene(this, 700, 600);
-    }
-
-    /*
-     * Load recipes from a file called "recipes.csv"
-     */
-    public void loadRecipes() {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("recipes.csv"));
-            String line;
-            String[] recipeInfo;
-            reader.readLine(); // skip the line with the delimeter specifier
-            reader.readLine(); // skip the line with the csv column labels
-            int counter = 0;
-            while ((line = reader.readLine()) != null) {
-                recipeInfo = line.split("\\| ");
-                Recipe temp = new Recipe(Integer.toString(counter), recipeInfo[0]);
-                temp.setAllIngredients(recipeInfo[1]);
-                temp.setAllInstructions(recipeInfo[2]);
-                recipeList.getRecipeDB().add(temp);
-                counter++;
-                updateDisplay();
-            }
-            reader.close();
-        } catch (IOException e) {
-            System.out.println("Recipes could not be loaded.");
-        }
-        recipeList.updateRecipeIndices();
     }
 
     public void addListeners(RecipeUI savedRecipe) {
@@ -141,26 +117,24 @@ public class AppFrameHome extends BorderPane {
     }
 
     public void addListenersInRecipe(RecipeUI recipe) {
-            detailsButton = recipe.getDetailsButton();
-            detailsButton.setOnAction(read -> {
-                // TODO: Add a way to switch to detailed recipe view
+        detailsButton = recipe.getDetailsButton();
+        detailsButton.setOnAction(read -> {
+            DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
 
-                DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
+            
+            details.setRecipeHolder(new RecipeDetailsUI(recipe.getRecipe())); // should have RecipeDetailsUI
+            details.storeNewRecipeUI(recipeList, recipe);
 
-                details.setRecipeHolder(new RecipeDetailsUI(recipe.getRecipe())); // should have RecipeDetailsUI
-                details.storeNewRecipeUI(recipeList, recipe);
+            details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
 
-                details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
+        });
 
-            });
-
-            deleteButton = recipe.getDeleteButton();
-            deleteButton.setOnAction(delete -> {
-                //recipeList.getChildren().remove(recipe);
-                recipeList.getRecipeDB().remove(recipe.getRecipe());
-                recipeList.saveRecipes();
-                recipeList.update();
-            });
+        deleteButton = recipe.getDeleteButton();
+        deleteButton.setOnAction(delete -> {
+            recipeList.getRecipeDB().remove(recipe.getRecipe());        // TODO: SERVER DELETE REQUEST
+            recipeList.saveRecipes();
+            recipeList.update();
+        });
 
     }
     /**
@@ -179,6 +153,10 @@ public class AppFrameHome extends BorderPane {
 
     public void setMain(Scene main) {
         mainScene = main;
+    }
+
+    public void setGetButtonAction(EventHandler<ActionEvent> eventHandler) {
+        detailsButton.setOnAction(eventHandler);
     }
 
     public void updateDisplay() {

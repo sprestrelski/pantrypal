@@ -1,6 +1,7 @@
 package code.client.View;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import code.client.Model.*;
 import javafx.animation.PauseTransition;
@@ -14,7 +15,7 @@ import javafx.util.Duration;
 import code.client.Model.*;
 import code.client.View.*;
 import code.client.Controllers.*;
-
+import javafx.event.*;
 
 public class DetailsAppFrame implements IWindowUI {
     private ArrayList<IWindowUI> scenes;
@@ -24,7 +25,7 @@ public class DetailsAppFrame implements IWindowUI {
     private RecipeUI recipeUI;
     private RecipeListUI list;
     private Button backToHomeButton, editButton, saveButton, deleteButton;
-    VBox detailedUI;
+    private VBox detailedUI;
     private boolean editable = false;
     private String defaultButtonStyle, onStyle, offStyle;
 
@@ -103,11 +104,8 @@ public class DetailsAppFrame implements IWindowUI {
             // textfield recipes.
             saveButton.setStyle("-fx-background-color: #00FFFF; -fx-border-width: 0;");
             Recipe providedRecipe = currentRecipe.getRecipe();
-            Recipe current = new Recipe("0", currentRecipe.getTitleField().getText());
-            current.setAllIngredients(providedRecipe.getAllIngredients());
-            current.setAllInstructions(providedRecipe.getAllInstructions());
 
-            recipeUI.setRecipe(current);
+            recipeUI.setRecipe(providedRecipe);
             list.getRecipeDB().add(providedRecipe);
             list.saveRecipes();
 
@@ -130,17 +128,17 @@ public class DetailsAppFrame implements IWindowUI {
         });
 
         deleteButton.setOnAction(e -> {
-            
+
             deleteRecipe();
             returnToHome();
         });
     }
 
-
     public void deleteRecipe() {
         list.getRecipeDB().remove(recipeUI.getRecipe());
         list.saveRecipes();
     }
+
     public void returnToHome() {
         HomeScreen home = (HomeScreen) scenes.get(0);
         home.setRoot(mainScene);
@@ -153,7 +151,7 @@ public class DetailsAppFrame implements IWindowUI {
      */
     private RecipeDetailsUI getMockedRecipe() {
         // Hardcoded value for now, recipe value for it should be changing
-        Recipe temp = new Recipe("1", "Fried Chicken and Egg Fried Rice");
+        Recipe temp = new Recipe("Fried Chicken and Egg Fried Rice");
         temp.addIngredient("2 chicken breasts, diced");
         temp.addIngredient("2 large eggs");
         temp.addIngredient("2 cups cooked rice");
@@ -163,7 +161,6 @@ public class DetailsAppFrame implements IWindowUI {
     }
 
     public void displayUpdate(RecipeDetailsUI details) {
-        //recipeUI.setRecipe(details.getRecipe()); // Adds recipe details from chatGPT to the main UI window
         // Resets the UI everytime
         detailedUI.getChildren().clear();
 
@@ -172,27 +169,43 @@ public class DetailsAppFrame implements IWindowUI {
         TextField title = details.getTitleField();
         title.setAlignment(Pos.CENTER);
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
+
+        addListeners();
+
         detailedUI.getChildren().addAll(backToHomeButton, title);
         setupContainer.getChildren().add(details);
-        detailedUI.getChildren().addAll(setupContainer, saveButton, editButton,deleteButton);
+        detailedUI.getChildren().addAll(setupContainer, saveButton, editButton, deleteButton);
+    }
+
+    public void setPostButtonAction(EventHandler<ActionEvent> eventHandler) {
+        saveButton.setOnAction(eventHandler);
+    }
+
+    public void setPutButtonAction(EventHandler<ActionEvent> eventHandler) {
+        saveButton.setOnAction(eventHandler);
+    }
+
+    public void setDeleteButtonAction(EventHandler<ActionEvent> eventHandler) {
+        deleteButton.setOnAction(eventHandler);
     }
 
     @Override
     public void setRoot(Scene scene) {
 
         // used for testing
-        
-         currentRecipe = getMockedRecipe();
-         RecipeDetailsUI details = getMockedRecipe();
-         
+
+        currentRecipe = getMockedRecipe();
+        RecipeDetailsUI details = getMockedRecipe();
+
         // used for testing
 
         // Actual code
-        //RecipeDetailsUI details = currentRecipe;
+        // RecipeDetailsUI details = currentRecipe;
 
         displayUpdate(details);
         // Changes the User Screen
         scene.setRoot(detailedUI);
         mainScene = scene;
     }
+
 }

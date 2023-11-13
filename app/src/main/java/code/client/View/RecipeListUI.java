@@ -8,6 +8,7 @@ import code.client.Model.Recipe;
 import code.client.Model.RecipeDb;
 import code.client.Model.RecipeWriter;
 
+// TODO: SERVER Controller that sends a GET(db) request for the recipeDB.
 public class RecipeListUI extends VBox {
     private static final String CSV_FILE = "recipes.csv";
     private final IRecipeDb recipeDb = new RecipeDb();
@@ -65,12 +66,10 @@ public class RecipeListUI extends VBox {
     public void update() {
         // RecipeListUI = this
         this.getChildren().clear();
-        int counter = 0;
         for (Recipe recipe : recipeDb) {
             RecipeUI temp = new RecipeUI();
             temp.setRecipe(recipe);
             this.getChildren().add(temp);
         }
-
     }
 }

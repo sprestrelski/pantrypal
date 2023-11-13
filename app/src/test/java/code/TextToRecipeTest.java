@@ -4,12 +4,9 @@ import org.junit.jupiter.api.Test;
 
 import code.client.Model.ITextToRecipe;
 import code.client.Model.Recipe;
-import code.client.Model.TextToRecipe;
+import code.client.Model.ChatGPTService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 public class TextToRecipeTest {
     
@@ -18,7 +15,7 @@ public class TextToRecipeTest {
      * Integration test for provide recipe
      */
     public void testPromptBuild() {
-        ITextToRecipe textToRecipe = new TextToRecipe();
+        ITextToRecipe textToRecipe = new ChatGPTService();
         String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Lunch. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
         String response = textToRecipe.buildPrompt("Lunch.","I have rice, shrimp, chicken, and eggs.");
         assertEquals(prompt, response);
@@ -29,7 +26,7 @@ public class TextToRecipeTest {
      * Unit tests for Recipe features
      */
     public void testParseJSON() {
-        ITextToRecipe textToRecipe = new TextToRecipe();
+        ITextToRecipe textToRecipe = new ChatGPTService();
         String responseText = """
                 Fried Chicken and Egg Fried Rice
 
@@ -93,7 +90,7 @@ public class TextToRecipeTest {
 
     @Test
     public void testParseNoIndentsAndNewLines() {
-        ITextToRecipe textToRecipe = new TextToRecipe();
+        ITextToRecipe textToRecipe = new ChatGPTService();
         String responseText = """
                 Cheesy pasta bake
                 Ingredients:
@@ -164,7 +161,7 @@ public class TextToRecipeTest {
 
     @Test
     public void testParseDifferentLineSpacing() {
-        ITextToRecipe textToRecipe = new TextToRecipe();
+        ITextToRecipe textToRecipe = new ChatGPTService();
         String responseText = """
 
 

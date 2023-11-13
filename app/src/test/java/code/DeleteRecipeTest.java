@@ -4,29 +4,126 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import code.client.Model.*;
-import code.client.Controllers.*;
-import code.client.View.*;
+import java.util.Iterator;
 
+import code.client.Model.*;
+
+/**
+ * Test the delete recipe feature for four distinct test cases:
+ * 1. Deleting all of the recipes in the recipe list
+ * 2. Deleting a recipe at the top of the recipe list
+ * 3. Deleting a recipe at the middle of the recipe list
+ * 4. Deleting a recipe at the bottom of the recipe list
+ */
 public class DeleteRecipeTest {
-    private RecipeListUI recipeList;
-    private RecipeDetailsUI recipeDetails;
-    
-    /*
-     * Before each test set up a recipe list with three recipes
+    private RecipeDb recipeDb;
+    private Iterator<Recipe> iterator;
+    private Recipe r1, r2, r3;
+
+    /**
+     * Before each test initialize a RecipeDb with three recipes and an iterator
      */
     @BeforeEach
-    public void setUp() {}
-    
-    /*
-     * Test for deleting a recipe from the recipe list
-     */
-    @Test
-    public void testDeleteRecipeFromList() {}
+    public void setUp() {
+        recipeDb = new RecipeDb();
+        iterator = recipeDb.iterator();
+        // Create three different recipes
+        r1 = new Recipe("French Toast");
+        r2 = new Recipe("Mac and Cheese");
+        r3 = new Recipe("Steak and Potatoes");
+        // Add the three recipes to the RecipeDb
+        recipeDb.add(r1);
+        recipeDb.add(r2);
+        recipeDb.add(r3);
+    }
 
-    /*
-     * Test for deleting a recipe from the recipe details
+    /**
+     * * Test case: Deleting all of the recipes in the list
+     * Expected result: The recipe list becomes empty
      */
     @Test
-    public void testDeleteRecipeFromDetails() {}
+    public void testDeleteAllRecipes() {
+        // Check that the size of the recipe list is 3 before deletion
+        assertEquals(recipeDb.size(), 3);
+        // Delete all of the recipes from the RecipeDb
+        recipeDb.remove(r1);
+        recipeDb.remove(r2);
+        recipeDb.remove(r3);
+        // Check that the size of the recipe list is now 0
+        assertEquals(recipeDb.size(), 0);
+    }
+
+    /**
+     * Test case: Deleting a recipe from the top of the recipe list
+     * Expected result: All of the other recipes have their indices shifted up by 1
+     */
+    @Test
+    public void testDeleteFirstRecipe() {
+        // Check that the size of the recipe list is 3 before deletion
+        assertEquals(recipeDb.size(), 3);
+        // Delete the recipe at the top of the recipe list
+        recipeDb.remove(r1);
+        // Check that the size of the recipe list is now 2
+        assertEquals(recipeDb.size(), 2);
+        // Check that the other recipes had their indices shifted up by 1
+        iterator = recipeDb.iterator();
+        Recipe idx0 = iterator.next(); // Recipe at index 0 of the new recipe list
+        Recipe idx1 = iterator.next(); // Recipe at index 1 of the new recipe list
+        // Check that the recipe at index 0 was the recipe that was at index 1
+        assertEquals(idx0.getTitle(), r2.getTitle());
+        assertEquals(idx0.getId(), r2.getId());
+        // Check that the recipe at index 1 was the recipe that was at index 2
+        assertEquals(idx1.getTitle(), r3.getTitle());
+        assertEquals(idx1.getId(), r3.getId());
+    }
+
+    /**
+     * Test case: Deleting a recipe from the middle of the recipe list
+     * Expected result: All recipes that were below the deleted recipe have their
+     * indices shifted up by 1
+     */
+    @Test
+    public void testDeleteMiddleRecipe() {
+        // Check that the size of the recipe list is 3 before deletion
+        assertEquals(recipeDb.size(), 3);
+        // Delete the recipe at the middle of the recipe list
+        recipeDb.remove(r2);
+        // Check that the size of the recipe list is now 2
+        assertEquals(recipeDb.size(), 2);
+        // Check that only the recipe at the bottom of the list had its index shifted up
+        // by 1
+        iterator = recipeDb.iterator();
+        Recipe idx0 = iterator.next(); // Recipe at index 0 of the new recipe list
+        Recipe idx1 = iterator.next(); // Recipe at index 1 of the new recipe list
+        // Check that the recipe at index 0 is still the recipe that was at index 0
+        assertEquals(idx0.getTitle(), r1.getTitle());
+        assertEquals(idx0.getId(), r1.getId());
+        // Check that the recipe at index 1 was the recipe that was at index 2
+        assertEquals(idx1.getTitle(), r3.getTitle());
+        assertEquals(idx1.getId(), r3.getId());
+    }
+
+    /**
+     * Test case: Deleting a recipe from the bottom of the recipe list
+     * Expected result: None of the other recipes have their indices shifted
+     */
+    @Test
+    public void testDeleteLastRecipe() {
+        // Check that the size of the recipe list is 3 before deletion
+        assertEquals(recipeDb.size(), 3);
+        // Delete the recipe at the middle of the recipe list
+        recipeDb.remove(r3);
+        // Check that the size of the recipe list is now 2
+        assertEquals(recipeDb.size(), 2);
+        // Check that none of the other recipes had their index shifted up by 1
+        iterator = recipeDb.iterator();
+        Recipe idx0 = iterator.next(); // Recipe at index 0 of the new recipe list
+        Recipe idx1 = iterator.next(); // Recipe at index 1 of the new recipe list
+        // Check that the recipe at index 0 is still the recipe that was at index 0
+        assertEquals(idx0.getTitle(), r1.getTitle());
+        assertEquals(idx0.getId(), r1.getId());
+        // Check that the recipe at index 1 is still the recipe that was at index 1
+        assertEquals(idx1.getTitle(), r2.getTitle());
+        assertEquals(idx1.getId(), r2.getId());
+    }
 }

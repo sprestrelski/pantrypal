@@ -3,8 +3,6 @@ package code.server;
 import com.sun.net.httpserver.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.*;
 
 public class MyServer {
@@ -16,16 +14,13 @@ public class MyServer {
   public static void main(String[] args) throws IOException {
     ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
     // create a map to store data
-    Map<String, String> data = new HashMap<>();
-
     // create a server
     HttpServer server = HttpServer.create(
         new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT),
         0);
 
     // create the context
-    server.createContext("/", new RequestHandler(data));
-    server.createContext("/name", new MyHandler());
+    server.createContext("/", new RequestHandler());
     // set the executor
     server.setExecutor(threadPoolExecutor);
     // start the server

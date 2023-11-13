@@ -1,43 +1,35 @@
 package code.client.Model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 public class Recipe {
-    private final String id;
-    private final String title;
+    private UUID id;
+    private String title;
     private final List<String> ingredientList = new ArrayList<>();
     private final List<String> instructionList = new ArrayList<>();
 
-    public Recipe(String id, String title) {
-        this.id = id;
+    public Recipe(String title) {
+        this.id = UUID.nameUUIDFromBytes(title.getBytes());
         this.title = title;
     }
 
-    public String getId() {
+    public void setID(UUID uuid) {
+        id = uuid;
+    }
+
+    public void setTitle(String name) {
+        title = name;
+    }
+
+    public UUID getId() {
         return id;
     }
 
     public String getTitle() {
         return title;
-    }
-
-    public String getAllIngredients() {
-        return String.join(";;", ingredientList);
-    }
-
-    public String getAllInstructions() {
-        return String.join(";;", instructionList);
-    }
-
-    public void setAllIngredients(String ingredients) {
-        ingredientList.addAll(Arrays.asList(ingredients.split(";;")));
-    }
-
-    public void setAllInstructions(String instructions) {
-        instructionList.addAll(Arrays.asList(instructions.split(";;")));
     }
 
     public void addIngredient(String ingredient) {
@@ -56,6 +48,19 @@ public class Recipe {
         return instructionList.iterator();
     }
 
+    public String getHttpString() {
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append(title).append("| ");
+        for (String ingredient : ingredientList) {
+            strBuilder.append(ingredient).append(";;");
+        }
+        strBuilder.append("| ");
+        for (String instruction : instructionList) {
+            strBuilder.append(instruction).append(";;");
+        }
+        return strBuilder.toString();
+    }
+
     @Override
     public String toString() {
         StringBuilder strBuilder = new StringBuilder();
@@ -69,5 +74,16 @@ public class Recipe {
             strBuilder.append(instruction).append("\n");
         }
         return strBuilder.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof Recipe recipe)) {
+            return false;
+        }
+        return id.equals(recipe.id);
     }
 }

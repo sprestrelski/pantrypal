@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.util.Iterator;
 
 public class RecipeWriter {
-    private Writer writer;
+    private final Writer writer;
 
     public RecipeWriter(Writer writer) {
         this.writer = writer;
     }
 
-    private void writeRecipe(Recipe recipe) throws IOException {
+    public void writeRecipe(Recipe recipe) throws IOException {
         StringBuilder strBuilder = new StringBuilder();
         Iterator<String> ingredientIter = recipe.getIngredientIterator();
         Iterator<String> instructionIter = recipe.getInstructionIterator();

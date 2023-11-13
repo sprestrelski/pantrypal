@@ -13,12 +13,12 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class TextToRecipe implements ITextToRecipe {
-    private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
-    private static final String API_KEY = "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";
-    private static final String MODEL = "text-davinci-003";
-    private static final int MAX_TOKENS = 500;
-    private static final double TEMPERATURE = 1.;
+public class ChatGPTService implements ITextToRecipe {
+    public static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
+    public static final String API_KEY = "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";
+    public static final String MODEL = "text-davinci-003";
+    public static final int MAX_TOKENS = 500;
+    public static final double TEMPERATURE = 1.;
 
     @Override
     public String getChatGPTResponse(String typeOfMeal, String input) throws IOException, InterruptedException, URISyntaxException {
@@ -72,7 +72,7 @@ public class TextToRecipe implements ITextToRecipe {
         }
 
         // Create a new recipe with a title
-        Recipe recipe = new Recipe("1", tokenList.get(0));
+        Recipe recipe = new Recipe(tokenList.get(0));
 
         // Parse recipe's ingredients
         String ingredient;

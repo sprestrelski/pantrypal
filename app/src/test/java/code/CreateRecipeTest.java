@@ -2,10 +2,7 @@ package code;
 
 import org.junit.jupiter.api.Test;
 
-import code.client.Model.ITextToRecipe;
 import code.client.Model.Recipe;
-import code.client.Model.TextToRecipe;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CreateRecipeTest {
@@ -14,8 +11,7 @@ public class CreateRecipeTest {
      */
     @Test
     public void testCreateRecipe() {
-        Recipe recipe = new Recipe("1", "Fried Rice");
-
+        Recipe recipe = new Recipe("Fried Rice");
         assertEquals("1", recipe.getId());
         assertEquals("Fried Rice", recipe.getTitle());
         recipe.addIngredient("Rice");

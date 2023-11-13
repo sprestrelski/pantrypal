@@ -18,6 +18,10 @@ public class HomeScreen implements IWindowUI {
         return holder;
     }
 
+    public AppFrameHome getAppFrameHome() {
+        return home;
+    }
+
     /**
      * This method provides the UI holder with the different scenes that can be
      * switched between.

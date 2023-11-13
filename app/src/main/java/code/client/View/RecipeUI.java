@@ -59,11 +59,4 @@ public class RecipeUI extends HBox {
         return this.recipe.getTitle();
     }
 
-    public String getRecipeIngredients() {
-        return this.recipe.getAllIngredients();
-    }
-
-    public String getRecipeInstructions() {
-        return this.recipe.getAllInstructions();
-    }
 }
