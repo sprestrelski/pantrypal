@@ -1,20 +1,28 @@
 package code.server;
 
 import com.sun.net.httpserver.*;
+
+import code.client.Model.IRecipeDb;
+import code.client.Model.Recipe;
+import code.client.Model.RecipeReader;
+import code.client.Model.RecipeWriter;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
 public class RequestHandler implements HttpHandler {
-    private final Map<String, String> data;
+    private static final String CSV_FILE = "recipes.csv";
+    private IRecipeDb recipeDb;
 
-    public RequestHandler(Map<String, String> data) {
-        this.data = data;
+    public RequestHandler() {
+        loadRecipes();
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
         String response = "Request Received";
         String method = httpExchange.getRequestMethod();
+        loadRecipes();
         try {
             if (method.equals("GET")) {
                 response = handleGet(httpExchange);
@@ -29,10 +37,10 @@ public class RequestHandler implements HttpHandler {
             }
         } catch (Exception e) {
             System.out.println("An erroneous request");
-            response = e.toString();
             e.printStackTrace();
         }
 
+        saveRecipes();
         // Sending back response to the client
         httpExchange.sendResponseHeaders(200, response.length());
         OutputStream outStream = httpExchange.getResponseBody();
@@ -40,56 +48,66 @@ public class RequestHandler implements HttpHandler {
         outStream.close();
     }
 
+    /*
+     * Expects UUID
+     */
     private String handleGet(HttpExchange httpExchange) throws IOException {
         String response = "Invalid GET request";
         URI uri = httpExchange.getRequestURI();
         String query = uri.getRawQuery();
+
         if (query != null) {
-            String value = query.substring(query.indexOf("=") + 1);
-            String year = data.get(value); // Retrieve data from hashmap
-            if (year != null) {
-                response = year;
-                System.out.println("Queried for " + value + " and found " + year);
+            UUID uuid = UUID.fromString(query.substring(query.indexOf("=") + 1));
+            Recipe recipe = recipeDb.find(uuid);
+            if (recipe != null) {
+                response = recipe.getHttpString();
+                System.out.println("Queried for " + uuid + " and found " + recipe.getTitle());
             } else {
-                response = "No data found for " + value;
+                response = "Recipe not found.";
             }
         }
+
         return response;
     }
 
+    private Recipe buildRecipe(String postData) throws IOException {
+        Reader reader = new StringReader(postData);
+        RecipeReader recipeReader = new RecipeReader(reader);
+        Recipe recipe = recipeReader.readRecipe();
+        return recipe;
+    }
+
+    /*
+     * Expects recipe as recipe| ingredients | instructions
+     */
     private String handlePost(HttpExchange httpExchange) throws IOException {
         InputStream inStream = httpExchange.getRequestBody();
         Scanner scanner = new Scanner(inStream);
         String postData = scanner.nextLine();
-        String language = postData.substring(
-                0,
-                postData.indexOf(",")), year = postData.substring(postData.indexOf(",") + 1);
-
-        // Store data in hashmap
-        data.put(language, year);
-
-        String response = "Posted entry {" + language + ", " + year + "}";
+        Recipe recipe = buildRecipe(postData);
+        recipeDb.add(recipe);
+        String response = "Posted entry " + recipe.getTitle();
         System.out.println(response);
         scanner.close();
-
         return response;
     }
 
+    /*
+     * Expects recipe as recipe| ingredients | instructions
+     */
     private String handlePut(HttpExchange httpExchange) throws IOException {
         InputStream inStream = httpExchange.getRequestBody();
         Scanner scanner = new Scanner(inStream);
         String postData = scanner.nextLine();
-        String language = postData.substring(
-                0,
-                postData.indexOf(",")), year = postData.substring(postData.indexOf(",") + 1);
+        Recipe recipe = buildRecipe(postData);
 
-        String response = "Added entry {" + language + ", " + year + "}";
-        String previous = data.put(language, year);
-        System.out.println(previous);
+        Recipe previous = recipeDb.find(recipe.getId());
         if (previous != null) {
-            response = "Updated entry {" + language + ", " + year + "} (previous year: " + previous + ")";
+            recipeDb.remove(previous);
         }
 
+        recipeDb.add(recipe);
+        String response = "Added entry " + recipe.getTitle();
         System.out.println(response);
         scanner.close();
 
@@ -100,18 +118,48 @@ public class RequestHandler implements HttpHandler {
         String response = "Invalid DELETE request";
         URI uri = httpExchange.getRequestURI();
         String query = uri.getRawQuery();
+
         if (query != null) {
-            String value = query.substring(query.indexOf("=") + 1);
-            String year = data.get(value); // Retrieve data from hashmap
-            if (year != null) {
-                data.remove(value);
-                response = "Deleted entry {" + value + ", " + year + "}";
-                System.out.println(response);
+            UUID uuid = UUID.fromString(query.substring(query.indexOf("=") + 1));
+            Recipe recipe = recipeDb.find(uuid);
+            if (recipe != null) {
+                recipeDb.remove(recipe);
+                response = recipe.getHttpString();
+                System.out.println("Queried for " + uuid + " and found " + recipe.getTitle());
             } else {
-                response = "No data found for " + value;
+                System.out.println("Recipe not found.");
             }
         }
+
         return response;
+    }
+
+    /*
+     * Save recipes to a file called "recipes.csv"
+     */
+    public void saveRecipes() {
+        try {
+            Writer writer = new BufferedWriter(new FileWriter(CSV_FILE));
+            RecipeWriter recipeWriter = new RecipeWriter(writer);
+            recipeWriter.writeRecipeDb(recipeDb);
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Recipes could not be saved.");
+        }
+    }
+
+    /*
+     * Load recipes from a file called "recipes.csv" to RecipeDb
+     */
+    public void loadRecipes() {
+        try {
+            Reader reader = new FileReader(CSV_FILE);
+            RecipeReader recipeReader = new RecipeReader(reader);
+            recipeDb = recipeReader.readRecipeDb();
+            System.out.println("Recipes loaded");
+        } catch (IOException e) {
+            System.out.println("Recipes could not be loaded.");
+        }
     }
 
 }

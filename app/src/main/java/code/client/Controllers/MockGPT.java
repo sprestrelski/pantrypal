@@ -35,7 +35,7 @@ public class MockGPT implements ITextToRecipe {
 
     @Override
     public Recipe mapResponseToRecipe(String responseText) {
-        Recipe recipe = new Recipe("1", "Fried Chicken");
+        Recipe recipe = new Recipe("Fried Chicken");
         recipe.addIngredient("- 2 chicken breasts, diced");
         recipe.addIngredient("- 2 eggs");
         recipe.addInstruction("1. Crack 2 eggs into bowl.");

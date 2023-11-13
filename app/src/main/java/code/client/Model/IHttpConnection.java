@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public interface CustomHttpConnection {
+public interface IHttpConnection {
     int getResponseCode() throws IOException;
 
     InputStream getInputStream() throws IOException;
@@ -21,5 +21,4 @@ public interface CustomHttpConnection {
     void setDoOutput(boolean output);
 
     void disconnect();
-
 }

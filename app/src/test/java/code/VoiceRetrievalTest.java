@@ -5,8 +5,8 @@ import java.net.URISyntaxException;
 
 import org.junit.jupiter.api.Test;
 
-import code.client.Model.CustomHttpConnection;
-import code.client.Model.WhisperHandler;
+import code.client.Model.IHttpConnection;
+import code.client.Model.WhisperService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,14 +17,21 @@ public class VoiceRetrievalTest {
      */
     @Test
     void testSuccessfulProcessAudio() throws IOException, URISyntaxException {
-        CustomHttpConnection connection = new MockHttpConnection(200,
-                new ByteArrayInputStream("{\"text\":\"Breakfast.\"}".getBytes()), new ByteArrayOutputStream());
-        WhisperHandler audioProcessor = new WhisperHandler("API_ENDPOINT", "TOKEN", "MODEL", connection);
+        IHttpConnection connection = new MockHttpConnection(
+                200,
+                new ByteArrayInputStream("{\"text\":\"Breakfast.\"}".getBytes()),
+                new ByteArrayOutputStream());
+
+        WhisperService audioProcessor = new WhisperService(connection);
         String response = audioProcessor.processAudio();
         assertEquals("Breakfast.", response);
 
-        audioProcessor.setHttpConnection(new MockHttpConnection(200,
-                new ByteArrayInputStream("{\"text\":\"Chicken, cheese.\"}".getBytes()), null));
+        audioProcessor.setConnection(
+                new MockHttpConnection(
+                        200,
+                        new ByteArrayInputStream("{\"text\":\"Chicken, cheese.\"}".getBytes()),
+                        null));
+
         response = audioProcessor.processAudio();
         assertEquals("Chicken, cheese.", response);
 
@@ -32,10 +39,12 @@ public class VoiceRetrievalTest {
 
     @Test
     void testFailedProcessAudio() throws IOException, URISyntaxException {
-        CustomHttpConnection connection = new MockHttpConnection(404,
+        IHttpConnection connection = new MockHttpConnection(
+                404,
                 new ByteArrayInputStream("Error text".getBytes()),
                 null);
-        WhisperHandler audioProcessor = new WhisperHandler("API_ENDPOINT", "TOKEN", "MODEL", connection);
+
+        WhisperService audioProcessor = new WhisperService(connection);
         String response = audioProcessor.processAudio();
         assertEquals("Error text", response);
     }
@@ -45,12 +54,14 @@ public class VoiceRetrievalTest {
      */
     @Test
     void testMockHttpCreation() throws IOException {
-        CustomHttpConnection connection = new MockHttpConnection(200, new ByteArrayInputStream("hello".getBytes()),
+        IHttpConnection connection = new MockHttpConnection(
+                200,
+                new ByteArrayInputStream("hello".getBytes()),
                 null);
+
         int responseCode = connection.getResponseCode();
         assertEquals(responseCode, 200);
         assertEquals(connection.getInputStream(), connection.getErrorStream());
-
     }
 
 }
