@@ -1,7 +1,9 @@
 package code.client.View;
 
-import code.client.Controllers.*;
 import code.client.Model.*;
+import code.client.View.*;
+import code.client.Controllers.*;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import java.io.File;
@@ -17,6 +19,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 // import javax.sound.sampled.*;
+
+
 
 class MealTypeSelection extends GridPane {
     private Label prompt;
@@ -168,10 +172,10 @@ class AppFrameMic extends BorderPane {
     private ArrayList<IWindowUI> scenes;
     private Scene mainScene;
     private RecipeUI newRecipe;
-    private RecipeList list;
+    private RecipeListUI list;
 
     AppFrameMic() throws URISyntaxException, IOException {
-        backButton = new Button("Back"); // not used yet (Back button)
+        backButton = new Button("Back"); 
         // backButton.setOnAction(e -> goBack());
         HBox backButtonContainer = new HBox(backButton);
         backButtonContainer.setPadding(new Insets(1)); // padding
@@ -210,7 +214,7 @@ class AppFrameMic extends BorderPane {
         addListeners();
     }
 
-    public void storeNewRecipeUI(RecipeList list, RecipeUI recipeUI) {
+    public void storeNewRecipeUI(RecipeListUI list, RecipeUI recipeUI) {
         newRecipe = recipeUI;
         this.list = list;
     }
@@ -311,11 +315,11 @@ class AppFrameMic extends BorderPane {
 public class NewRecipeUI implements IWindowUI {
     private AppFrameMic root;
 
-    NewRecipeUI() throws URISyntaxException, IOException {
+    public NewRecipeUI() throws URISyntaxException, IOException {
         root = new AppFrameMic();
     }
 
-    public void storeNewRecipeUI(RecipeList list, RecipeUI recipeUI) {
+    public void storeNewRecipeUI(RecipeListUI list, RecipeUI recipeUI) {
         root.storeNewRecipeUI(list, recipeUI);
     }
 

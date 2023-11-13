@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 
 import org.junit.jupiter.api.Test;
 
-import code.client.Model.CustomHttpConnection;
+import code.client.Model.IHttpConnection;
 import code.client.Model.WhisperHandler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +17,7 @@ public class VoiceRetrievalTest {
      */
     @Test
     void testSuccessfulProcessAudio() throws IOException, URISyntaxException {
-        CustomHttpConnection connection = new MockHttpConnection(200,
+        IHttpConnection connection = new MockHttpConnection(200,
                 new ByteArrayInputStream("{\"text\":\"Breakfast.\"}".getBytes()), new ByteArrayOutputStream());
         WhisperHandler audioProcessor = new WhisperHandler("API_ENDPOINT", "TOKEN", "MODEL", connection);
         String response = audioProcessor.processAudio();
@@ -32,7 +32,7 @@ public class VoiceRetrievalTest {
 
     @Test
     void testFailedProcessAudio() throws IOException, URISyntaxException {
-        CustomHttpConnection connection = new MockHttpConnection(404,
+        IHttpConnection connection = new MockHttpConnection(404,
                 new ByteArrayInputStream("Error text".getBytes()),
                 null);
         WhisperHandler audioProcessor = new WhisperHandler("API_ENDPOINT", "TOKEN", "MODEL", connection);
@@ -45,7 +45,7 @@ public class VoiceRetrievalTest {
      */
     @Test
     void testMockHttpCreation() throws IOException {
-        CustomHttpConnection connection = new MockHttpConnection(200, new ByteArrayInputStream("hello".getBytes()),
+        IHttpConnection connection = new MockHttpConnection(200, new ByteArrayInputStream("hello".getBytes()),
                 null);
         int responseCode = connection.getResponseCode();
         assertEquals(responseCode, 200);

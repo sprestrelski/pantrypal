@@ -15,7 +15,7 @@ public class WhisperHandler {
     private String API_ENDPOINT;
     private String TOKEN;
     private String MODEL;
-    private CustomHttpConnection connection;
+    private IHttpConnection connection;
 
     public WhisperHandler(String API_ENDPOINT, String TOKEN, String MODEL) throws IOException, URISyntaxException {
         this.API_ENDPOINT = API_ENDPOINT;
@@ -23,7 +23,7 @@ public class WhisperHandler {
         this.MODEL = MODEL;
     }
 
-    public WhisperHandler(String API_ENDPOINT, String TOKEN, String MODEL, CustomHttpConnection connection) {
+    public WhisperHandler(String API_ENDPOINT, String TOKEN, String MODEL, IHttpConnection connection) {
         this.API_ENDPOINT = API_ENDPOINT;
         this.TOKEN = TOKEN;
         this.MODEL = MODEL;
@@ -49,11 +49,11 @@ public class WhisperHandler {
         return response;
     }
 
-    public void setHttpConnection(CustomHttpConnection connection) {
+    public void setHttpConnection(IHttpConnection connection) {
         this.connection = connection;
     }
 
-    public CustomHttpConnection sendHttpRequest() throws IOException, URISyntaxException {
+    public IHttpConnection sendHttpRequest() throws IOException, URISyntaxException {
         // Set up request headers
         File file = new File("recording.wav");
         String boundary = "Boundary-" + System.currentTimeMillis();
@@ -118,7 +118,7 @@ public class WhisperHandler {
     }
 
     // Helper method to handle a successful response
-    private static String handleSuccessResponse(CustomHttpConnection connection)
+    private static String handleSuccessResponse(IHttpConnection connection)
             throws IOException, JSONException {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(connection.getInputStream()));
@@ -137,7 +137,7 @@ public class WhisperHandler {
     }
 
     // Helper method to handle an error response
-    private static String handleErrorResponse(CustomHttpConnection connection)
+    private static String handleErrorResponse(IHttpConnection connection)
             throws IOException, JSONException {
         BufferedReader errorReader = new BufferedReader(
                 new InputStreamReader(connection.getErrorStream()));

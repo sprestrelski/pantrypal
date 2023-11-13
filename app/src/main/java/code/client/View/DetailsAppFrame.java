@@ -2,7 +2,7 @@ package code.client.View;
 
 import java.util.ArrayList;
 
-import code.client.Model.Recipe;
+import code.client.Model.*;
 import javafx.animation.PauseTransition;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,19 +11,24 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import code.client.Model.*;
+import code.client.View.*;
+import code.client.Controllers.*;
+
+
 public class DetailsAppFrame implements IWindowUI {
     private ArrayList<IWindowUI> scenes;
     private Scene mainScene;
 
     private RecipeDetailsUI currentRecipe;
     private RecipeUI recipeUI;
-    private RecipeList list;
+    private RecipeListUI list;
     private Button backToHomeButton, editButton, saveButton, deleteButton;
     VBox detailedUI;
     private boolean editable = false;
     private String defaultButtonStyle, onStyle, offStyle;
 
-    DetailsAppFrame() {
+    public DetailsAppFrame() {
 
         detailedUI = new VBox();
         detailedUI.setSpacing(20);
@@ -73,7 +78,7 @@ public class DetailsAppFrame implements IWindowUI {
      * @param recipeUI - the UI element that stores the recipe name in the Home
      *                 Recipe List
      */
-    public void storeNewRecipeUI(RecipeList list, RecipeUI recipeUI) {
+    public void storeNewRecipeUI(RecipeListUI list, RecipeUI recipeUI) {
         this.recipeUI = recipeUI;
         this.list = list;
     }
@@ -104,6 +109,9 @@ public class DetailsAppFrame implements IWindowUI {
 
             recipeUI.setRecipe(current);
             list.saveRecipes();
+            //**************************** */
+            list.getRecipeDB().add(providedRecipe);
+            //**************************** */
 
             PauseTransition pause = new PauseTransition(Duration.seconds(1));
             pause.setOnFinished(f -> saveButton.setStyle(defaultButtonStyle));

@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class RealHttpConnection implements CustomHttpConnection {
+public class RealHttpConnection implements IHttpConnection {
     private HttpURLConnection connection;
 
-    public RealHttpConnection(String API_ENDPOINT)
+    public RealHttpConnection(String apiEndPoint)
             throws URISyntaxException, IOException {
-        URL url = new URI(API_ENDPOINT).toURL();
+        URL url = new URI(apiEndPoint).toURL();
         this.connection = (HttpURLConnection) url.openConnection();
     }
 

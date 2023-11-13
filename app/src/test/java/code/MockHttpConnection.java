@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import code.client.Model.CustomHttpConnection;
+import code.client.Model.IHttpConnection;
 
-public class MockHttpConnection implements CustomHttpConnection {
+public class MockHttpConnection implements IHttpConnection {
     private int responseCode;
     private InputStream inputStream;
     private OutputStream outputStream;
