@@ -209,6 +209,14 @@ class AppFrameMic extends BorderPane {
         addListeners();
     }
 
+    public void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
     public void storeNewRecipeUI(RecipeListUI list, RecipeUI recipeUI) {
         newRecipe = recipeUI;
         this.list = list;
@@ -249,7 +257,17 @@ class AppFrameMic extends BorderPane {
                     exception.printStackTrace();
                 }
 
-                mealTypeSelection.getMealType().setText(mealType);
+                mealType = mealType.toLowerCase();
+                if (mealType.contains("breakfast")) {
+                    mealTypeSelection.getMealType().setText("Breakfast");
+                } else if (mealType.contains("lunch")) {
+                    mealTypeSelection.getMealType().setText("Lunch");
+                } else if (mealType.contains("dinner")) {
+                    mealTypeSelection.getMealType().setText("Dinner");
+                } else {
+                    showAlert("Input Error", "Please say a valid meal type!");
+                    mealType = "";
+                }
             }
         });
 
@@ -269,7 +287,15 @@ class AppFrameMic extends BorderPane {
                     exception.printStackTrace();
                 }
 
-                ingredientsList.getIngredients().setText(ingredients);
+                // handles gibberish
+                String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
+                if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*")) {
+                    showAlert("Input Error", "Please provide valid ingredients!");
+                    ingredients = "";
+                } else {
+                    ingredientsList.getIngredients().setText(ingredients);
+                }
+
             }
         });
 
@@ -284,23 +310,28 @@ class AppFrameMic extends BorderPane {
 
         // CHANGE SCENE TO DETAILED RECIPE DISPLAY
         saveButton.setOnAction(e -> {
-            ITextToRecipe caller = new ChatGPTService();
-            try {
-                String audioOutput1 = mealType;
-                String audioOutput2 = ingredients;// audio.processAudio();
-                String responseText = caller.getChatGPTResponse(audioOutput1, audioOutput2);
-                Recipe recipe = caller.mapResponseToRecipe(responseText);
-                RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
+            if (mealType != "" && ingredients != "") {
+                ITextToRecipe caller = new ChatGPTService();
+                try {
+                    String audioOutput1 = mealType;
+                    String audioOutput2 = ingredients;// audio.processAudio();
+                    String responseText = caller.getChatGPTResponse(audioOutput1, audioOutput2);
+                    Recipe recipe = caller.mapResponseToRecipe(responseText);
+                    RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
 
-                // gets the DetailsAppFrame
-                DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
-                details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
-                details.storeNewRecipeUI(list, newRecipe);
-                details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
+                    // gets the DetailsAppFrame
+                    DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
+                    details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
+                    details.storeNewRecipeUI(list, newRecipe);
+                    details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
 
-            } catch (Exception e1) {
-                e1.printStackTrace();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            } else {
+                showAlert("Input Error", "Invalid meal type or ingredients, please try again!");
             }
+
         });
     }
 }
