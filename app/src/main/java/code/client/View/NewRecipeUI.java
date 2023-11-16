@@ -20,7 +20,7 @@ import javafx.scene.text.*;
 // import javax.sound.sampled.*;
 
 class MealTypeSelection extends GridPane {
-    private final Label prompt;
+    private final Label prompt, recordingLabel;
     private final Button recordButton;
     private final ImageView microphone;
     private final TextArea mealTypeArea;
@@ -45,10 +45,15 @@ class MealTypeSelection extends GridPane {
         recordButton = new Button();
         recordButton.setGraphic(microphone);
 
+        // Create a label that indicated if the app is currently recording
+        recordingLabel = new Label("Recording...");
+        recordingLabel.setTextFill(Color.web("#FF0000"));
+        recordingLabel.setVisible(false);
+
         // Set the user prompt for meal type selection
         prompt = new Label("Select Meal Type (Breakfast, Lunch, or Dinner)");
-        prompt.setStyle("-fx-font-size: 16;");
-        prompt.setTextFill(Color.web("#FF0000"));
+        prompt.setStyle("-fx-font-size: 16; -fx-font-weight: bold;");
+        // prompt.setTextFill(Color.web("#FF0000"));
 
         // Set a textField for the meal type that was selected
         mealTypeArea = new TextArea();
@@ -60,8 +65,10 @@ class MealTypeSelection extends GridPane {
 
         // Add all of the elements to the MealTypeSelection
         this.add(recordButton, 0, 0);
-        this.add(prompt, 1, 0);
-        this.add(mealTypeArea, 0, 1);
+        this.add(recordingLabel, 0, 1);
+        this.add(prompt, 0, 2);
+        this.add(mealTypeArea, 0, 3);
+
     }
 
     public TextArea getMealType() {
@@ -71,11 +78,15 @@ class MealTypeSelection extends GridPane {
     public Button getRecordButton() {
         return recordButton;
     }
+
+    public Label getRecordingLabel() {
+        return recordingLabel;
+    }
 }
 
 class IngredientsList extends GridPane {
 
-    private Label prompt;
+    private Label prompt, recordingLabel;
     private Button recordButton;
     private ImageView microphone;
     private TextArea ingredientsArea;
@@ -85,21 +96,31 @@ class IngredientsList extends GridPane {
         // Set the preferred vertical and horizontal gaps
         this.setVgap(20);
         this.setHgap(20);
+
         // Get a picture of a microphone for the voice recording button
         File file = new File("app/src/main/java/code/client/View/microphone.png");
         microphone = new ImageView(new Image(file.toURI().toString()));
+
         // Set the size of the microphone image
         microphone.setFitWidth(50);
         microphone.setFitHeight(50);
         microphone.setScaleX(1);
         microphone.setScaleY(1);
+
         // Create a recording button
         recordButton = new Button();
         recordButton.setGraphic(microphone);
+
+        // Create a label that indicated if the app is currently recording
+        recordingLabel = new Label("Recording...");
+        recordingLabel.setTextFill(Color.web("#FF0000"));
+        recordingLabel.setVisible(false);
+
         // Set the user prompt for meal type selection
         prompt = new Label("Please List Your Ingredients");
-        prompt.setStyle("-fx-font-size: 16;");
-        prompt.setTextFill(Color.web("#FF0000")); // CHANGE 2 (COLOR)
+        prompt.setStyle("-fx-font-size: 16; -fx-font-weight: bold;");
+        // prompt.setTextFill(Color.web("#FF0000"));
+
         // Set a textField for the meal type that was selected
         ingredientsArea = new TextArea();
         ingredientsArea.setPromptText("Ingredients");
@@ -110,8 +131,9 @@ class IngredientsList extends GridPane {
 
         // Add all of the elements to the MealTypeSelection
         this.add(recordButton, 0, 0);
-        this.add(prompt, 1, 0);
-        this.add(ingredientsArea, 0, 1);
+        this.add(recordingLabel, 0, 1);
+        this.add(prompt, 0, 2);
+        this.add(ingredientsArea, 0, 3);
     }
 
     public TextArea getIngredients() {
@@ -120,6 +142,10 @@ class IngredientsList extends GridPane {
 
     public Button getRecordButton() {
         return recordButton;
+    }
+
+    public Label getRecordingLabel() {
+        return recordingLabel;
     }
 }
 
@@ -163,6 +189,7 @@ class AppFrameMic extends BorderPane {
     private MealTypeSelection mealTypeSelection;
     private IngredientsList ingredientsList;
     private Button recordButton1, recordButton2, saveButton, backButton;
+    private Label recordingLabel1, recordingLabel2;
 
     // Scene Transitions
     private ArrayList<IWindowUI> scenes;
@@ -196,7 +223,9 @@ class AppFrameMic extends BorderPane {
         this.setCenter(recipeCreationGrid);
 
         recordButton1 = mealTypeSelection.getRecordButton();
+        recordingLabel1 = mealTypeSelection.getRecordingLabel();
         recordButton2 = ingredientsList.getRecordButton();
+        recordingLabel2 = ingredientsList.getRecordingLabel();
 
         // createButton = new Button("Create Recipe");
         // recipeCreationGrid.add(createButton, 0, 3);
@@ -239,15 +268,22 @@ class AppFrameMic extends BorderPane {
     public void addListeners() throws IOException, URISyntaxException {
 
         AudioRecorder recorder = new AudioRecorder();
-        VoiceToText whisperService = new WhisperService();
+        WhisperService whisperService = new WhisperService();
 
         recordButton1.setOnAction(event -> {
             if (!recording) {
                 recorder.startRecording();
                 recording = true;
+                recordButton1.setStyle("-fx-background-color: #FF0000;");
+
+                recordingLabel1.setVisible(true);
+                // recordingLabel1.setStyle("-fx-font-color: #FF0000;");
             } else {
                 recorder.stopRecording();
                 recording = false;
+                recordButton1.setStyle("");
+                recordingLabel1.setVisible(false);
+                // recordingLabel1.setStyle("");
 
                 try {
                     whisperService.setConnection(new RealHttpConnection(WhisperService.API_ENDPOINT));
@@ -277,9 +313,15 @@ class AppFrameMic extends BorderPane {
             if (!recording) {
                 recorder.startRecording();
                 recording = true;
+                recordButton2.setStyle("-fx-background-color: #FF0000;");
+                recordingLabel2.setVisible(true);
+                // recordingLabel2.setStyle("-fx-background-color: #FF0000;");
             } else {
                 recorder.stopRecording();
                 recording = false;
+                recordButton2.setStyle("");
+                recordingLabel2.setVisible(false);
+                // recordingLabel2.setStyle("");
 
                 try {
                     whisperService.setConnection(new RealHttpConnection(WhisperService.API_ENDPOINT));
@@ -318,7 +360,7 @@ class AppFrameMic extends BorderPane {
                     String audioOutput1 = mealType;
                     String audioOutput2 = ingredients;// audio.processAudio();
                     String responseText = caller.getChatGPTResponse(audioOutput1, audioOutput2);
-                    Recipe recipe = caller.mapResponseToRecipe(responseText);
+                    Recipe recipe = caller.mapResponseToRecipe(mealType, responseText);
                     RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
 
                     // gets the DetailsAppFrame

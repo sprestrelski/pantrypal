@@ -24,7 +24,7 @@ public class RecipeReader {
         }
 
         for (String instruction : instructionTokens) {
-            recipe.addIngredient(instruction);
+            recipe.addInstruction(instruction);
         }
 
         return recipe;

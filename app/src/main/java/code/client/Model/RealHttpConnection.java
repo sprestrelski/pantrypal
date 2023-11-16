@@ -55,7 +55,6 @@ public class RealHttpConnection implements IHttpConnection {
 
     @Override
     public void disconnect() {
-
     }
 
 }
