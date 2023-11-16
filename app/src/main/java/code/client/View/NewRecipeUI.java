@@ -252,22 +252,24 @@ class AppFrameMic extends BorderPane {
                 try {
                     whisperService.setConnection(new RealHttpConnection(WhisperService.API_ENDPOINT));
                     whisperService.sendHttpRequest();
-                    mealType = whisperService.processAudio();
+                    mealType = whisperService.processAudio().toLowerCase();
+
+                    // type check
+                    if (mealType.contains("breakfast")) {
+                        mealTypeSelection.getMealType().setText("Breakfast");
+                    } else if (mealType.contains("lunch")) {
+                        mealTypeSelection.getMealType().setText("Lunch");
+                    } else if (mealType.contains("dinner")) {
+                        mealTypeSelection.getMealType().setText("Dinner");
+                    } else {
+                        showAlert("Input Error", "Please say a valid meal type!");
+                        mealType = null;
+                    }
                 } catch (IOException | URISyntaxException exception) {
+                    showAlert("Connection Error", "Something went wrong. Please check your connection and try again.");
                     exception.printStackTrace();
                 }
 
-                mealType = mealType.toLowerCase();
-                if (mealType.contains("breakfast")) {
-                    mealTypeSelection.getMealType().setText("Breakfast");
-                } else if (mealType.contains("lunch")) {
-                    mealTypeSelection.getMealType().setText("Lunch");
-                } else if (mealType.contains("dinner")) {
-                    mealTypeSelection.getMealType().setText("Dinner");
-                } else {
-                    showAlert("Input Error", "Please say a valid meal type!");
-                    mealType = "";
-                }
             }
         });
 
@@ -283,17 +285,17 @@ class AppFrameMic extends BorderPane {
                     whisperService.setConnection(new RealHttpConnection(WhisperService.API_ENDPOINT));
                     whisperService.sendHttpRequest();
                     ingredients = whisperService.processAudio();
-                } catch (IOException | URISyntaxException exception) {
-                    exception.printStackTrace();
-                }
 
-                // handles gibberish
-                String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
-                if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*")) {
-                    showAlert("Input Error", "Please provide valid ingredients!");
-                    ingredients = "";
-                } else {
-                    ingredientsList.getIngredients().setText(ingredients);
+                    String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
+                    if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*") || ingredients.trim().isEmpty()) {
+                        showAlert("Input Error", "Please provide valid ingredients!");
+                        ingredients = null;
+                    } else {
+                        ingredientsList.getIngredients().setText(ingredients);
+                    }
+                } catch (IOException | URISyntaxException exception) {
+                    showAlert("Connection Error", "Something went wrong. Please check your connection and try again.");
+                    exception.printStackTrace();
                 }
 
             }
@@ -310,7 +312,7 @@ class AppFrameMic extends BorderPane {
 
         // CHANGE SCENE TO DETAILED RECIPE DISPLAY
         saveButton.setOnAction(e -> {
-            if (mealType != "" && ingredients != "") {
+            if (mealType != null && ingredients != null) {
                 ITextToRecipe caller = new ChatGPTService();
                 try {
                     String audioOutput1 = mealType;
@@ -325,8 +327,9 @@ class AppFrameMic extends BorderPane {
                     details.storeNewRecipeUI(list, newRecipe);
                     details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
 
-                } catch (Exception e1) {
-                    e1.printStackTrace();
+                } catch (IOException | URISyntaxException | InterruptedException exception) {
+                    showAlert("Connection Error", "Something went wrong. Please check your connection and try again.");
+                    exception.printStackTrace();
                 }
             } else {
                 showAlert("Input Error", "Invalid meal type or ingredients, please try again!");
