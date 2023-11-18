@@ -17,7 +17,7 @@ public class ChatGPTTest {
     public void testPromptBuild() {
         ITextToRecipe textToRecipe = new ChatGPTService();
         String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Lunch. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
-        String response = textToRecipe.buildPrompt("Lunch.", "I have rice, shrimp, chicken, and eggs.");
+        String response = textToRecipe.buildPrompt("Lunch", "I have rice, shrimp, chicken, and eggs.");
         assertEquals(prompt, response);
     }
 
@@ -27,7 +27,7 @@ public class ChatGPTTest {
      */
     public void testParseJSON() {
         ITextToRecipe textToRecipe = new ChatGPTService();
-        String mealType = "BREakFast.";
+        String mealType = "BREakFast";
         String responseText = """
                 Fried Chicken and Egg Fried Rice
 
@@ -60,7 +60,7 @@ public class ChatGPTTest {
                 8. Drizzle with sesame oil, season with more salt and pepper if desired, and serve. Enjoy!
                 """;
         String parsedResponse = """
-                Title: Breakfast - Fried Chicken and Egg Fried Rice
+                Title: Breakfast: Fried Chicken and Egg Fried Rice
                 Ingredients:
                 2 chicken breasts, diced
                 2 large eggs
@@ -86,7 +86,7 @@ public class ChatGPTTest {
     @Test
     public void testParseNoIndentsAndNewLines() {
         ITextToRecipe textToRecipe = new ChatGPTService();
-        String mealType = "LUNCH.";
+        String mealType = "LUNCH";
         String responseText = """
                 Cheesy pasta bake
                 Ingredients:
@@ -114,7 +114,7 @@ public class ChatGPTTest {
                 9. Serve the cheesy pasta bake with garlic bread. Enjoy!
                 """;
         String parsedResponse = """
-                Title: Lunch - Cheesy pasta bake
+                Title: Lunch: Cheesy pasta bake
                 Ingredients:
                 1 lb pasta
                 1 lb ground beef
@@ -146,7 +146,7 @@ public class ChatGPTTest {
     @Test
     public void testParseDifferentLineSpacing() {
         ITextToRecipe textToRecipe = new ChatGPTService();
-        String mealType = "DINNER.";
+        String mealType = "DINNER";
         String responseText = """
 
 
@@ -187,7 +187,7 @@ public class ChatGPTTest {
                 11. Enjoy!
                     """;
         String parsedResponse = """
-                Title: Dinner - Savory Beef Pasta Bake
+                Title: Dinner: Savory Beef Pasta Bake
                 Ingredients:
                 ½ pound of ground beef
                 1 box of your favorite pasta noodles
@@ -259,7 +259,7 @@ public class ChatGPTTest {
                 11. Enjoy!
                     """;
         String parsedResponse = """
-                Title: Lunch - Savory Beef Pasta Bake
+                Title: Lunch: Savory Beef Pasta Bake
                 Ingredients:
                 ½ pound of ground beef
                 1 box of your favorite pasta noodles

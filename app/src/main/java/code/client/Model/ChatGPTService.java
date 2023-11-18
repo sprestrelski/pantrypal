@@ -122,7 +122,7 @@ public class ChatGPTService implements ITextToRecipe {
         StringBuilder prompt = new StringBuilder();
         prompt.append("I am a student on a budget with a busy schedule and I need to quickly cook a ")
                 .append(mealType)
-                .append(" ")
+                .append(". ")
                 .append(ingredients)
                 .append(" Make a recipe using only these ingredients plus condiments. ")
                 .append("Remember to first include a title, then a list of ingredients, and then a list of instructions.");
