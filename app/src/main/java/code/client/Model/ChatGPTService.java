@@ -59,15 +59,9 @@ public class ChatGPTService implements ITextToRecipe {
 
     @Override
     public Recipe mapResponseToRecipe(String mealType, String responseText) {
-        // char firstChar = mealType.charAt(0);
-        // char lastChar = mealType.charAt(mealType.length() - 1);
-        // String lowerCased = mealType.toLowerCase();
-        // String mealTypeTitle = Character.toUpperCase(firstChar) +
-        // lowerCased.substring(1);
-        // if (lastChar == '.' || lastChar == '!') {
-        // mealTypeTitle = Character.toUpperCase(firstChar) + lowerCased.substring(1,
-        // lowerCased.length() - 1);
-        // }
+        char firstChar = mealType.charAt(0);
+        String lowerCased = mealType.toLowerCase();
+        String mealTypeTitle = Character.toUpperCase(firstChar) + lowerCased.substring(1);
 
         // Split the tokens into lines
         String[] tokenArr = responseText.split("\n");
@@ -84,7 +78,7 @@ public class ChatGPTService implements ITextToRecipe {
         }
 
         // Create a new recipe with a title
-        Recipe recipe = new Recipe(tokenList.get(0));
+        Recipe recipe = new Recipe(mealTypeTitle + ": " + tokenList.get(0));
 
         // Parse recipe's ingredients
         String ingredient;

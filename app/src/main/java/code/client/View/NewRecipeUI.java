@@ -293,10 +293,13 @@ class AppFrameMic extends BorderPane {
                     // type check
                     if (mealType.contains("breakfast")) {
                         mealTypeSelection.getMealType().setText("Breakfast");
+                        mealType = "Breakfast";
                     } else if (mealType.contains("lunch")) {
                         mealTypeSelection.getMealType().setText("Lunch");
+                        mealType = "Lunch";
                     } else if (mealType.contains("dinner")) {
                         mealTypeSelection.getMealType().setText("Dinner");
+                        mealType = "Dinner";
                     } else {
                         showAlert("Input Error", "Please say a valid meal type!");
                         mealType = null;
@@ -360,7 +363,7 @@ class AppFrameMic extends BorderPane {
                     String audioOutput1 = mealType;
                     String audioOutput2 = ingredients;// audio.processAudio();
                     String responseText = caller.getChatGPTResponse(audioOutput1, audioOutput2);
-                    Recipe recipe = caller.mapResponseToRecipe(mealType, responseText);
+                    Recipe recipe = caller.mapResponseToRecipe(audioOutput1, responseText);
                     RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
 
                     // gets the DetailsAppFrame
