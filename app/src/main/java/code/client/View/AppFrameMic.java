@@ -2,7 +2,8 @@ package code.client.View;
 
 import code.client.Model.*;
 import code.client.Controllers.*;
-
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import java.io.File;
@@ -178,7 +179,7 @@ class HeaderMic extends HBox {
     }
 }
 
-class AppFrameMic extends BorderPane {
+public class AppFrameMic extends BorderPane {
     // Helper variables for button functionality
     private boolean recording; // keeps track if the app is currently recording
     private String mealType; // stores the meal type specified by the user
@@ -188,20 +189,10 @@ class AppFrameMic extends BorderPane {
     private HeaderMic header;
     private MealTypeSelection mealTypeSelection;
     private IngredientsList ingredientsList;
-    private Button recordButton1, recordButton2, saveButton, backButton;
+    private Button recordButton1, recordButton2, goToDetailedButton, backButton;
     private Label recordingLabel1, recordingLabel2;
 
-    // Scene Transitions
-    private ArrayList<IWindowUI> scenes;
-    private Scene mainScene;
-    private RecipeUI newRecipe;
-    private RecipeListUI list;
-
     AppFrameMic() throws URISyntaxException, IOException {
-        backButton = new Button("Back");
-        // backButton.setOnAction(e -> goBack());
-        HBox backButtonContainer = new HBox(backButton);
-        backButtonContainer.setPadding(new Insets(1)); // padding
 
         this.setStyle("-fx-background-color: #DAE5EA;"); // If want to change
         // background color
@@ -215,7 +206,6 @@ class AppFrameMic extends BorderPane {
         recipeCreationGrid.setHgap(10);
         recipeCreationGrid.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
 
-        recipeCreationGrid.add(backButtonContainer, 0, 0);
         recipeCreationGrid.add(mealTypeSelection, 0, 1);
         recipeCreationGrid.add(ingredientsList, 0, 2);
 
@@ -230,8 +220,8 @@ class AppFrameMic extends BorderPane {
         // createButton = new Button("Create Recipe");
         // recipeCreationGrid.add(createButton, 0, 3);
 
-        saveButton = new Button("Save Setup");
-        recipeCreationGrid.add(saveButton, 0, 5);
+        goToDetailedButton = new Button("See Detailed Recipe");
+        recipeCreationGrid.add(goToDetailedButton, 0, 5);
 
         backButton = new Button("Back to List");
         recipeCreationGrid.add(backButton, 0, 0);
@@ -244,25 +234,6 @@ class AppFrameMic extends BorderPane {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
-    }
-
-    public void storeNewRecipeUI(RecipeListUI list, RecipeUI recipeUI) {
-        newRecipe = recipeUI;
-        this.list = list;
-    }
-
-    /**
-     * This method provides the UI holder with the different scenes that can be
-     * switched between.
-     * 
-     * @param scenes - list of different scenes to switch between.
-     */
-    public void setScenes(ArrayList<IWindowUI> scenes) {
-        this.scenes = scenes;
-    }
-
-    public void setMain(Scene main) {
-        mainScene = main;
     }
 
     public void addListeners() throws IOException, URISyntaxException {
@@ -293,13 +264,10 @@ class AppFrameMic extends BorderPane {
                     // type check
                     if (mealType.contains("breakfast")) {
                         mealTypeSelection.getMealType().setText("Breakfast");
-                        mealType = "Breakfast";
                     } else if (mealType.contains("lunch")) {
                         mealTypeSelection.getMealType().setText("Lunch");
-                        mealType = "Lunch";
                     } else if (mealType.contains("dinner")) {
                         mealTypeSelection.getMealType().setText("Dinner");
-                        mealType = "Dinner";
                     } else {
                         showAlert("Input Error", "Please say a valid meal type!");
                         mealType = null;
@@ -332,7 +300,7 @@ class AppFrameMic extends BorderPane {
                     ingredients = whisperService.processAudio();
 
                     String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
-                    if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*") || ingredients.trim().isEmpty()) {
+                    if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*") || ingredients.trim().isEmpty() || ingredients.contains("you")) {
                         showAlert("Input Error", "Please provide valid ingredients!");
                         ingredients = null;
                     } else {
@@ -346,76 +314,36 @@ class AppFrameMic extends BorderPane {
             }
         });
 
-        // createButton.setOnAction(e -> {
-
-        // });
-        backButton.setOnAction(e -> {
-            list.getChildren().remove(newRecipe);
-            HomeScreen home = (HomeScreen) scenes.get(0);
-            home.setRoot(mainScene);
-        });
-
-        // CHANGE SCENE TO DETAILED RECIPE DISPLAY
-        saveButton.setOnAction(e -> {
-            if (mealType != null && ingredients != null) {
-                ITextToRecipe caller = new ChatGPTService();
-                try {
-                    String audioOutput1 = mealType;
-                    String audioOutput2 = ingredients;// audio.processAudio();
-                    String responseText = caller.getChatGPTResponse(audioOutput1, audioOutput2);
-                    Recipe recipe = caller.mapResponseToRecipe(audioOutput1, responseText);
-                    RecipeDetailsUI detailsUI = new RecipeDetailsUI(recipe);
-
-                    // gets the DetailsAppFrame
-                    DetailsAppFrame details = (DetailsAppFrame) scenes.get(2);
-                    details.setRecipeHolder(detailsUI); // should have RecipeDetailsUI
-                    details.storeNewRecipeUI(list, newRecipe);
-                    details.setRoot(mainScene); // Changes UI to Detailed Recipe Screen
-
-                } catch (IOException | URISyntaxException | InterruptedException exception) {
-                    showAlert("Connection Error", "Something went wrong. Please check your connection and try again.");
-                    exception.printStackTrace();
-                }
-            } else {
-                showAlert("Input Error", "Invalid meal type or ingredients, please try again!");
-            }
-
-        });
-    }
-}
-
-public class NewRecipeUI implements IWindowUI {
-    private AppFrameMic root;
-
-    public NewRecipeUI() throws URISyntaxException, IOException {
-        root = new AppFrameMic();
     }
 
-    public void storeNewRecipeUI(RecipeListUI list, RecipeUI recipeUI) {
-        root.storeNewRecipeUI(list, recipeUI);
+    public void setGoToDetailedButtonAction(EventHandler<ActionEvent> eventHandler) {
+        goToDetailedButton.setOnAction(eventHandler);
     }
 
-    public Scene getSceneWindow() {
-        Scene scene = new Scene(root, 700, 700);
-        return scene;
+    public void setGoToHomeButtonAction(EventHandler<ActionEvent> eventHandler) {
+        backButton.setOnAction(eventHandler);
     }
 
-    /**
-     * This method provides the UI holder with the different scenes that can be
-     * switched between.
-     * 
-     * @param scenes - list of different scenes to switch between.
-     * @param scenes - list of different scenes to switch between.
-     */
-
-    @Override
-    public void setRoot(Scene scene) {
-        scene.setRoot(root);
-        root.setMain(scene);
+    //recordButton1, recordButton2, saveButton, backButton;
+    public Button getRecButton1() {
+        return recordButton1;
     }
 
-    public void setScenes(ArrayList<IWindowUI> scenes) {
-        root.setScenes(scenes);
+    public Button getRecButton2() {
+        return recordButton2;
+    }
+
+    public StackPane getRoot() {
+        StackPane stack = new StackPane();
+        stack.getChildren().add(this);
+        return stack;
+    }
+
+    public ArrayList<String> getVoiceResponse() {
+        ArrayList<String> temp = new ArrayList<>();
+        temp.add(mealType);
+        temp.add(ingredients);
+        return temp;
     }
 
 }

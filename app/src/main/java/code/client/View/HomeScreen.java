@@ -1,11 +1,12 @@
 package code.client.View;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class HomeScreen implements IWindowUI {
+public class HomeScreen {
     private AppFrameHome home;
     private Scene holder;
 
@@ -22,21 +23,9 @@ public class HomeScreen implements IWindowUI {
         return home;
     }
 
-    /**
-     * This method provides the UI holder with the different scenes that can be
-     * switched between.
-     * 
-     * @param scenes - list of different scenes to switch between.
-     */
-    public void setScenes(ArrayList<IWindowUI> scenes) {
-        home.setScenes(scenes);
-    }
 
-    @Override
-    public void setRoot(Scene scene) {
-        scene.setRoot(home);
-        home.updateDisplay();
-        home.setMain(scene);
+    public Button getNewButton() {
+        return home.getNewButton();
     }
 
 }

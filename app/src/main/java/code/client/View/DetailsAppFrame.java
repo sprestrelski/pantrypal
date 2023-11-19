@@ -1,33 +1,19 @@
 package code.client.View;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import code.client.Model.*;
-import javafx.animation.PauseTransition;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-import javafx.util.Duration;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.*;
 
-import code.client.Model.*;
-import code.client.View.*;
-import code.client.Controllers.*;
 import javafx.event.*;
 
-public class DetailsAppFrame implements IWindowUI {
-    private ArrayList<IWindowUI> scenes;
-    private Scene mainScene;
-
-    private RecipeDetailsUI currentRecipe;
-    private RecipeUI recipeUI;
-    private RecipeListUI list;
-    private Button backToHomeButton, editButton, saveButton, deleteButton;
+public class DetailsAppFrame {
+    private Recipe currentRecipe;
+    private RecipeDetailsUI recipeInfo;
+    private Button backToHomeButton, editButton, saveButton, deleteButton, refreshButton, shareButton;
     private VBox detailedUI;
-    private boolean editable = false;
     private String defaultButtonStyle, onStyle, offStyle;
 
     public DetailsAppFrame() {
@@ -36,6 +22,7 @@ public class DetailsAppFrame implements IWindowUI {
         detailedUI.setSpacing(20);
         detailedUI.setAlignment(Pos.CENTER);
         detailedUI.setStyle("-fx-background-color: #F0F8FF;");
+        setupGrowingUI();
 
         defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF; -fx-font-weight: bold; -fx-font: 11 arial;";
         onStyle = "-fx-font-style: italic; -fx-background-color: #90EE90; -fx-font-weight: bold; -fx-font: 11 arial;";
@@ -44,6 +31,10 @@ public class DetailsAppFrame implements IWindowUI {
         backToHomeButton = new Button("Back to List");
         backToHomeButton.setStyle(defaultButtonStyle);
         backToHomeButton.setAlignment(Pos.TOP_LEFT);
+
+        refreshButton = new Button("Remake Recipe");
+        refreshButton.setStyle(defaultButtonStyle);
+        refreshButton.setAlignment(Pos.TOP_RIGHT);
 
         saveButton = new Button("Save");
         saveButton.setStyle(defaultButtonStyle);
@@ -57,101 +48,25 @@ public class DetailsAppFrame implements IWindowUI {
         deleteButton.setStyle(defaultButtonStyle);
         deleteButton.setAlignment(Pos.BOTTOM_RIGHT);
 
+        shareButton = new Button("Share");
+        shareButton.setStyle(defaultButtonStyle);
+        shareButton.setAlignment(Pos.BOTTOM_RIGHT);
+
         // Default recipe
         currentRecipe = getMockedRecipe();
-
-        addListeners();
     }
 
-    /**
-     * This method is used to modify what recipe is shown when showing this UI
-     * display.
-     * 
-     * @param recipeHolder - A given recipe in a formatted manner.
-     */
-    public void setRecipeHolder(RecipeDetailsUI recipeHolder) {
-        currentRecipe = recipeHolder;
+    private void setupGrowingUI() {
+        for(int i = 0; i < detailedUI.getChildren().size(); i++) {
+            VBox.setVgrow(detailedUI.getChildren().get(i), Priority.ALWAYS);
+        }
+        VBox.setVgrow(detailedUI, Priority.ALWAYS);
     }
 
-    /**
-     * This method is used to store the provided recipe and its title
-     * in the actual list in the home screen.
-     * 
-     * @param recipeUI - the UI element that stores the recipe name in the Home
-     *                 Recipe List
-     */
-    public void storeNewRecipeUI(RecipeListUI list, RecipeUI recipeUI) {
-        this.recipeUI = recipeUI;
-        this.list = list;
-    }
-
-    /**
-     * This method provides the UI holder with the different scenes that can be
-     * switched between.
-     * 
-     * @param scenes - list of different scenes to switch between.
-     */
-    public void setScenes(ArrayList<IWindowUI> scenes) {
-        this.scenes = scenes;
-    }
-
-    public void addListeners() {
-
-        backToHomeButton.setOnAction(e -> {
-            returnToHome();
-        });
-        saveButton.setOnAction(e -> {
-            // Takes the values of the provided recipe and applying it to the updated
-            // textfield recipes.
-            saveButton.setStyle("-fx-background-color: #00FFFF; -fx-border-width: 0;");
-            Recipe providedRecipe = getDisplayedRecipe();
-
-            recipeUI.setRecipe(providedRecipe);
-            Recipe checker = list.getRecipeDB().find(providedRecipe.getId());
-
-            // TODO : PUT or POST request to Server here
-            list.getRecipeDB().set(providedRecipe.getId(), providedRecipe);
-
-            list.saveRecipes();
-
-            PauseTransition pause = new PauseTransition(Duration.seconds(1));
-            pause.setOnFinished(f -> saveButton.setStyle(defaultButtonStyle));
-            pause.play();
-        });
-
-        editButton.setOnAction(e -> {
-            editable = !editable;
-            currentRecipe.setEditable(editable);
-            if (editable) {
-                editButton.setStyle(onStyle);
-            } else {
-                editButton.setStyle(offStyle);
-            }
-            displayUpdate(currentRecipe);
-            // System.out.println("Edit on");
-        });
-
-        deleteButton.setOnAction(e -> {
-
-            deleteRecipe();
-            returnToHome();
-        });
-    }
-
-    public void deleteRecipe() {
-        list.getRecipeDB().remove(recipeUI.getRecipe());
-        list.saveRecipes();
-    }
-
-    public void returnToHome() {
-        HomeScreen home = (HomeScreen) scenes.get(0);
-        home.setRoot(mainScene);
-    }
-
-    private Recipe getDisplayedRecipe() {
-        String title = currentRecipe.getTitleField().getText();
-        String ingredients = currentRecipe.getIngredientsField().getText();
-        String instructions = currentRecipe.getInstructionsField().getText();
+    public Recipe getDisplayedRecipe() {
+        String title = recipeInfo.getTitleField().getText();
+        String ingredients = recipeInfo.getIngredientsField().getText();
+        String instructions = recipeInfo.getInstructionsField().getText();
 
         /// Use Trung's deformatting here.
         String[] ingr = ingredients.split("\n");
@@ -173,7 +88,7 @@ public class DetailsAppFrame implements IWindowUI {
      * 
      * @return recipe
      */
-    private RecipeDetailsUI getMockedRecipe() {
+    private Recipe getMockedRecipe() {
         // Hardcoded value for now, recipe value for it should be changing
         Recipe temp = new Recipe("Fried Chicken and Egg Fried Rice");
         temp.addIngredient("2 chicken breasts, diced");
@@ -181,31 +96,40 @@ public class DetailsAppFrame implements IWindowUI {
         temp.addIngredient("2 cups cooked rice");
         temp.addIngredient("2 tablespoons vegetable oil");
         temp.addInstruction("1. Heat the vegetable oil in a large pan over medium-high heat.");
-        return new RecipeDetailsUI(temp);
+        return temp;
     }
 
-    public void displayUpdate(RecipeDetailsUI details) {
+    public void updateDisplay() {
         // Resets the UI everytime
         detailedUI.getChildren().clear();
 
         VBox setupContainer = new VBox();
         setupContainer.setSpacing(10);
-        TextField title = details.getTitleField();
-        title.setAlignment(Pos.CENTER);
+
+        recipeInfo = new RecipeDetailsUI(currentRecipe);
+        TextField title = recipeInfo.getTitleField();
+        title.setAlignment(Pos.TOP_CENTER);
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
 
-        addListeners();
+        HBox topButtons = new HBox();
+        topButtons.setSpacing(100);
+        topButtons.setAlignment(Pos.CENTER);
+        topButtons.getChildren().addAll(backToHomeButton,refreshButton);
+        HBox.setHgrow(topButtons, Priority.ALWAYS);
 
-        detailedUI.getChildren().addAll(backToHomeButton, title);
-        setupContainer.getChildren().add(details);
-        detailedUI.getChildren().addAll(setupContainer, saveButton, editButton, deleteButton);
+        detailedUI.getChildren().addAll(topButtons, title);
+        setupContainer.getChildren().add(recipeInfo);
+        detailedUI.getChildren().add(setupContainer);
+
+        HBox botButtons = new HBox(); 
+        botButtons.setSpacing(100);
+        botButtons.setAlignment(Pos.CENTER);
+        botButtons.getChildren().addAll(editButton,deleteButton,saveButton,shareButton);
+
+        detailedUI.getChildren().add(botButtons);
     }
 
     public void setPostButtonAction(EventHandler<ActionEvent> eventHandler) {
-        saveButton.setOnAction(eventHandler);
-    }
-
-    public void setPutButtonAction(EventHandler<ActionEvent> eventHandler) {
         saveButton.setOnAction(eventHandler);
     }
 
@@ -213,23 +137,44 @@ public class DetailsAppFrame implements IWindowUI {
         deleteButton.setOnAction(eventHandler);
     }
 
-    @Override
-    public void setRoot(Scene scene) {
+    public void setHomeButtonAction(EventHandler<ActionEvent> eventHandler) {
+        backToHomeButton.setOnAction(eventHandler);
+    }
 
-        // used for testing
+    public void setEditButtonAction(EventHandler<ActionEvent> eventHandler) {
+        editButton.setOnAction(eventHandler);
+    }
 
-        // currentRecipe = getMockedRecipe();
-        // RecipeDetailsUI details = getMockedRecipe();
+    public void setShareButtonAction(EventHandler<ActionEvent> eventHandler) {
+        shareButton.setOnAction(eventHandler);
+    }
 
-        // used for testing
+    public void setRefreshButtonAction(EventHandler<ActionEvent> eventHandler) {
+        refreshButton.setOnAction(eventHandler);
+    }
 
-        // Actual code
-        RecipeDetailsUI details = currentRecipe;
+    public VBox getRoot(Recipe recipe, boolean old) {
+        currentRecipe = recipe;
+        if(!old) {
+            deleteButton.setVisible(false);
+        }
+        else {
+            deleteButton.setVisible(true);
+        }
+        updateDisplay();
+        return detailedUI;
+    }
 
-        displayUpdate(details);
-        // Changes the User Screen
-        scene.setRoot(detailedUI);
-        mainScene = scene;
+    public RecipeDetailsUI getRecipeDetailsUI() {
+        return recipeInfo;
+    }
+
+    public Button getSaveButton() {
+        return saveButton;
+    }
+
+    public Button getEditButton() {
+        return editButton;
     }
 
 }
