@@ -17,7 +17,7 @@ public class RecipeWriter {
         Iterator<String> instructionIter = recipe.getInstructionIterator();
         String ingredient, instruction;
 
-        strBuilder.append(recipe.getTitle()).append("| ");
+        strBuilder.append(recipe.getTitle()).append("\\| ");
 
         while (ingredientIter.hasNext()) {
             ingredient = ingredientIter.next();
@@ -28,7 +28,7 @@ public class RecipeWriter {
             }
         }
 
-        strBuilder.append("| ");
+        strBuilder.append("\\| ");
 
         while (instructionIter.hasNext()) {
             instruction = instructionIter.next();
@@ -46,9 +46,9 @@ public class RecipeWriter {
     public void writeRecipeDb(IRecipeDb recipeDb) throws IOException {
         StringBuilder strBuilder = new StringBuilder();
         // use "|" as a delimeter for the csv files
-        strBuilder.append("sep=|").append("\n");
+        strBuilder.append("sep=|").append(System.lineSeparator());
         // add labels for the columns of the csv file
-        strBuilder.append("Recipe Name| Ingredients| Instructions").append("\n");
+        strBuilder.append("Recipe Name| Ingredients| Instructions").append(System.lineSeparator());
         writer.write(strBuilder.toString());
         for (Recipe recipe : recipeDb) {
             writeRecipe(recipe);

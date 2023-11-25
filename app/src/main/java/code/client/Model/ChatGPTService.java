@@ -21,9 +21,10 @@ public class ChatGPTService implements ITextToRecipe {
     public static final double TEMPERATURE = 1.;
 
     @Override
-    public String getChatGPTResponse(String typeOfMeal, String input) throws IOException, InterruptedException, URISyntaxException {
+    public String getChatGPTResponse(String mealType, String ingredients)
+            throws IOException, InterruptedException, URISyntaxException {
         // Set request parameters
-        String prompt = buildPrompt(typeOfMeal, input);
+        String prompt = buildPrompt(mealType, ingredients);
 
         // Create a request body which you will pass into request object
         JSONObject requestBody = new JSONObject();
@@ -57,13 +58,18 @@ public class ChatGPTService implements ITextToRecipe {
     }
 
     @Override
-    public Recipe mapResponseToRecipe(String responseText) {
-        // System.out.println(responseText);
+    public Recipe mapResponseToRecipe(String mealType, String responseText) {
+        char firstChar = mealType.charAt(0);
+        String lowerCased = mealType.toLowerCase();
+        String mealTypeTitle = Character.toUpperCase(firstChar) + lowerCased.substring(1);
+
+        // Split the tokens into lines
         String[] tokenArr = responseText.split("\n");
         List<String> tokenList = new ArrayList<>(Arrays.asList(tokenArr));
-        int i = 0;
+        int i;
+
         // Remove empty tokens
-        for (; i < tokenList.size();) {
+        for (i = 0; i < tokenList.size();) {
             if (tokenList.get(i).isBlank()) {
                 tokenList.remove(i);
             } else {
@@ -72,34 +78,52 @@ public class ChatGPTService implements ITextToRecipe {
         }
 
         // Create a new recipe with a title
-        Recipe recipe = new Recipe(tokenList.get(0));
+        Recipe recipe = new Recipe(mealTypeTitle + ": " + tokenList.get(0));
 
         // Parse recipe's ingredients
         String ingredient;
-        i = 2;
-        for (; !tokenList.get(i).equals("Instructions:"); ++i) {
-            // Remove leading "-"
-            ingredient = tokenList.get(i).trim();
+        for (i = 2; !tokenList.get(i).equals("Instructions:"); ++i) {
+            ingredient = removeDashFromIngredient(tokenList.get(i).trim());
             recipe.addIngredient(ingredient);
         }
 
         // Parse recipe's instructions
         String instruction;
-        ++i;
-        for (; i < tokenList.size(); ++i) {
-            // Remove leading numbers
-            instruction = tokenList.get(i).trim();
+        for (i += 1; i < tokenList.size(); ++i) {
+            instruction = removeNumberFromInstruction(tokenList.get(i).trim());
             recipe.addInstruction(instruction);
         }
 
         return recipe;
     }
 
-    public String buildPrompt(String typeOfMeal, String input) {
+    private String removeDashFromIngredient(String ingredient) {
+        return ingredient.substring(2);
+    }
+
+    private String removeNumberFromInstruction(String instruction) {
+        StringBuilder strBuilder = new StringBuilder();
+        int i;
+
+        // Ignore characters until '.'
+        for (i = 0; i < instruction.length() && (instruction.charAt(i) != '.'); ++i)
+            ;
+
+        // Ignore '.' and ' ' after
+        // Get all characters until end of string
+        for (i += 2; i < instruction.length(); ++i) {
+            strBuilder.append(instruction.charAt(i));
+        }
+
+        return strBuilder.toString();
+    }
+
+    public String buildPrompt(String mealType, String ingredients) {
         StringBuilder prompt = new StringBuilder();
         prompt.append("I am a student on a budget with a busy schedule and I need to quickly cook a ")
-                .append(typeOfMeal + " ")
-                .append(input)
+                .append(mealType)
+                .append(". ")
+                .append(ingredients)
                 .append(" Make a recipe using only these ingredients plus condiments. ")
                 .append("Remember to first include a title, then a list of ingredients, and then a list of instructions.");
         return prompt.toString();

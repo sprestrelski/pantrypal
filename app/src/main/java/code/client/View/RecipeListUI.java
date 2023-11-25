@@ -53,6 +53,7 @@ public class RecipeListUI extends VBox {
             writer.close();
         } catch (IOException e) {
             System.out.println("Recipes could not be saved.");
+            e.printStackTrace();
         }
     }
 

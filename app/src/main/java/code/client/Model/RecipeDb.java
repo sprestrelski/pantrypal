@@ -1,4 +1,5 @@
 package code.client.Model;
+
 import java.util.UUID;
 import java.util.List;
 import java.util.ArrayList;
@@ -28,11 +29,25 @@ public class RecipeDb implements IRecipeDb {
         return null;
     }
 
+    public void set(UUID id, Recipe newRecipe) {
+        int index = -1;
+        for (int i = 0; i < recipeList.size(); i++) {
+            if (recipeList.get(i).getId() == id) {
+                index = i;
+            }
+        }
+        if (index >= 0) {
+            recipeList.set(index, newRecipe);
+        }
+        recipeList.add(0, newRecipe);
+
+    }
+
     public void remove(Recipe recipe) {
         recipeList.remove(recipe);
     }
 
-    public Recipe remove(UUID id){
+    public Recipe remove(UUID id) {
         for (int i = 0; i < recipeList.size(); i++) {
             if (recipeList.get(i).getId() == id) {
                 Recipe temp = recipeList.get(i);
@@ -52,8 +67,8 @@ public class RecipeDb implements IRecipeDb {
         return recipeList.iterator();
     }
 
-	@Override
-	public int size() {
-		return recipeList.size();
-	}
+    @Override
+    public int size() {
+        return recipeList.size();
+    }
 }

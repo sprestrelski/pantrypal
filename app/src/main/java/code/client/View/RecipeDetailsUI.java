@@ -47,8 +47,16 @@ public class RecipeDetailsUI extends HBox {
         return titleTextField;
     }
 
+    public TextArea getIngredientsField() {
+        return ingredientTextArea;
+    }
+
+    public TextArea getInstructionsField() {
+        return instructionTextArea;
+    }
+
     public void setEditable(boolean status) {
-        titleTextField.setEditable(status);
+        // titleTextField.setEditable(status); // TODO : maybe later?
         ingredientTextArea.setEditable(status);
         instructionTextArea.setEditable(status);
     }

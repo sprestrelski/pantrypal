@@ -6,17 +6,26 @@ import java.net.URISyntaxException;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-public class WhisperService extends VoiceToText {
+public class WhisperService implements IVoiceToText {
     public static final String API_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
     public static final String API_KEY = "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";
     public static final String MODEL = "whisper-1";
     public static final String AUDIO_FILE = "recording.wav";
+    private IHttpConnection connection;
 
     public WhisperService() {
     }
 
     public WhisperService(IHttpConnection connection) {
-        super(connection);
+        this.connection = connection;
+    }
+
+    public IHttpConnection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(IHttpConnection connection) {
+        this.connection = connection;
     }
 
     // https://stackoverflow.com/questions/25334139/how-to-mock-a-url-connection

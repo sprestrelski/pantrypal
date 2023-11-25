@@ -1,6 +1,7 @@
 package code.client.View;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import code.client.Model.*;
@@ -103,16 +104,19 @@ public class DetailsAppFrame implements IWindowUI {
             // Takes the values of the provided recipe and applying it to the updated
             // textfield recipes.
             saveButton.setStyle("-fx-background-color: #00FFFF; -fx-border-width: 0;");
-            Recipe providedRecipe = currentRecipe.getRecipe();
+            Recipe providedRecipe = getDisplayedRecipe();
 
             recipeUI.setRecipe(providedRecipe);
-            list.getRecipeDB().add(providedRecipe);
+            Recipe checker = list.getRecipeDB().find(providedRecipe.getId());
+
+            // TODO : PUT or POST request to Server here
+            list.getRecipeDB().set(providedRecipe.getId(), providedRecipe);
+
             list.saveRecipes();
 
             PauseTransition pause = new PauseTransition(Duration.seconds(1));
             pause.setOnFinished(f -> saveButton.setStyle(defaultButtonStyle));
             pause.play();
-            // System.out.println("Saved: " + currentRecipe.getTitleField().getText());
         });
 
         editButton.setOnAction(e -> {
@@ -142,6 +146,26 @@ public class DetailsAppFrame implements IWindowUI {
     public void returnToHome() {
         HomeScreen home = (HomeScreen) scenes.get(0);
         home.setRoot(mainScene);
+    }
+
+    private Recipe getDisplayedRecipe() {
+        String title = currentRecipe.getTitleField().getText();
+        String ingredients = currentRecipe.getIngredientsField().getText();
+        String instructions = currentRecipe.getInstructionsField().getText();
+
+        /// Use Trung's deformatting here.
+        String[] ingr = ingredients.split("\n");
+        String[] instr = instructions.split("\n");
+
+        Recipe edit = new Recipe(title);
+        for (String ingredient : ingr) {
+            edit.addIngredient(ingredient);
+        }
+        for (String instruction : instr) {
+            edit.addInstruction(instruction);
+        }
+
+        return edit;
     }
 
     /**

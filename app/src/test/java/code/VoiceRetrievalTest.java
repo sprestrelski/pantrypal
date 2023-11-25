@@ -6,6 +6,8 @@ import java.net.URISyntaxException;
 import org.junit.jupiter.api.Test;
 
 import code.client.Model.IHttpConnection;
+import code.client.Model.IVoiceToText;
+import code.client.Model.MockWhisper;
 import code.client.Model.WhisperService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class VoiceRetrievalTest {
 
     /*
-     * Integration Tests
+     * Integration Test
      */
     @Test
     void testSuccessfulProcessAudio() throws IOException, URISyntaxException {
@@ -37,6 +39,9 @@ public class VoiceRetrievalTest {
 
     }
 
+    /*
+     * Unit test
+     */
     @Test
     void testFailedProcessAudio() throws IOException, URISyntaxException {
         IHttpConnection connection = new MockHttpConnection(
@@ -50,7 +55,7 @@ public class VoiceRetrievalTest {
     }
 
     /*
-     * Unit tests
+     * Unit test
      */
     @Test
     void testMockHttpCreation() throws IOException {
@@ -62,6 +67,15 @@ public class VoiceRetrievalTest {
         int responseCode = connection.getResponseCode();
         assertEquals(responseCode, 200);
         assertEquals(connection.getInputStream(), connection.getErrorStream());
+    }
+
+    /*
+     * Unit test
+     */
+    @Test
+    void testMockWhisper() throws IOException, URISyntaxException {
+        IVoiceToText mockWhisper = new MockWhisper();
+        assertEquals("Invoked mock audio processing", mockWhisper.processAudio());
     }
 
 }

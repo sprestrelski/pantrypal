@@ -21,7 +21,8 @@ public class DeleteRecipeTest {
     private Recipe r1, r2, r3;
 
     /**
-     * Before each test initialize a RecipeDb with three recipes and an iterator
+     * Before each test initialize a RecipeDb with three different recipes and an
+     * iterator
      */
     @BeforeEach
     public void setUp() {
