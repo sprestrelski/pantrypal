@@ -5,11 +5,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
-import javax.swing.Action;
-
-import code.client.View.DetailsAppFrame;
-import code.client.View.HomeScreen;
-import code.client.View.RecipeDetailsUI;
 import code.client.View.RecipeListUI;
 import code.client.View.RecipeUI;
 import code.client.View.View;
@@ -18,12 +13,13 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.util.Duration;
 import code.client.Model.*;
+import code.client.View.AppAlert;
 
 public class Controller {
     private Model model;
     private View view;
     private Recipe recipe;
-    private RecipeWriter recipeWriter;
+    private RecipeCSVWriter recipeWriter;
     private String title;
     private String defaultButtonStyle, onStyle, offStyle, blinkStyle;
 
@@ -37,7 +33,7 @@ public class Controller {
         offStyle = "-fx-font-style: italic; -fx-background-color: #FF7377; -fx-font-weight: bold; -fx-font: 11 arial;";
         blinkStyle = "-fx-background-color: #00FFFF; -fx-border-width: 0;";
 
-        //this.view.getAppFrameHome().setGetButtonAction(this::handleGetButton);
+        // this.view.getAppFrameHome().setGetButtonAction(this::handleGetButton);
         this.view.getAppFrameHome().setNewRecipeButtonAction(event -> {
             try {
                 handleNewButton(event);
@@ -61,15 +57,15 @@ public class Controller {
         Button saveButtonFromDetailed = view.getDetailedView().getSaveButton();
         saveButtonFromDetailed.setStyle(blinkStyle);
         PauseTransition pause = new PauseTransition(Duration.seconds(1));
-            pause.setOnFinished(f -> saveButtonFromDetailed.setStyle(defaultButtonStyle));
-            pause.play();
+        pause.setOnFinished(f -> saveButtonFromDetailed.setStyle(defaultButtonStyle));
+        pause.play();
 
         Writer writer = new StringWriter();
-        recipeWriter = new RecipeWriter(writer);
+        recipeWriter = new RecipeCSVWriter(writer);
         recipeWriter.writeRecipe(postedRecipe);
 
         String recipe = writer.toString();
-        
+
         // Debugging
         System.out.println(recipe);
         // Debuggging
@@ -101,7 +97,7 @@ public class Controller {
 
     public void addListenersToList() {
         RecipeListUI list = view.getAppFrameHome().getRecipeList();
-        for(int i = 0; i < list.getChildren().size(); i++) {
+        for (int i = 0; i < list.getChildren().size(); i++) {
             RecipeUI currRecipe = (RecipeUI) list.getChildren().get(i);
             currRecipe.getDeleteButton().setOnAction(e -> {
                 setTitle(currRecipe.getRecipeName());
@@ -121,34 +117,33 @@ public class Controller {
         // Get ChatGPT response from the Model
         List<String> inputs = view.getAppFrameMic().getVoiceResponse();
         // Testing
-        inputs.set(0,"w");
-        inputs.set(1,"s");
+        inputs.set(0, "w");
+        inputs.set(1, "s");
         // Testing
         String mealType = inputs.get(0);
         String ingredients = inputs.get(1);
         if (mealType != null && ingredients != null) {
-                ITextToRecipe caller = new MockGPT();//new ChatGPTService();
-                try {
-                    String audioOutput1 = mealType;
-                    String audioOutput2 = ingredients;// audio.processAudio();
-                    String responseText = caller.getChatGPTResponse(audioOutput1, audioOutput2);
-                    Recipe chatGPTrecipe = caller.mapResponseToRecipe(mealType, responseText);
+            TextToRecipe caller = new MockGPTService();// new ChatGPTService();
+            try {
+                String audioOutput1 = mealType;
+                String audioOutput2 = ingredients;// audio.processAudio();
+                String responseText = caller.getResponse(audioOutput1, audioOutput2);
+                Recipe chatGPTrecipe = caller.mapResponseToRecipe(mealType, responseText);
 
-                    // TODO Changes UI to Detailed Recipe Screen
-                    view.goToDetailedView(chatGPTrecipe, false);
-                    view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-                    handleDetailedViewListeners();
-                    
+                // TODO Changes UI to Detailed Recipe Screen
+                view.goToDetailedView(chatGPTrecipe, false);
+                view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+                handleDetailedViewListeners();
 
-                } catch (IOException | URISyntaxException | InterruptedException exception) {
-                    view.showAlert("Connection Error", "Something went wrong. Please check your connection and try again.");
-                    exception.printStackTrace();
-                }
-            } else {
-                view.showAlert("Input Error", "Invalid meal type or ingredients, please try again!");
+            } catch (IOException | URISyntaxException | InterruptedException exception) {
+                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+                exception.printStackTrace();
             }
-        
+        } else {
+            AppAlert.show("Input Error", "Invalid meal type or ingredients, please try again!");
+        }
     }
+
     private void handleDetailedViewListeners() {
         // Saving recipe or editing recipe from Detailed View
         this.view.getDetailedView().setPostButtonAction(event -> {
@@ -162,7 +157,7 @@ public class Controller {
         this.view.getDetailedView().setDeleteButtonAction(this::handleDeleteButton);
         this.view.getDetailedView().setHomeButtonAction(this::handleHomeButton);
     }
-    
+
     private void handleEditButton(ActionEvent event) {
         Button edit = view.getDetailedView().getEditButton();
         view.getDetailedView().getRecipeDetailsUI().setEditable();
@@ -170,10 +165,9 @@ public class Controller {
     }
 
     private void changeEditButtonColor(Button edit) {
-        if(view.getDetailedView().getRecipeDetailsUI().isEditable()) {
+        if (view.getDetailedView().getRecipeDetailsUI().isEditable()) {
             edit.setStyle(onStyle);
-        }
-        else {
+        } else {
             edit.setStyle(offStyle);
         }
     }

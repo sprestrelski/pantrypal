@@ -6,13 +6,13 @@ import org.junit.jupiter.api.BeforeAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import code.client.Model.Recipe;
-import code.client.Model.RecipeDb;
-import code.client.Model.RecipeWriter;
+import code.client.Model.RecipeListDb;
+import code.client.Model.RecipeCSVWriter;
 
 import java.io.IOException;
 import java.io.StringWriter;
 
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * Test the save recipe list feature for three distinct test cases:
@@ -21,10 +21,10 @@ import java.util.Iterator;
  * 3. Saving changes made to an existing recipe to an existing CSV file
  */
 public class SaveRecipeTest {
-    private static RecipeWriter writer; // Recipe writer to write recipes into a mocked "recipes.csv"
+    private static RecipeCSVWriter writer; // Recipe writer to write recipes into a mocked "recipes.csv"
     private static StringWriter recipes_csv; // Mock "recipes.csv" file to test save functionality
     private static Recipe r1, r2; // Recipes that will be used for the tests
-    private static RecipeDb recipeDb; // Recipe database for storing test recipes
+    private static RecipeListDb recipeDb; // Recipe database for storing test recipes
     private static String expected; // Helper string to store the expected value used for assertEquals
 
     /**
@@ -33,7 +33,7 @@ public class SaveRecipeTest {
     @BeforeAll
     public static void setUp() throws IOException {
         // Initialize a RecipeDb
-        recipeDb = new RecipeDb();
+        recipeDb = new RecipeListDb();
         // Initialize two simple recipes
         r1 = new Recipe("Plain Spaghetti");
         r1.addIngredient("Spaghetti noodles");
@@ -52,7 +52,7 @@ public class SaveRecipeTest {
         // Create a mock "recipes.csv" file
         recipes_csv = new StringWriter();
         // Initialize a writer to add saved recipes to "recipes.csv"
-        writer = new RecipeWriter(recipes_csv);
+        writer = new RecipeCSVWriter(recipes_csv);
         // Initialize recipes_csv file without recipes
         writer.writeRecipeDb(recipeDb);
         /**
@@ -113,11 +113,8 @@ public class SaveRecipeTest {
     @Test
     public static void testSaveEditOldFile() throws IOException {
         // Edit an existing recipe in the RecipeDb
-        Iterator<Recipe> itr = recipeDb.iterator(); // Initialize a recipeDb iterator
-        // Move the iterator to the first recipe in the list
-        itr.next();
-        // Move the iterator to the second recipe in the list
-        itr.next().addInstruction("Add steak sauce"); // Edit the recipe by adding an instruction
+        List<Recipe> recipeList = recipeDb.getList();
+        recipeList.get(1).addInstruction("Add steak sauce"); // Edit the recipe by adding an instruction
         // Save the updated recipe to the existing recipes.csv file
         writer.writeRecipeDb(recipeDb);
         /**

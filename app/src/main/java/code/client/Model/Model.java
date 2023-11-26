@@ -3,8 +3,6 @@ package code.client.Model;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URI;
@@ -14,7 +12,7 @@ public class Model {
     public String performRequest(String method, String recipe, String uuid) {
         // Implement your HTTP request logic here and return the response
         try {
-            String urlString = "http://localhost:8100/";
+            String urlString = AppConfig.SERVER_URL;
             if (uuid != null) {
                 urlString += "?=" + uuid;
             }

@@ -2,18 +2,19 @@ package code.client.View;
 
 import javafx.scene.layout.*;
 import java.io.*;
+import java.util.List;
 
 import code.client.Model.IRecipeDb;
 import code.client.Model.Recipe;
-import code.client.Model.RecipeDb;
-import code.client.Model.RecipeReader;
-import code.client.Model.RecipeWriter;
+import code.client.Model.RecipeListDb;
+import code.client.Model.RecipeCSVReader;
+import code.client.Model.RecipeCSVWriter;
 
 // TODO: SERVER Controller that sends a GET(db) request for the recipeDB.
 public class RecipeListUI extends VBox {
     private static final String CSV_FILE = "recipes.csv";
-    private IRecipeDb recipeDb = new RecipeDb();
-    private RecipeWriter recipeWriter;
+    private IRecipeDb recipeDb = new RecipeListDb();
+    private RecipeCSVWriter recipeWriter;
 
     RecipeListUI() throws IOException {
         this.setSpacing(5);
@@ -49,7 +50,7 @@ public class RecipeListUI extends VBox {
     public void saveRecipes() {
         try {
             Writer writer = new BufferedWriter(new FileWriter(CSV_FILE));
-            recipeWriter = new RecipeWriter(writer);
+            recipeWriter = new RecipeCSVWriter(writer);
             recipeWriter.writeRecipeDb(recipeDb);
             writer.close();
         } catch (IOException e) {
@@ -70,7 +71,9 @@ public class RecipeListUI extends VBox {
     public void update() {
         // RecipeListUI = this
         this.getChildren().clear();
-        for (Recipe recipe : recipeDb) {
+        List<Recipe> recipeList = recipeDb.getList();
+
+        for (Recipe recipe : recipeList) {
             RecipeUI temp = new RecipeUI();
             temp.setRecipe(recipe);
             this.getChildren().add(temp);
@@ -96,8 +99,9 @@ public class RecipeListUI extends VBox {
     public void loadRecipes() {
         try {
             Reader reader = new FileReader(CSV_FILE);
-            RecipeReader recipeReader = new RecipeReader(reader);
-            recipeDb = recipeReader.readRecipeDb();
+            RecipeCSVReader recipeReader = new RecipeCSVReader(reader);
+            IRecipeDb recipeDb = new RecipeListDb();
+            recipeReader.readRecipeDb(recipeDb);
             System.out.println("Recipes loaded");
         } catch (IOException e) {
             System.out.println("Recipes could not be loaded.");

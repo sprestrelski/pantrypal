@@ -1,17 +1,14 @@
 package code.client.View;
 
 import code.client.Model.*;
-import code.client.Controllers.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -189,12 +186,13 @@ public class AppFrameMic extends BorderPane {
     private HeaderMic header;
     private MealTypeSelection mealTypeSelection;
     private IngredientsList ingredientsList;
-    private Button recordButton1, recordButton2, goToDetailedButton, backButton;
-    private Label recordingLabel1, recordingLabel2;
+    private Button recordMealTypeButton, recordIngredientsButton, goToDetailedButton, backButton;
+    private Label recordingMealTypeLabel, recordingIngredientsLabel;
+    private final AudioRecorder recorder = new AudioRecorder();
+    private final VoiceToText voiceToText = new WhisperService();
 
     AppFrameMic() throws URISyntaxException, IOException {
-
-        this.setStyle("-fx-background-color: #DAE5EA;"); // If want to change
+        setStyle("-fx-background-color: #DAE5EA;"); // If want to change
         // background color
         header = new HeaderMic();
         mealTypeSelection = new MealTypeSelection();
@@ -212,10 +210,10 @@ public class AppFrameMic extends BorderPane {
         this.setTop(header);
         this.setCenter(recipeCreationGrid);
 
-        recordButton1 = mealTypeSelection.getRecordButton();
-        recordingLabel1 = mealTypeSelection.getRecordingLabel();
-        recordButton2 = ingredientsList.getRecordButton();
-        recordingLabel2 = ingredientsList.getRecordingLabel();
+        recordMealTypeButton = mealTypeSelection.getRecordButton();
+        recordingMealTypeLabel = mealTypeSelection.getRecordingLabel();
+        recordIngredientsButton = ingredientsList.getRecordButton();
+        recordingIngredientsLabel = ingredientsList.getRecordingLabel();
 
         // createButton = new Button("Create Recipe");
         // recipeCreationGrid.add(createButton, 0, 3);
@@ -228,90 +226,80 @@ public class AppFrameMic extends BorderPane {
         addListeners();
     }
 
-    public void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+    private void recordMealType() {
+        if (!recording) {
+            recorder.startRecording();
+            recording = true;
+            recordMealTypeButton.setStyle("-fx-background-color: #FF0000;");
+            recordingMealTypeLabel.setVisible(true);
+            // recordingLabel1.setStyle("-fx-font-color: #FF0000;");
+        } else {
+            recorder.stopRecording();
+            recording = false;
+            recordMealTypeButton.setStyle("");
+            recordingMealTypeLabel.setVisible(false);
+            // recordingLabel1.setStyle("");
+
+            try {
+                mealType = voiceToText.processAudio().toLowerCase();
+                // type check
+                if (mealType.contains("breakfast")) {
+                    mealTypeSelection.getMealType().setText("Breakfast");
+                } else if (mealType.contains("lunch")) {
+                    mealTypeSelection.getMealType().setText("Lunch");
+                } else if (mealType.contains("dinner")) {
+                    mealTypeSelection.getMealType().setText("Dinner");
+                } else {
+                    AppAlert.show("Input Error", "Please say a valid meal type!");
+                    mealType = null;
+                }
+            } catch (IOException | URISyntaxException exception) {
+                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+                exception.printStackTrace();
+            }
+        }
+    }
+
+    private void recordIngredients() {
+        if (!recording) {
+            recorder.startRecording();
+            recording = true;
+            recordIngredientsButton.setStyle("-fx-background-color: #FF0000;");
+            recordingIngredientsLabel.setVisible(true);
+            // recordingLabel2.setStyle("-fx-background-color: #FF0000;");
+        } else {
+            recorder.stopRecording();
+            recording = false;
+            recordIngredientsButton.setStyle("");
+            recordingIngredientsLabel.setVisible(false);
+            // recordingLabel2.setStyle("");
+
+            try {
+                ingredients = voiceToText.processAudio();
+                String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
+
+                if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*") ||
+                        ingredients.trim().isEmpty() ||
+                        ingredients.contains("you")) {
+                    AppAlert.show("Input Error", "Please provide valid ingredients!");
+                    ingredients = null;
+                } else {
+                    ingredientsList.getIngredients().setText(ingredients);
+                }
+            } catch (IOException | URISyntaxException exception) {
+                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+                exception.printStackTrace();
+            }
+        }
     }
 
     public void addListeners() throws IOException, URISyntaxException {
-
-        AudioRecorder recorder = new AudioRecorder();
-        WhisperService whisperService = new WhisperService();
-
-        recordButton1.setOnAction(event -> {
-            if (!recording) {
-                recorder.startRecording();
-                recording = true;
-                recordButton1.setStyle("-fx-background-color: #FF0000;");
-
-                recordingLabel1.setVisible(true);
-                // recordingLabel1.setStyle("-fx-font-color: #FF0000;");
-            } else {
-                recorder.stopRecording();
-                recording = false;
-                recordButton1.setStyle("");
-                recordingLabel1.setVisible(false);
-                // recordingLabel1.setStyle("");
-
-                try {
-                    whisperService.setConnection(new RealHttpConnection(WhisperService.API_ENDPOINT));
-                    whisperService.sendHttpRequest();
-                    mealType = whisperService.processAudio().toLowerCase();
-
-                    // type check
-                    if (mealType.contains("breakfast")) {
-                        mealTypeSelection.getMealType().setText("Breakfast");
-                    } else if (mealType.contains("lunch")) {
-                        mealTypeSelection.getMealType().setText("Lunch");
-                    } else if (mealType.contains("dinner")) {
-                        mealTypeSelection.getMealType().setText("Dinner");
-                    } else {
-                        showAlert("Input Error", "Please say a valid meal type!");
-                        mealType = null;
-                    }
-                } catch (IOException | URISyntaxException exception) {
-                    showAlert("Connection Error", "Something went wrong. Please check your connection and try again.");
-                    exception.printStackTrace();
-                }
-
-            }
+        recordMealTypeButton.setOnAction(event -> {
+            recordMealType();
         });
 
-        recordButton2.setOnAction(event -> {
-            if (!recording) {
-                recorder.startRecording();
-                recording = true;
-                recordButton2.setStyle("-fx-background-color: #FF0000;");
-                recordingLabel2.setVisible(true);
-                // recordingLabel2.setStyle("-fx-background-color: #FF0000;");
-            } else {
-                recorder.stopRecording();
-                recording = false;
-                recordButton2.setStyle("");
-                recordingLabel2.setVisible(false);
-                // recordingLabel2.setStyle("");
-
-                try {
-                    whisperService.setConnection(new RealHttpConnection(WhisperService.API_ENDPOINT));
-                    whisperService.sendHttpRequest();
-                    ingredients = whisperService.processAudio();
-
-                    String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
-                    if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*") || ingredients.trim().isEmpty() || ingredients.contains("you")) {
-                        showAlert("Input Error", "Please provide valid ingredients!");
-                        ingredients = null;
-                    } else {
-                        ingredientsList.getIngredients().setText(ingredients);
-                    }
-                } catch (IOException | URISyntaxException exception) {
-                    showAlert("Connection Error", "Something went wrong. Please check your connection and try again.");
-                    exception.printStackTrace();
-                }
-
-            }
+        recordIngredientsButton.setOnAction(event -> {
+            recordIngredients();
         });
 
     }
@@ -324,13 +312,13 @@ public class AppFrameMic extends BorderPane {
         backButton.setOnAction(eventHandler);
     }
 
-    //recordButton1, recordButton2, saveButton, backButton;
+    // recordButton1, recordButton2, saveButton, backButton;
     public Button getRecButton1() {
-        return recordButton1;
+        return recordMealTypeButton;
     }
 
     public Button getRecButton2() {
-        return recordButton2;
+        return recordIngredientsButton;
     }
 
     public StackPane getRoot() {

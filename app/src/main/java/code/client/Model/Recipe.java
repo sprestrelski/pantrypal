@@ -3,29 +3,30 @@ package code.client.Model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
+import org.bson.types.ObjectId;
 
 public class Recipe {
-    private UUID id;
+    private final ObjectId id;
     private String title;
-    private final List<String> ingredientList = new ArrayList<>();
-    private final List<String> instructionList = new ArrayList<>();
+    private final List<String> ingredients = new ArrayList<>();
+    private final List<String> instructions = new ArrayList<>();
 
-    public Recipe(String title) {
-        this.id = UUID.nameUUIDFromBytes(title.getBytes());
+    public Recipe(ObjectId id, String title) {
+        this.id = id;
         this.title = title;
     }
 
-    public void setID(UUID uuid) {
-        id = uuid;
+    public Recipe(String title) {
+        id = new ObjectId();
+        this.title = title;
     }
 
-    public void setTitle(String name) {
-        title = name;
-    }
-
-    public UUID getId() {
+    public ObjectId getId() {
         return id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getTitle() {
@@ -33,44 +34,31 @@ public class Recipe {
     }
 
     public void addIngredient(String ingredient) {
-        ingredientList.add(ingredient);
+        ingredients.add(ingredient);
     }
 
     public void addInstruction(String instruction) {
-        instructionList.add(instruction);
+        instructions.add(instruction);
     }
 
     public Iterator<String> getIngredientIterator() {
-        return ingredientList.iterator();
+        return ingredients.iterator();
     }
 
     public Iterator<String> getInstructionIterator() {
-        return instructionList.iterator();
-    }
-
-    public String getHttpString() {
-        StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(title).append("| ");
-        for (String ingredient : ingredientList) {
-            strBuilder.append(ingredient).append(";;");
-        }
-        strBuilder.append("| ");
-        for (String instruction : instructionList) {
-            strBuilder.append(instruction).append(";;");
-        }
-        return strBuilder.toString();
+        return instructions.iterator();
     }
 
     @Override
     public String toString() {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("Title: ").append(title).append("\n");
-        strBuilder.append("Ingredients:\n");
-        for (String ingredient : ingredientList) {
+        strBuilder.append("Ingredients:").append("\n");
+        for (String ingredient : ingredients) {
             strBuilder.append(ingredient).append("\n");
         }
-        strBuilder.append("Instructions:\n");
-        for (String instruction : instructionList) {
+        strBuilder.append("Instructions:").append("\n");
+        for (String instruction : instructions) {
             strBuilder.append(instruction).append("\n");
         }
         return strBuilder.toString();

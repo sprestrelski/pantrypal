@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Iterator;
+import java.util.List;
 
 import code.client.Model.*;
 
@@ -16,18 +16,15 @@ import code.client.Model.*;
  * 4. Deleting a recipe at the bottom of the recipe list
  */
 public class DeleteRecipeTest {
-    private RecipeDb recipeDb;
-    private Iterator<Recipe> iterator;
+    private RecipeListDb recipeDb;
     private Recipe r1, r2, r3;
 
     /**
-     * Before each test initialize a RecipeDb with three different recipes and an
-     * iterator
+     * Before each test initialize a RecipeDb with three different recipes
      */
     @BeforeEach
     public void setUp() {
-        recipeDb = new RecipeDb();
-        iterator = recipeDb.iterator();
+        recipeDb = new RecipeListDb();
         // Create three different recipes
         r1 = new Recipe("French Toast");
         r2 = new Recipe("Mac and Cheese");
@@ -47,9 +44,9 @@ public class DeleteRecipeTest {
         // Check that the size of the recipe list is 3 before deletion
         assertEquals(recipeDb.size(), 3);
         // Delete all of the recipes from the RecipeDb
-        recipeDb.remove(r1);
-        recipeDb.remove(r2);
-        recipeDb.remove(r3);
+        recipeDb.remove(r1.getId());
+        recipeDb.remove(r2.getId());
+        recipeDb.remove(r3.getId());
         // Check that the size of the recipe list is now 0
         assertEquals(recipeDb.size(), 0);
     }
@@ -63,13 +60,13 @@ public class DeleteRecipeTest {
         // Check that the size of the recipe list is 3 before deletion
         assertEquals(recipeDb.size(), 3);
         // Delete the recipe at the top of the recipe list
-        recipeDb.remove(r1);
+        recipeDb.remove(r1.getId());
         // Check that the size of the recipe list is now 2
         assertEquals(recipeDb.size(), 2);
         // Check that the other recipes had their indices shifted up by 1
-        iterator = recipeDb.iterator();
-        Recipe idx0 = iterator.next(); // Recipe at index 0 of the new recipe list
-        Recipe idx1 = iterator.next(); // Recipe at index 1 of the new recipe list
+        List<Recipe> recipeList = recipeDb.getList();
+        Recipe idx0 = recipeList.get(0); // Recipe at index 0 of the new recipe list
+        Recipe idx1 = recipeList.get(1); // Recipe at index 1 of the new recipe list
         // Check that the recipe at index 0 was the recipe that was at index 1
         assertEquals(idx0.getTitle(), r2.getTitle());
         assertEquals(idx0.getId(), r2.getId());
@@ -88,14 +85,14 @@ public class DeleteRecipeTest {
         // Check that the size of the recipe list is 3 before deletion
         assertEquals(recipeDb.size(), 3);
         // Delete the recipe at the middle of the recipe list
-        recipeDb.remove(r2);
+        recipeDb.remove(r2.getId());
         // Check that the size of the recipe list is now 2
         assertEquals(recipeDb.size(), 2);
         // Check that only the recipe at the bottom of the list had its index shifted up
         // by 1
-        iterator = recipeDb.iterator();
-        Recipe idx0 = iterator.next(); // Recipe at index 0 of the new recipe list
-        Recipe idx1 = iterator.next(); // Recipe at index 1 of the new recipe list
+        List<Recipe> recipeList = recipeDb.getList();
+        Recipe idx0 = recipeList.get(0); // Recipe at index 0 of the new recipe list
+        Recipe idx1 = recipeList.get(1); // Recipe at index 1 of the new recipe list
         // Check that the recipe at index 0 is still the recipe that was at index 0
         assertEquals(idx0.getTitle(), r1.getTitle());
         assertEquals(idx0.getId(), r1.getId());
@@ -113,13 +110,13 @@ public class DeleteRecipeTest {
         // Check that the size of the recipe list is 3 before deletion
         assertEquals(recipeDb.size(), 3);
         // Delete the recipe at the middle of the recipe list
-        recipeDb.remove(r3);
+        recipeDb.remove(r3.getId());
         // Check that the size of the recipe list is now 2
         assertEquals(recipeDb.size(), 2);
         // Check that none of the other recipes had their index shifted up by 1
-        iterator = recipeDb.iterator();
-        Recipe idx0 = iterator.next(); // Recipe at index 0 of the new recipe list
-        Recipe idx1 = iterator.next(); // Recipe at index 1 of the new recipe list
+        List<Recipe> recipeList = recipeDb.getList();
+        Recipe idx0 = recipeList.get(0); // Recipe at index 0 of the new recipe list
+        Recipe idx1 = recipeList.get(1); // Recipe at index 1 of the new recipe list
         // Check that the recipe at index 0 is still the recipe that was at index 0
         assertEquals(idx0.getTitle(), r1.getTitle());
         assertEquals(idx0.getId(), r1.getId());
