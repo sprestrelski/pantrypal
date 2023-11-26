@@ -1,7 +1,6 @@
 package code.client.Model;
 
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 
 public class WhisperService extends VoiceToText {
@@ -16,18 +15,7 @@ public class WhisperService extends VoiceToText {
     public String processAudio() throws IOException, URISyntaxException {
         // Send HTTP request
         sendHttpRequest();
-        // Get response code
-        int responseCode = connection.getResponseCode();
-        String response;
-
-        // Check response code and handle response accordingly
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            response = handleSuccessResponse();
-        } else {
-            response = handleErrorResponse();
-        }
-
-        return response;
+        return super.processAudio();
     }
 
     private IHttpConnection sendHttpRequest() throws IOException, URISyntaxException {

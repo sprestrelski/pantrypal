@@ -45,9 +45,9 @@
         },
         {
             "type": "java",
-            "name": "MyServer",
+            "name": "AppServer",
             "request": "launch",
-            "mainClass": "code.server.MyServer",
+            "mainClass": "code.server.AppServer",
         }
     ]
 }

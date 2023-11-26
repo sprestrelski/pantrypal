@@ -1,6 +1,7 @@
 package code.client.Model;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 
 import org.json.JSONException;
@@ -13,10 +14,27 @@ public abstract class VoiceToText {
         this.connection = connection;
     }
 
-    public abstract String processAudio() throws IOException, URISyntaxException;
+    public String processAudio() throws IOException, URISyntaxException {
+        return handleResponse();
+    }
+
+    private String handleResponse() throws IOException {
+        // Get response code
+        int responseCode = connection.getResponseCode();
+        String response;
+
+        // Check response code and handle response accordingly
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            response = handleSuccessResponse();
+        } else {
+            response = handleErrorResponse();
+        }
+
+        return response;
+    }
 
     // Helper method to handle a successful response
-    protected String handleSuccessResponse() throws IOException, JSONException {
+    private String handleSuccessResponse() throws IOException, JSONException {
         BufferedReader responseReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
         StringBuilder response = new StringBuilder();
@@ -32,7 +50,7 @@ public abstract class VoiceToText {
     }
 
     // Helper method to handle an error response
-    protected String handleErrorResponse() throws IOException, JSONException {
+    private String handleErrorResponse() throws IOException, JSONException {
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
         String errorLine;
         StringBuilder errorResponse = new StringBuilder();
