@@ -19,7 +19,6 @@ public class RecipeListUI extends VBox {
         this.setSpacing(5);
         this.setPrefSize(700, 600);
         this.setStyle("-fx-background-color: #F0F8FF;");
-        loadRecipes();
         VBox.setVgrow(this, Priority.ALWAYS);
     }
 
@@ -43,20 +42,20 @@ public class RecipeListUI extends VBox {
         this.updateRecipeIndices();
     }
 
-    /*
-     * Save recipes to a file called "recipes.csv"
-     */
-    public void saveRecipes() {
-        try {
-            Writer writer = new BufferedWriter(new FileWriter(CSV_FILE));
-            recipeWriter = new RecipeWriter(writer);
-            recipeWriter.writeRecipeDb(recipeDb);
-            writer.close();
-        } catch (IOException e) {
-            System.out.println("Recipes could not be saved.");
-            e.printStackTrace();
-        }
-    }
+    // /*
+    // * Save recipes to a file called "recipes.csv"
+    // */
+    // public void saveRecipes() {
+    // try {
+    // Writer writer = new BufferedWriter(new FileWriter(CSV_FILE));
+    // recipeWriter = new RecipeWriter(writer);
+    // recipeWriter.writeRecipeDb(recipeDb);
+    // writer.close();
+    // } catch (IOException e) {
+    // System.out.println("Recipes could not be saved.");
+    // e.printStackTrace();
+    // }
+    // }
 
     public IRecipeDb getRecipeDB() {
         return this.recipeDb;
@@ -77,18 +76,20 @@ public class RecipeListUI extends VBox {
         }
     }
 
-    /*public void update(ArrayList<Filters> filters) {
-        // RecipeListUI = this
-        this.getChildren().clear();
-        for (Recipe recipe : recipeDb) {
-            if(filters.contains(recipe.getMealType())) {
-                RecipeUI temp = new RecipeUI();
-                temp.setRecipe(recipe);
-                this.getChildren().add(temp);
-            }
-            else {}
-        }
-    }*/
+    /*
+     * public void update(ArrayList<Filters> filters) {
+     * // RecipeListUI = this
+     * this.getChildren().clear();
+     * for (Recipe recipe : recipeDb) {
+     * if(filters.contains(recipe.getMealType())) {
+     * RecipeUI temp = new RecipeUI();
+     * temp.setRecipe(recipe);
+     * this.getChildren().add(temp);
+     * }
+     * else {}
+     * }
+     * }
+     */
 
     /*
      * Load recipes from a file called "recipes.csv" to RecipeDb

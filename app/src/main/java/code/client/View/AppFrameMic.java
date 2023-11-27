@@ -4,14 +4,12 @@ import code.client.Model.*;
 import code.client.Controllers.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -300,7 +298,8 @@ public class AppFrameMic extends BorderPane {
                     ingredients = whisperService.processAudio();
 
                     String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
-                    if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*") || ingredients.trim().isEmpty() || ingredients.contains("you")) {
+                    if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*") || ingredients.trim().isEmpty()
+                            || ingredients.contains("you")) {
                         showAlert("Input Error", "Please provide valid ingredients!");
                         ingredients = null;
                     } else {
@@ -324,7 +323,7 @@ public class AppFrameMic extends BorderPane {
         backButton.setOnAction(eventHandler);
     }
 
-    //recordButton1, recordButton2, saveButton, backButton;
+    // recordButton1, recordButton2, saveButton, backButton;
     public Button getRecButton1() {
         return recordButton1;
     }
