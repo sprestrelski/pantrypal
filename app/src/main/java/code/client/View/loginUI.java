@@ -7,13 +7,17 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -24,29 +28,26 @@ import javafx.util.Duration;
 
 import code.client.Model.Account;
 
-public class LoginUI extends Application {
+public class LoginUI {
 
-    private Stage primaryStage;
     private boolean rememberLogin, accountSaved = false;
     private Account savedAccount;
-
-    public static void main(String[] args) {
-        launch(args);
-    }
+    private Hyperlink goToCreate;
+    private Button loginButton;
+    private TextField usernameField;
+    private PasswordField passwordField;
+    private GridPane grid;
 
     public static final String CSVFILE = "userCredentials.csv";
-
-    @Override
-    public void start(Stage primaryStage) {
+    LoginUI() {
         loadCredentials();
         if (savedAccount != null) {
             accountSaved = true;
         }
         
-        this.primaryStage = primaryStage;
-        this.primaryStage.setTitle("Pantry Pal - Login");
+        //this.primaryStage.setTitle("Pantry Pal - Login");
 
-        GridPane grid = new GridPane();
+        grid = new GridPane();
         grid.setAlignment(javafx.geometry.Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
@@ -60,13 +61,13 @@ public class LoginUI extends Application {
         Label usernameLabel = new Label("Username:");
         grid.add(usernameLabel, 0, 1);
 
-        TextField usernameField = new TextField();
+        usernameField = new TextField();
         grid.add(usernameField, 1, 1);
 
         Label passwordLabel = new Label("Password:");
         grid.add(passwordLabel, 0, 2);
 
-        PasswordField passwordField = new PasswordField();
+        passwordField = new PasswordField();
         grid.add(passwordField, 1, 2);
 
         CheckBox rememberCheckBox = new CheckBox("Remember my login");
@@ -77,50 +78,50 @@ public class LoginUI extends Application {
             System.out.println("Remember Login: " + rememberLogin);
         });
 
-        Button loginButton = new Button("Login");
+        loginButton = new Button("Login");
         grid.add(loginButton, 1, 4);
 
-        
+        goToCreate = new Hyperlink("Click here");;
+
+        FlowPane flow = new FlowPane();
+        flow.getChildren().addAll(
+            new Text("Don't have an account? "), goToCreate
+        );
+        grid.add(flow,1,5);
 
         loginButton.setOnAction(e -> {
-            String username = usernameField.getText();
-            String password = passwordField.getText();
-
-            // Perform login logic here
-            boolean loginSuccessful = performLogin(username, password);
-
-            if (loginSuccessful) {
-                showLoginSuccessPane(grid, true); //useless
-                if (rememberLogin) {
-                    saveCredentials(username, password);
-                }
-            } else {
-                showLoginSuccessPane(grid, false);
-            }
+            
         });
-
-        Scene scene = new Scene(grid, 700, 600);
-        this.primaryStage.setScene(scene);
 
         if (accountSaved) {
             usernameField.setText(savedAccount.getUsername());
             passwordField.setText(savedAccount.getPassword());
         }
 
-        this.primaryStage.show();
     }
 
-    private void saveCredentials (String username, String password) {
-        try (FileWriter writer = new FileWriter(CSVFILE, true)) {
-            writer.append(username)
-                  .append("|")
-                  .append(password);
-            writer.flush();
-            writer.close();
-        } catch (IOException exception) {
-            exception.printStackTrace();
-            System.out.println("Account credentials could not be saved.");
-        }
+    public GridPane getRoot() {
+        return grid;
+    }
+
+    public TextField getUsernameTextField() {
+        return usernameField;
+    }
+
+    public PasswordField getPasswordField() {
+        return passwordField;
+    }
+
+    public boolean getRememberLogin() {
+        return rememberLogin;
+    }
+
+    public void setGoToCreateAction(EventHandler<ActionEvent> eventHandler) {
+        goToCreate.setOnAction(eventHandler);
+    }
+
+    public void setLoginButtonAction(EventHandler<ActionEvent> eventHandler) {
+        loginButton.setOnAction(eventHandler);
     }
 
     public void loadCredentials() {
@@ -137,30 +138,5 @@ public class LoginUI extends Application {
         catch (IOException e) {
             System.out.println("No account credentials saved currently.");
         }
-    }
-
-    private void showLoginSuccessPane(GridPane grid, boolean loginSuccessful) {
-        Text successText;
-        if (loginSuccessful) {
-            successText = new Text("Login successful! Welcome to Pantry Pal.");
-            successText.setFill(Color.GREEN);
-        } else {
-            successText = new Text("Account does not exist. Please try again.");
-            successText.setFill(Color.RED);
-        }
-
-        successText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        grid.add(successText, 1, 5);
-
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(0), new KeyValue(successText.opacityProperty(), 1.0)),
-                new KeyFrame(Duration.seconds(5), new KeyValue(successText.opacityProperty(), 0.0))
-        );
-        timeline.play();
-    }
-
-    private boolean performLogin(String username, String password) {
-        // Will add logic for failed login later
-        return true;
     }
 }

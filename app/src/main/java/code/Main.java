@@ -7,7 +7,6 @@ import code.client.Model.*;
 import code.client.View.*;
 import code.client.Controllers.*;
 import javafx.scene.Scene;
-import java.util.ArrayList;
 
 public class Main extends Application {
 
@@ -16,14 +15,17 @@ public class Main extends Application {
         View view = new View();
         Model model = new Model();
         Controller controller = new Controller(view, model);
-        
-        Scene main = new Scene(view.getAppFrameHome().getRoot());
-        view.setScene(main);
+        Scene login = new Scene(view.getLoginUI().getRoot());
+        view.setScene(login);
+        // Scene main = new Scene(view.getAppFrameHome().getRoot());
+        // view.setScene(main);
         controller.addListenersToList();
 
-        primaryStage.setScene(main);
+        primaryStage.setScene(login);
         primaryStage.setTitle("Pantry Pal");
         primaryStage.setResizable(true);
+        primaryStage.setMinWidth(620);
+        primaryStage.setMinHeight(620);
         primaryStage.show();
     }
 
