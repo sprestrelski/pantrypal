@@ -59,7 +59,7 @@ class MealTypeSelection extends GridPane {
         mealTypeArea.setStyle("-fx-font-size: 16"); // CHANGE 1 (FONT)
         mealTypeArea.setPrefWidth(300);
         mealTypeArea.setPrefHeight(50);
-        mealTypeArea.setEditable(false);
+        mealTypeArea.setEditable(true);
 
         // Add all of the elements to the MealTypeSelection
         this.add(recordButton, 0, 0);
@@ -125,7 +125,7 @@ class IngredientsList extends GridPane {
         ingredientsArea.setStyle("-fx-font-size: 16"); // change
         ingredientsArea.setPrefWidth(300); // CHANGE 3 (WIDTH OF PROMPT)
         ingredientsArea.setPrefHeight(50); // CHANGE
-        ingredientsArea.setEditable(false);
+        ingredientsArea.setEditable(true);
 
         // Add all of the elements to the MealTypeSelection
         this.add(recordButton, 0, 0);
@@ -189,7 +189,7 @@ public class AppFrameMic extends BorderPane {
     private Button recordMealTypeButton, recordIngredientsButton, goToDetailedButton, backButton;
     private Label recordingMealTypeLabel, recordingIngredientsLabel;
     private final AudioRecorder recorder = new AudioRecorder();
-    private final VoiceToText voiceToText = new WhisperService();
+    private VoiceToText voiceToText;
 
     AppFrameMic() throws URISyntaxException, IOException {
         setStyle("-fx-background-color: #DAE5EA;"); // If want to change
@@ -241,6 +241,7 @@ public class AppFrameMic extends BorderPane {
             // recordingLabel1.setStyle("");
 
             try {
+                voiceToText = new WhisperService();
                 mealType = voiceToText.processAudio().toLowerCase();
                 // type check
                 if (mealType.contains("breakfast")) {
@@ -275,6 +276,7 @@ public class AppFrameMic extends BorderPane {
             // recordingLabel2.setStyle("");
 
             try {
+                voiceToText = new WhisperService();
                 ingredients = voiceToText.processAudio();
                 String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
 
@@ -313,11 +315,11 @@ public class AppFrameMic extends BorderPane {
     }
 
     // recordButton1, recordButton2, saveButton, backButton;
-    public Button getRecButton1() {
+    public Button getRecordMealTypeButton() {
         return recordMealTypeButton;
     }
 
-    public Button getRecButton2() {
+    public Button getRecordIngredientsButton() {
         return recordIngredientsButton;
     }
 

@@ -4,6 +4,7 @@ import javafx.scene.layout.*;
 import java.io.*;
 import java.util.List;
 
+import code.client.Model.AppConfig;
 import code.client.Model.IRecipeDb;
 import code.client.Model.Recipe;
 import code.client.Model.RecipeListDb;
@@ -12,8 +13,7 @@ import code.client.Model.RecipeCSVWriter;
 
 // TODO: SERVER Controller that sends a GET(db) request for the recipeDB.
 public class RecipeListUI extends VBox {
-    private static final String CSV_FILE = "recipes.csv";
-    private IRecipeDb recipeDb = new RecipeListDb();
+    private IRecipeDb recipeDb;
     private RecipeCSVWriter recipeWriter;
 
     RecipeListUI() throws IOException {
@@ -49,7 +49,7 @@ public class RecipeListUI extends VBox {
      */
     public void saveRecipes() {
         try {
-            Writer writer = new BufferedWriter(new FileWriter(CSV_FILE));
+            Writer writer = new BufferedWriter(new FileWriter(AppConfig.CSV_FILE));
             recipeWriter = new RecipeCSVWriter(writer);
             recipeWriter.writeRecipeDb(recipeDb);
             writer.close();
@@ -98,9 +98,9 @@ public class RecipeListUI extends VBox {
      */
     public void loadRecipes() {
         try {
-            Reader reader = new FileReader(CSV_FILE);
+            Reader reader = new FileReader(AppConfig.CSV_FILE);
             RecipeCSVReader recipeReader = new RecipeCSVReader(reader);
-            IRecipeDb recipeDb = new RecipeListDb();
+            recipeDb = new RecipeListDb();
             recipeReader.readRecipeDb(recipeDb);
             System.out.println("Recipes loaded");
         } catch (IOException e) {

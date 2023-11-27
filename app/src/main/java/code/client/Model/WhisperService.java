@@ -18,7 +18,7 @@ public class WhisperService extends VoiceToText {
         return super.processAudio();
     }
 
-    private IHttpConnection sendHttpRequest() throws IOException, URISyntaxException {
+    private void sendHttpRequest() throws IOException, URISyntaxException {
         // Set up request headers
         File file = new File(AppConfig.AUDIO_FILE);
         String boundary = "Boundary-" + System.currentTimeMillis();
@@ -37,7 +37,6 @@ public class WhisperService extends VoiceToText {
         // Flush and close output stream
         outputStream.flush();
         outputStream.close();
-        return connection;
     }
 
     // Helper method to write a parameter to the output stream in multipart form

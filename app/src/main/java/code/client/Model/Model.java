@@ -12,7 +12,7 @@ public class Model {
     public String performRequest(String method, String recipe, String uuid) {
         // Implement your HTTP request logic here and return the response
         try {
-            String urlString = AppConfig.SERVER_URL;
+            String urlString = AppConfig.SERVER_URL + "/recipes";
             if (uuid != null) {
                 urlString += "?=" + uuid;
             }
