@@ -84,8 +84,7 @@ public class Controller {
         String recipe = writer.toString();
 
         // Debugging
-        System.out.println(recipe);
-        // Debuggging
+        System.out.println("Posting: " + recipe);
 
         model.performRequest("POST", recipe, null);
     }

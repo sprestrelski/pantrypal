@@ -7,6 +7,14 @@ import code.client.Model.Recipe;
 import code.client.Model.RecipeReader;
 import code.client.Model.RecipeWriter;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.InsertManyOptions;
+import org.bson.Document;
+import org.bson.types.ObjectId;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -16,7 +24,6 @@ public class RequestHandler implements HttpHandler {
     private IRecipeDb recipeDb;
 
     public RequestHandler() {
-        loadRecipes();
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -40,7 +47,6 @@ public class RequestHandler implements HttpHandler {
             e.printStackTrace();
         }
 
-        saveRecipes();
         // Sending back response to the client
         httpExchange.sendResponseHeaders(200, response.length());
         OutputStream outStream = httpExchange.getResponseBody();
@@ -72,6 +78,7 @@ public class RequestHandler implements HttpHandler {
 
     private Recipe buildRecipe(String postData) throws IOException {
         Reader reader = new StringReader(postData);
+        // System.out.println("building recipe from: " + postData);
         RecipeReader recipeReader = new RecipeReader(reader);
         Recipe recipe = recipeReader.readRecipe();
         return recipe;
@@ -134,19 +141,19 @@ public class RequestHandler implements HttpHandler {
         return response;
     }
 
-    /*
-     * Save recipes to a file called "recipes.csv"
-     */
-    public void saveRecipes() {
-        try {
-            Writer writer = new BufferedWriter(new FileWriter(CSV_FILE));
-            RecipeWriter recipeWriter = new RecipeWriter(writer);
-            recipeWriter.writeRecipeDb(recipeDb);
-            writer.close();
-        } catch (IOException e) {
-            System.out.println("Recipes could not be saved.");
-        }
-    }
+    // /*
+    // * Save recipes to a file called "recipes.csv"
+    // */
+    // public void saveRecipes() {
+    // try {
+    // Writer writer = new BufferedWriter(new FileWriter(CSV_FILE));
+    // RecipeWriter recipeWriter = new RecipeWriter(writer);
+    // recipeWriter.writeRecipeDb(recipeDb);
+    // writer.close();
+    // } catch (IOException e) {
+    // System.out.println("Recipes could not be saved.");
+    // }
+    // }
 
     /*
      * Load recipes from a file called "recipes.csv" to RecipeDb

@@ -4,14 +4,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import javax.swing.plaf.basic.BasicOptionPaneUI.ButtonAreaLayout;
-
 import code.client.Model.Account;
 import code.client.Model.Recipe;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.stage.Stage;
-import code.client.View.AppFrameMic;
 
 public class View {
     // private IWindowUI home, audioCapture, detailedRecipe, currentScene;
@@ -21,8 +17,10 @@ public class View {
     private LoginUI login;
     private AccountCreationUI createAcc;
     private Scene mainScene;
+    private OfflineUI offlineScreen;
 
     public View() throws IOException, URISyntaxException {
+        offlineScreen = new OfflineUI();
         login = new LoginUI();
         home = new AppFrameHome();
         audioCapture = new AppFrameMic();
@@ -53,6 +51,10 @@ public class View {
 
     public void goToLoginUI() {
         mainScene.setRoot(login.getRoot());
+    }
+
+    public void goToOfflineUI() {
+        mainScene.setRoot(offlineScreen);
     }
 
     public RecipeListUI getRecipeButtons() {

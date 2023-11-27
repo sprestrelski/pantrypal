@@ -13,7 +13,8 @@ public class RecipeReader {
     }
 
     private Recipe readRecipe(String recipeStr) throws IOException {
-        String[] recipeTokens = recipeStr.split("\\| ");
+        String[] recipeTokens = recipeStr.split("::");
+        // System.out.println("Reading recipe: " + recipeTokens[0]);
         String[] ingredientTokens = recipeTokens[1].split(";;");
         String[] instructionTokens = recipeTokens[2].split(";;");
         Recipe recipe = new Recipe(recipeTokens[0]);
