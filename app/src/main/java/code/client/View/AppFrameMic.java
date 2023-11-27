@@ -314,7 +314,6 @@ public class AppFrameMic extends BorderPane {
         backButton.setOnAction(eventHandler);
     }
 
-    // recordButton1, recordButton2, saveButton, backButton;
     public Button getRecordMealTypeButton() {
         return recordMealTypeButton;
     }

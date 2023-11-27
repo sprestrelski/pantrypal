@@ -33,7 +33,6 @@ public class Controller {
         offStyle = "-fx-font-style: italic; -fx-background-color: #FF7377; -fx-font-weight: bold; -fx-font: 11 arial;";
         blinkStyle = "-fx-background-color: #00FFFF; -fx-border-width: 0;";
 
-        // this.view.getAppFrameHome().setGetButtonAction(this::handleGetButton);
         this.view.getAppFrameHome().setNewRecipeButtonAction(event -> {
             try {
                 handleNewButton(event);
@@ -65,10 +64,8 @@ public class Controller {
         recipeWriter.writeRecipe(postedRecipe);
 
         String recipe = writer.toString();
-
         // Debugging
-        System.out.println(recipe);
-        // Debuggging
+        System.out.println("Posting: " + recipe);
 
         model.performRequest("POST", recipe, null);
     }
@@ -136,12 +133,13 @@ public class Controller {
                 handleDetailedViewListeners();
 
             } catch (IOException | URISyntaxException | InterruptedException exception) {
-                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+                view.showAlert("Connection Error", "Something went wrong. Please check your connection and try again.");
                 exception.printStackTrace();
             }
         } else {
-            AppAlert.show("Input Error", "Invalid meal type or ingredients, please try again!");
+            view.showAlert("Input Error", "Invalid meal type or ingredients, please try again!");
         }
+
     }
 
     private void handleDetailedViewListeners() {

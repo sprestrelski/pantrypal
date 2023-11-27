@@ -13,7 +13,7 @@ public class RecipeCSVReader {
     }
 
     private Recipe readRecipe(String recipeStr) throws IOException {
-        String[] recipeTokens = recipeStr.split("\\| ");
+        String[] recipeTokens = recipeStr.split("::");
         String id = recipeTokens[0];
         String title = recipeTokens[1];
         String[] ingredientTokens = recipeTokens[2].split(";;");

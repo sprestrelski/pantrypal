@@ -45,6 +45,7 @@ class Footer extends HBox {
 class Header extends HBox {
 
     private Button filterButton, sortButton;
+
     Header() {
         String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF; -fx-font-weight: bold; -fx-font: 13 arial;";
 
@@ -65,7 +66,7 @@ class Header extends HBox {
     }
 }
 
-public class AppFrameHome extends BorderPane{
+public class AppFrameHome extends BorderPane {
     private Header header;
     private Footer footer;
     private RecipeListUI recipeList;
@@ -88,10 +89,9 @@ public class AppFrameHome extends BorderPane{
         this.setTop(header);
         this.setCenter(scroller);
         this.setBottom(footer);
-        
+
         newButton = footer.getNewButton();
     }
-
 
     public StackPane getRoot() {
         stack.getChildren().clear();
