@@ -2,23 +2,30 @@ package code.client.View;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+
+import javax.swing.plaf.basic.BasicOptionPaneUI.ButtonAreaLayout;
+import code.client.Model.Account;
 import code.client.Model.Recipe;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 
 public class View {
     // private IWindowUI home, audioCapture, detailedRecipe, currentScene;
-    private OfflineUI offlineScreen;
     private AppFrameHome home;
     private AppFrameMic audioCapture;
     private DetailsAppFrame detailedRecipe;
+    private LoginUI login;
+    private AccountCreationUI createAcc;
     private Scene mainScene;
+    private OfflineUI offlineScreen;
 
     public View() throws IOException, URISyntaxException {
         offlineScreen = new OfflineUI();
+        login = new LoginUI();
         home = new AppFrameHome();
         audioCapture = new AppFrameMic();
         detailedRecipe = new DetailsAppFrame();
+        createAcc = new AccountCreationUI();
     }
 
     public void setScene(Scene scene) {
@@ -36,6 +43,14 @@ public class View {
 
     public void goToDetailedView(Recipe recipe, boolean savedRecipe) {
         mainScene.setRoot(detailedRecipe.getRoot(recipe, savedRecipe));
+    }
+
+    public void goToCreateAcc() {
+        mainScene.setRoot(createAcc.getRoot());
+    }
+
+    public void goToLoginUI() {
+        mainScene.setRoot(login.getRoot());
     }
 
     public void goToOfflineUI() {
@@ -56,6 +71,14 @@ public class View {
 
     public AppFrameHome getAppFrameHome() {
         return home;
+    }
+
+    public LoginUI getLoginUI() {
+        return login;
+    }
+
+    public AccountCreationUI getAccountCreationUI() {
+        return createAcc;
     }
 
     public void showAlert(String title, String content) {

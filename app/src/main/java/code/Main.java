@@ -16,9 +16,8 @@ public class Main extends Application {
         Model model = new Model();
         Controller controller = new Controller(view, model);
         ServerCheck checker = new ServerCheck();
-
-        Scene main = new Scene(view.getAppFrameHome().getRoot());
-        view.setScene(main);
+        Scene login = new Scene(view.getLoginUI().getRoot());
+        view.setScene(login);
         if (checker.isOnline()) {
             System.out.println("Server is online");
             controller.addListenersToList();
@@ -27,9 +26,12 @@ public class Main extends Application {
             view.goToOfflineUI();
         }
         primaryStage.setMinWidth(600);
-        primaryStage.setScene(main);
+        primaryStage.setScene(login);
+
         primaryStage.setTitle("Pantry Pal");
         primaryStage.setResizable(true);
+        primaryStage.setMinWidth(620);
+        primaryStage.setMinHeight(620);
         primaryStage.show();
     }
 
