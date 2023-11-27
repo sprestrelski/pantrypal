@@ -67,17 +67,17 @@ public class Controller {
         // Debugging
         System.out.println("Posting: " + recipe);
 
-        model.performRequest("POST", recipe, null);
+        model.performRecipeRequest("POST", recipe, null);
     }
 
     private void handleGetButton(ActionEvent event) {
         String uuid = UUID.fromString(title).toString();
-        model.performRequest("GET", null, uuid);
+        model.performRecipeRequest("GET", null, uuid);
     }
 
     private void handleDeleteButton(ActionEvent event) {
         String uuid = UUID.fromString(title).toString();
-        model.performRequest("DELETE", null, uuid);
+        model.performRecipeRequest("DELETE", null, uuid);
     }
 
     private void handleNewButton(ActionEvent event) throws URISyntaxException, IOException {
@@ -99,7 +99,7 @@ public class Controller {
             currRecipe.getDeleteButton().setOnAction(e -> {
                 setTitle(currRecipe.getRecipeName());
                 String uuid = currRecipe.getId();
-                model.performRequest("DELETE", null, uuid);
+                model.performRecipeRequest("DELETE", null, uuid);
             });
             currRecipe.getDetailsButton().setOnAction(e -> {
                 view.goToDetailedView(currRecipe.getRecipe(), true);

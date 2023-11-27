@@ -7,9 +7,52 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URI;
 
-
 public class Model {
-    public String performRequest(String method, String recipe, String uuid) {
+
+    public String performUserRequest(String method, String user, String password) {
+        try {
+            String urlString = AppConfig.SERVER_URL + "/user";
+            URL url = new URI(urlString).toURL();
+            urlString += "?=" + user + ":" + password;
+            // POSSIBLY this later --> "url/username=123&&password=345"
+            // Temporarily THIS --> "url/?=123:345"
+
+            // send GET request to see if user exists
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod(method);
+            conn.setDoOutput(true);
+
+            boolean userExists = false;
+            boolean userPassMatch = true;
+            // make a new user
+            if (method.equals("POST")) {
+                if (!userExists) {
+                    // make new account
+                } else {
+                    return "Error: " + user + " already exists!";
+                }
+
+            } // return recipe list
+            else if (method.equals("GET")) {
+                if (userExists && userPassMatch) {
+                    // return recipe list
+                } else {
+                    return "Error: username or password incorrect";
+                }
+
+            }
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String response = in.readLine();
+            in.close();
+            return response;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "Error: " + ex.getMessage();
+        }
+    }
+
+    public String performRecipeRequest(String method, String recipe, String uuid) {
         // Implement your HTTP request logic here and return the response
         try {
             String urlString = AppConfig.SERVER_URL + "/recipes";

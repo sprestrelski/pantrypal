@@ -17,8 +17,9 @@ public class MyServer {
 
   public void startServer() {
     ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-    httpServer.createContext("/", new RecipeRequestHandler());
+    httpServer.createContext("/recipes", new RecipeRequestHandler());
     httpServer.setExecutor(threadPoolExecutor);
+    httpServer.createContext("/user", new RequestAccHandler());
     httpServer.start();
     System.out.println("Server started on port " + SERVER_PORT);
   }

@@ -14,7 +14,6 @@ import code.client.Model.RecipeCSVWriter;
 // TODO: SERVER Controller that sends a GET(db) request for the recipeDB.
 public class RecipeListUI extends VBox {
     private IRecipeDb recipeDb;
-    private RecipeCSVWriter recipeWriter;
 
     RecipeListUI() throws IOException {
         this.setSpacing(5);
