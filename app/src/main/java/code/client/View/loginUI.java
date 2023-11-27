@@ -19,16 +19,29 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import code.client.Model.Account;
+
 public class loginUI extends Application {
 
     private Stage primaryStage;
+    private boolean rememberLogin, accountSaved = false;
+    private Account savedAccount;
+
+    private TextField usernameField, passwordField;
 
     public static void main(String[] args) {
         launch(args);
     }
 
+    public static final String CSVFILE = "userCredentials.csv";
+
     @Override
     public void start(Stage primaryStage) {
+        loadCredentials();
+        if (savedAccount != null) {
+            accountSaved = true;
+        }
+        
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Pantry Pal - Login");
 
@@ -41,7 +54,7 @@ public class loginUI extends Application {
 
         Text titleText = new Text("Pantry Pal - Login");
         titleText.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-        grid.add(titleText, 0, 0, 2, 1); 
+        grid.add(titleText, 0, 0, 2, 1);
 
         Label usernameLabel = new Label("Username:");
         grid.add(usernameLabel, 0, 1);
@@ -58,28 +71,71 @@ public class loginUI extends Application {
         CheckBox rememberCheckBox = new CheckBox("Remember my login");
         grid.add(rememberCheckBox, 1, 3);
 
+        rememberCheckBox.setOnAction(e -> {
+            rememberLogin = rememberCheckBox.isSelected();
+            System.out.println("Remember Login: " + rememberLogin);
+        });
+
         Button loginButton = new Button("Login");
         grid.add(loginButton, 1, 4);
+
+        
 
         loginButton.setOnAction(e -> {
             String username = usernameField.getText();
             String password = passwordField.getText();
-            boolean rememberLogin = rememberCheckBox.isSelected();
 
             // Perform login logic here
             boolean loginSuccessful = performLogin(username, password);
 
             if (loginSuccessful) {
-                showLoginSuccessPane(grid, true);
+                showLoginSuccessPane(grid, true); //useless
+                if (rememberLogin) {
+                    saveCredentials(username, password);
+                }
             } else {
                 showLoginSuccessPane(grid, false);
             }
         });
 
-        Scene scene = new Scene(grid, 700, 600); 
+        Scene scene = new Scene(grid, 700, 600);
         this.primaryStage.setScene(scene);
 
+        if (accountSaved) {
+            usernameField.setText(savedAccount.getUsername());
+            passwordField.setText(savedAccount.getPassword());
+        }
+
         this.primaryStage.show();
+    }
+
+    private void saveCredentials (String username, String password) {
+        try (FileWriter writer = new FileWriter(CSVFILE, true)) {
+            writer.append(username)
+                  .append("|")
+                  .append(password);
+            writer.flush();
+            writer.close();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            System.out.println("Account credentials could not be saved.");
+        }
+    }
+
+    public void loadCredentials() {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(CSVFILE));
+            String line;
+            String[] credentials;
+            while ((line = reader.readLine()) != null) {
+                credentials = line.split("\\|");
+                savedAccount = new Account(credentials[0], credentials[1]);
+            }
+            reader.close();
+        } 
+        catch (IOException e) {
+            System.out.println("No account credentials saved currently.");
+        }
     }
 
     private void showLoginSuccessPane(GridPane grid, boolean loginSuccessful) {
@@ -103,9 +159,7 @@ public class loginUI extends Application {
     }
 
     private boolean performLogin(String username, String password) {
-        
         // Will add logic for failed login later
         return true;
     }
 }
-

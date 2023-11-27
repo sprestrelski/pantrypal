@@ -18,6 +18,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import code.client.Model.Account;
+
 public class accountCreationUI extends Application {
 
     private Stage primaryStage;
