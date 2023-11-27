@@ -7,39 +7,29 @@ import code.client.Model.*;
 import code.client.View.*;
 import code.client.Controllers.*;
 import javafx.scene.Scene;
-import java.util.ArrayList;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        HomeScreen home = new HomeScreen();
+        View view = new View();
+        Model model = new Model();
+        Controller controller = new Controller(view, model);
+        ServerCheck checker = new ServerCheck();
 
-        NewRecipeUI audioCapture = new NewRecipeUI();
-        // Scene speaking = audioCapture.getScene();
-
-        DetailsAppFrame details = new DetailsAppFrame();
-        // Scene details = chatGPTed.getScene();
-
-        ArrayList<IWindowUI> scenes = new ArrayList<IWindowUI>();
-
-        scenes.add(home);
-        scenes.add(audioCapture);
-        scenes.add(details);
-        // details.setRecipeHolder(new RecipeDetailsUI(new Recipe("2", "Testing")));
-        // Can create observer, subject interface here
-        home.setScenes(scenes);
-        audioCapture.setScenes(scenes);
-        details.setScenes(scenes);
-
-        primaryStage.setTitle("PantryPal");
-        // primaryStage.setScene(home.getSceneWindow());
-
-        Scene main = home.getSceneWindow();
-        home.setRoot(main);
-
+        Scene main = new Scene(view.getAppFrameHome().getRoot());
+        view.setScene(main);
+        if (checker.isOnline()) {
+            System.out.println("Server is online");
+            controller.addListenersToList();
+        } else {
+            System.out.println("Server is offline");
+            view.goToOfflineUI();
+        }
+        primaryStage.setMinWidth(600);
         primaryStage.setScene(main);
-        primaryStage.setResizable(false);
+        primaryStage.setTitle("Pantry Pal");
+        primaryStage.setResizable(true);
         primaryStage.show();
     }
 

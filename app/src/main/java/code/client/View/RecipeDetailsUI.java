@@ -12,6 +12,7 @@ public class RecipeDetailsUI extends HBox {
     private TextArea ingredientTextArea;
     private TextArea instructionTextArea;
     private Recipe recipe;
+    private boolean editableStatus = false;
 
     public RecipeDetailsUI(Recipe recipe) {
         titleTextField = new TextField();
@@ -55,10 +56,18 @@ public class RecipeDetailsUI extends HBox {
         return instructionTextArea;
     }
 
-    public void setEditable(boolean status) {
-        // titleTextField.setEditable(status); // TODO : maybe later?
-        ingredientTextArea.setEditable(status);
-        instructionTextArea.setEditable(status);
+    public boolean isEditable() {
+        return editableStatus;
+    }
+    public void setEditable(boolean value) {
+        editableStatus = value;
+    }
+
+    public void setEditable() {
+        // titleTextField.setEditable(!editableStatus); // TODO : maybe later?
+        ingredientTextArea.setEditable(!editableStatus);
+        instructionTextArea.setEditable(!editableStatus);
+        editableStatus = !editableStatus;
     }
 
     public Recipe getRecipe() {

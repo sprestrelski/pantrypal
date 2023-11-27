@@ -18,13 +18,13 @@ public class MockGPT implements ITextToRecipe {
 
                 Ingredients:
 
-                - 2 chicken breasts, diced
-                - 2 eggs
+                2 chicken breasts, diced
+                2 eggs
 
                 Instructions:
-                1. Crack 2 eggs into bowl.
-                2. Add chicken into bowl and then fry.
-                3. Enjoy!
+                Crack 2 eggs into bowl.
+                Add chicken into bowl and then fry.
+                Enjoy!
                 """;
     }
 
