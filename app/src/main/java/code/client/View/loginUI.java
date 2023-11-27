@@ -1,5 +1,8 @@
 package code.client.View;
 
+import java.util.*;
+import java.io.*;
+import java.nio.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -21,13 +24,11 @@ import javafx.util.Duration;
 
 import code.client.Model.Account;
 
-public class loginUI extends Application {
+public class LoginUI extends Application {
 
     private Stage primaryStage;
     private boolean rememberLogin, accountSaved = false;
     private Account savedAccount;
-
-    private TextField usernameField, passwordField;
 
     public static void main(String[] args) {
         launch(args);

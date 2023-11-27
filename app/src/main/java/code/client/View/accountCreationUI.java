@@ -20,7 +20,7 @@ import javafx.util.Duration;
 
 import code.client.Model.Account;
 
-public class accountCreationUI extends Application {
+public class AccountCreationUI extends Application {
 
     private Stage primaryStage;
 
