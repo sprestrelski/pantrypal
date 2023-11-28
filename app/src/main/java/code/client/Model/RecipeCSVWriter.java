@@ -22,20 +22,19 @@ public class RecipeCSVWriter {
 
         while (ingredientIter.hasNext()) {
             ingredient = ingredientIter.next();
+            strBuilder.append(ingredient);
             if (ingredientIter.hasNext()) {
-                strBuilder.append(ingredient).append(";;");
-            } else {
-                strBuilder.append(ingredient);
+                strBuilder.append(";;");
             }
         }
+
         strBuilder.append("::");
 
         while (instructionIter.hasNext()) {
             instruction = instructionIter.next();
+            strBuilder.append(instruction);
             if (instructionIter.hasNext()) {
-                strBuilder.append(instruction).append(";;");
-            } else {
-                strBuilder.append(instruction);
+                strBuilder.append(";;");
             }
         }
 
@@ -49,14 +48,10 @@ public class RecipeCSVWriter {
         strBuilder.append("sep=::").append("\n");
         // add labels for the columns of the csv file
         strBuilder.append("ID::Title::Ingredients::Instructions").append("\n");
-
         writer.write(strBuilder.toString());
+
         for (Recipe recipe : recipeDb.getList()) {
             writeRecipe(recipe);
         }
-    }
-
-    public void close() throws IOException {
-        writer.close();
     }
 }

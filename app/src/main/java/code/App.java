@@ -19,8 +19,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        setUpDb();
-        startServer();
+        initDb();
+        initServer();
+        // server.start();
         drawUI(primaryStage);
     }
 
@@ -32,18 +33,26 @@ public class App extends Application {
         View view = new View();
         Model model = new Model();
         Controller controller = new Controller(view, model);
-
         Scene scene = new Scene(view.getAppFrameHome().getRoot());
         view.setScene(scene);
-        controller.addListenersToList();
+        ServerConnection connection = new ServerConnection(server);
 
+        if (connection.isOnline()) {
+            System.out.println("Server is online");
+            controller.addListenersToList();
+        } else {
+            System.out.println("Server is offline");
+            view.goToOfflineUI();
+        }
+
+        primaryStage.setMinWidth(600);
         primaryStage.setScene(scene);
         primaryStage.setTitle(AppConfig.APP_NAME);
         primaryStage.setResizable(true);
         primaryStage.show();
     }
 
-    private IRecipeDb setUpDb() throws IOException {
+    private IRecipeDb initDb() throws IOException {
         recipeDb = new RecipeListDb();
         RecipeCSVReader csvReader = new RecipeCSVReader(new FileReader(AppConfig.CSV_FILE));
         csvReader.readRecipeDb(recipeDb);
@@ -51,8 +60,7 @@ public class App extends Application {
         return recipeDb;
     }
 
-    private void startServer() throws IOException {
-        server = new AppServer(recipeDb);
-        server.start();
+    private void initServer() throws IOException {
+        server = new AppServer(recipeDb, AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
     }
 }

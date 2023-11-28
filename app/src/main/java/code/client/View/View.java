@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import code.client.Model.Recipe;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 
 public class View {
     // private IWindowUI home, audioCapture, detailedRecipe, currentScene;
@@ -56,13 +55,5 @@ public class View {
 
     public AppFrameHome getAppFrameHome() {
         return home;
-    }
-
-    public void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }

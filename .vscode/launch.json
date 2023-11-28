@@ -29,22 +29,6 @@
         },
         {
             "type": "java",
-            "name": "ThreadingNoThread",
-            "request": "launch",
-            "mainClass": "multithreading.ThreadingNoThread",
-            "projectName": "cse110-lab5_d0dfa5ee",
-            //"vmArgs": "--module-path 'C:\\Users\\Christophian S\\Desktop\\javafx-sdk-21\\lib' --add-modules javafx.controls,javafx.fxml"
-        },
-        {
-            "type": "java",
-            "name": "ThreadingWithThread",
-            "request": "launch",
-            "mainClass": "multithreading.ThreadingWithThread",
-            "projectName": "cse110-lab5_d0dfa5ee",
-            //"vmArgs": "--module-path 'C:\\Users\\Christophian S\\Desktop\\javafx-sdk-21\\lib' --add-modules javafx.controls,javafx.fxml"
-        },
-        {
-            "type": "java",
             "name": "AppServer",
             "request": "launch",
             "mainClass": "code.server.AppServer",

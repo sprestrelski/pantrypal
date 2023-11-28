@@ -106,14 +106,13 @@ public class AppFrameHome extends BorderPane {
         newButton.setOnAction(eventHandler);
     }
 
-    // public void setRecipeDetailsButtonAction(EventHandler<ActionEvent>
-    // eventHandler) {
-    // for (int i = 0; i < recipeList.getChildren().size(); i++) {
-    // RecipeUI currRecipe = (RecipeUI) recipeList.getChildren().get(i);
-    // currRecipe.getDetailsButton().setOnAction(eventHandler);
-    // // currRecipe.getDeleteButton().setOnAction(eventHandler);
-    // }
-    // }
+    public void setRecipeDetailsButtonAction(EventHandler<ActionEvent> eventHandler) {
+        for (int i = 0; i < recipeList.getChildren().size(); i++) {
+            RecipeUI currRecipe = (RecipeUI) recipeList.getChildren().get(i);
+            currRecipe.getDetailsButton().setOnAction(eventHandler);
+            // currRecipe.getDeleteButton().setOnAction(eventHandler);
+        }
+    }
 
     public Button getNewButton() {
         return footer.getNewButton();

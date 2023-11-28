@@ -6,22 +6,13 @@ import code.client.Model.AppConfig;
 import code.client.Model.IRecipeDb;
 import code.client.Model.Recipe;
 import code.client.Model.RecipeCSVReader;
-import code.client.Model.RecipeCSVWriter;
 import code.client.Model.RecipeListDb;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.InsertManyOptions;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
-import org.bson.types.ObjectId;
 
 public class RecipeRequestHandler implements HttpHandler {
     private IRecipeDb recipeDb;

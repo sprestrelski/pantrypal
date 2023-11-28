@@ -133,13 +133,12 @@ public class Controller {
                 handleDetailedViewListeners();
 
             } catch (IOException | URISyntaxException | InterruptedException exception) {
-                view.showAlert("Connection Error", "Something went wrong. Please check your connection and try again.");
+                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
                 exception.printStackTrace();
             }
         } else {
-            view.showAlert("Input Error", "Invalid meal type or ingredients, please try again!");
+            AppAlert.show("Input Error", "Invalid meal type or ingredients, please try again!");
         }
-
     }
 
     private void handleDetailedViewListeners() {
