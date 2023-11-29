@@ -1,5 +1,6 @@
 package code.server;
 
+import com.mongodb.MongoTimeoutException;
 import com.sun.net.httpserver.*;
 
 import java.io.*;
@@ -55,16 +56,23 @@ public class AccountRequestHandler implements HttpHandler {
                 String[] split = usernameNPassword.split(":");
 
                 System.out.println("Queried for " + split[0]);
+                System.out.println("Split size is " + split.length);
 
                 // If only provided username
-                if (split.length < 2) {
-                    Account takenUsername = accountMongoDB.find(split[0]);
-                    if (takenUsername == null)
-                        response = "Username is not taken";
-                } else {
-                    if (accountMongoDB.validate(split[0], split[1])) {
-                        response = "Username and Password are correct.";
+                try {
+                    if (split.length < 2) {
+                        Account takenUsername = accountMongoDB.find(split[0]);
+                        response = (takenUsername == null) ? "Username is not taken" : "Username is taken";
+                    } else {
+                        if (accountMongoDB.validate(split[0], split[1])) {
+                            response = "Username and Password are correct.";
+                        } else {
+                            response = "Password is not correct.";
+                        }
                     }
+                } catch (MongoTimeoutException e) {
+                    response = "No access to database";
+                    System.out.println(response);
                 }
             }
         }
