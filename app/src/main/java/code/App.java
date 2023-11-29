@@ -33,22 +33,23 @@ public class App extends Application {
         View view = new View();
         Model model = new Model();
         Controller controller = new Controller(view, model);
-        Scene scene = new Scene(view.getAppFrameHome().getRoot());
-        view.setScene(scene);
+        Scene login = new Scene(view.getLoginUI().getRoot());
+        view.setScene(login);
         ServerConnection connection = new ServerConnection(server);
 
         if (connection.isOnline()) {
-            System.out.println("Server is online");
+            // System.out.println("Server is online");
             controller.addListenersToList();
         } else {
-            System.out.println("Server is offline");
+            // System.out.println("Server is offline");
             view.goToOfflineUI();
         }
 
-        primaryStage.setMinWidth(600);
-        primaryStage.setScene(scene);
+        primaryStage.setScene(login);
         primaryStage.setTitle(AppConfig.APP_NAME);
         primaryStage.setResizable(true);
+        primaryStage.setMinWidth(620);
+        primaryStage.setMinHeight(620);
         primaryStage.show();
     }
 

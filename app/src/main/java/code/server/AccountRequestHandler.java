@@ -16,12 +16,14 @@ public class AccountRequestHandler implements HttpHandler {
     public void handle(HttpExchange httpExchange) throws IOException {
         String response = "Request Received";
         String method = httpExchange.getRequestMethod();
+        System.out.println("Method is " + method);
         try {
             if (method.equals("GET")) {
                 response = handleGet(httpExchange);
             } else if (method.equals("PUT")) {
                 response = handlePut(httpExchange);
             } else {
+                // response = handleGet(httpExchange);
                 throw new Exception("Not Valid Request Method");
             }
         } catch (Exception e) {
@@ -42,8 +44,10 @@ public class AccountRequestHandler implements HttpHandler {
     private String handleGet(HttpExchange httpExchange) throws IOException {
         String response = "Invalid GET request";
         URI uri = httpExchange.getRequestURI();
+        System.out.println("URI: " + uri);
         String query = uri.getRawQuery();
-
+        System.out.println("Made it to server");///////////////
+        System.out.println("Query: " + query);
         if (query != null) {
             String usernameNPassword = query.substring(query.indexOf("=") + 1);
             response = "User not found.";

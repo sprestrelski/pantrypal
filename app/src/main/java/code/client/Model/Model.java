@@ -11,9 +11,9 @@ public class Model {
 
     public String performUserRequest(String method, String user, String password) {
         try {
-            String urlString = AppConfig.SERVER_URL + "/user";
-            URL url = new URI(urlString).toURL();
+            String urlString = AppConfig.SERVER_URL + "/user/";
             urlString += "?=" + user + ":" + password;
+            URL url = new URI(urlString).toURL();
             // POSSIBLY this later --> "url/username=123&&password=345"
             // Temporarily THIS --> "url/?=123:345"
 
@@ -21,18 +21,14 @@ public class Model {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
-            
+            System.out.println("Method is " + method);
             // make a new user
-            if (method.equals("POST")) {
+            if (method.equals("PUT")) {
                 OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
                 out.write(user + "," + password);
                 out.flush();
                 out.close();
             } // return recipe list
-            else if (method.equals("GET")) {
-                
-            }
-
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String response = in.readLine();
             in.close();

@@ -25,13 +25,10 @@ public class AppServer extends BaseServer {
     public AppServer(IRecipeDb recipeDb, String hostName, int port) {
         super(hostName, port);
         this.recipeDb = recipeDb;
-        try (MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN)) {
-            MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
-            MongoCollection<Document> userCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
-            accountMongoDB = new AccountMongoDB(userCollection);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN);
+        MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
+        MongoCollection<Document> userCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
+        accountMongoDB = new AccountMongoDB(userCollection);
     }
 
     @Override
