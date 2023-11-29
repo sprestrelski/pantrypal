@@ -17,8 +17,7 @@ public class Recipe {
     }
 
     public Recipe(String title) {
-        id = new ObjectId();
-        this.title = title;
+        this(new ObjectId(), title);
     }
 
     public ObjectId getId() {

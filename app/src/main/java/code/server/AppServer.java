@@ -1,20 +1,37 @@
 package code.server;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.internal.connection.tlschannel.impl.TlsChannelImpl.EofException;
 import com.sun.net.httpserver.*;
 
+import code.client.Model.AppConfig;
 import code.client.Model.IRecipeDb;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.*;
 
+import org.bson.Document;
+
 public class AppServer extends BaseServer {
     private IRecipeDb recipeDb;
+    private AccountMongoDB accountMongoDB;
+
     private final static int NUM_THREADS = 10;
     private HttpServer httpServer;
 
     public AppServer(IRecipeDb recipeDb, String hostName, int port) {
         super(hostName, port);
         this.recipeDb = recipeDb;
+        try (MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN)) {
+            MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
+            MongoCollection<Document> userCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
+            accountMongoDB = new AccountMongoDB(userCollection);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -28,7 +45,7 @@ public class AppServer extends BaseServer {
                 0);
         // create the context to map urls
         httpServer.createContext("/recipes", new RecipeRequestHandler(recipeDb));
-        httpServer.createContext("/user", new AccountRequestHandler());
+        httpServer.createContext("/user", new AccountRequestHandler(accountMongoDB));
         // set the executor
         httpServer.setExecutor(threadPoolExecutor);
         // start the server

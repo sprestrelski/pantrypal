@@ -13,8 +13,8 @@ public class AppConfig {
     public static final String MONGODB_CONN = "mongodb://trungluu:xGoGkkbozvWyiXyZ@ac-ajwebab-shard-00-00.lta1oi1.mongodb.net:27017,ac-ajwebab-shard-00-01.lta1oi1.mongodb.net:27017,ac-ajwebab-shard-00-02.lta1oi1.mongodb.net:27017/?ssl=true&replicaSet=atlas-3daxhg-shard-0&authSource=admin&retryWrites=true&w=majority";
     public static final String MONGO_DB = "pantry_pal";
     public static final String MONGO_RECIPE_COLLECTION = "recipes";
+    public static final String MONGO_USER_COLLECTION = "users";
     public static final String SERVER_HOST = "localhost";
     public static final int SERVER_PORT = 8100;
     public static final String SERVER_URL = "http://" + SERVER_HOST + ":" + SERVER_PORT;
-    
 }

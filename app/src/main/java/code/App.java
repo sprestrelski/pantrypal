@@ -21,7 +21,7 @@ public class App extends Application {
     public void start(Stage primaryStage) throws Exception {
         initDb();
         initServer();
-        // server.start();
+        server.start();
         drawUI(primaryStage);
     }
 

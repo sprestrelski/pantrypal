@@ -95,7 +95,16 @@ public class AppFrameHome extends BorderPane {
     public StackPane getRoot() {
         stack.getChildren().clear();
         stack.getChildren().add(this);
+        this.updateDisplay();
         return stack;
+    }
+
+    public void updateDisplay() {
+        recipeList.update();
+        for (int i = 0; i < recipeList.getChildren().size(); i++) {
+            RecipeUI currRecipe = (RecipeUI) recipeList.getChildren().get(i);
+        }
+        this.setCenter(recipeList);
     }
 
     public void setMain(Scene main) {

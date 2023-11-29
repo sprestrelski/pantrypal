@@ -50,7 +50,7 @@ public class Controller {
         this.title = title;
     }
 
-    private void handlePostButton(ActionEvent event) throws IOException {
+    private void handleRecipePostButton(ActionEvent event) throws IOException {
         Recipe postedRecipe = view.getDetailedView().getDisplayedRecipe();
 
         Button saveButtonFromDetailed = view.getDetailedView().getSaveButton();
@@ -145,7 +145,7 @@ public class Controller {
         // Saving recipe or editing recipe from Detailed View
         this.view.getDetailedView().setPostButtonAction(event -> {
             try {
-                handlePostButton(event);
+                handleRecipePostButton(event);
             } catch (IOException e) {
                 e.printStackTrace();
             }

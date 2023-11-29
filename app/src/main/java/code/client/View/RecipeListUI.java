@@ -26,6 +26,18 @@ public class RecipeListUI extends VBox {
         return this.recipeDb;
     }
 
+
+    public void update() {
+        getChildren().clear();
+        List<Recipe> recipeList = recipeDb.getList();
+        RecipeUI recipeUI;
+
+        for (Recipe recipe : recipeList) {
+            recipeUI = new RecipeUI(recipe);
+            this.getChildren().add(recipeUI);
+        }
+    }
+    
     /*
      * TODO : ERADICATE THIS from here
      * Load recipes from a file called "recipes.csv" to RecipeDb

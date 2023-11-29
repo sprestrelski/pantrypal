@@ -21,25 +21,16 @@ public class Model {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
-
-            boolean userExists = false;
-            boolean userPassMatch = true;
+            
             // make a new user
             if (method.equals("POST")) {
-                if (!userExists) {
-                    // make new account
-                } else {
-                    return "Error: " + user + " already exists!";
-                }
-
+                OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+                out.write(user + "," + password);
+                out.flush();
+                out.close();
             } // return recipe list
             else if (method.equals("GET")) {
-                if (userExists && userPassMatch) {
-                    // return recipe list
-                } else {
-                    return "Error: username or password incorrect";
-                }
-
+                
             }
 
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));

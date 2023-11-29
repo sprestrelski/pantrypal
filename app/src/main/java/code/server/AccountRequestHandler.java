@@ -7,7 +7,9 @@ import java.net.*;
 import java.util.*;
 
 public class AccountRequestHandler implements HttpHandler {
-    public AccountRequestHandler() {
+    private AccountMongoDB accountMongoDB;
+    public AccountRequestHandler(AccountMongoDB accountMongoDB) {
+        this.accountMongoDB = accountMongoDB;
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -16,12 +18,8 @@ public class AccountRequestHandler implements HttpHandler {
         try {
             if (method.equals("GET")) {
                 response = handleGet(httpExchange);
-            } else if (method.equals("POST")) {
-                response = handlePost(httpExchange);
             } else if (method.equals("PUT")) {
                 response = handlePut(httpExchange);
-            } else if (method.equals("DELETE")) {
-                response = handleDelete(httpExchange);
             } else {
                 throw new Exception("Not Valid Request Method");
             }
@@ -47,29 +45,25 @@ public class AccountRequestHandler implements HttpHandler {
 
         if (query != null) {
             String usernameNPassword = query.substring(query.indexOf("=") + 1);
-
+            response = "User not found.";
             if (usernameNPassword != null) {
+                String[] split = usernameNPassword.split(":"); 
 
-                System.out.println("Queried for "); // TODO
-            } else {
-                response = "User not found.";
-            }
+                System.out.println("Queried for " + split[0]); 
+
+                // If only provided username
+                if(split.length < 2) { 
+                    Account takenUsername = accountMongoDB.find(split[0]);
+                    if(takenUsername == null) response = "Username is not taken";
+                }
+                else {
+                    if(accountMongoDB.validate(split[0],split[1])) {
+                        response = "Username and Password are correct.";
+                    }
+                }
+            } 
         }
 
-        return response;
-    }
-
-    /*
-     * TODO FOR accounts
-     */
-    private String handlePost(HttpExchange httpExchange) throws IOException {
-        InputStream inStream = httpExchange.getRequestBody();
-        Scanner scanner = new Scanner(inStream);
-        String postData = scanner.nextLine();
-        //
-        String response = "Posted entry "; // + accountInfo
-        System.out.println(response);
-        scanner.close();
         return response;
     }
 
@@ -77,36 +71,23 @@ public class AccountRequestHandler implements HttpHandler {
      * TODO FOR accounts
      */
     private String handlePut(HttpExchange httpExchange) throws IOException {
+        String response = "Username has already been taken.";
+
         InputStream inStream = httpExchange.getRequestBody();
         Scanner scanner = new Scanner(inStream);
         String postData = scanner.nextLine();
+        String  username = postData.substring(0,postData.indexOf(",")), 
+                password = postData.substring(postData.indexOf(",") + 1);
 
-        String response = "Added entry ";
+        Account account = new Account(username, password);
+        accountMongoDB.add(account);
+        response = "Added entry " + username +".";
+
         System.out.println(response);
+
         scanner.close();
 
         return response;
     }
 
-    /*
-     * TODO for deletion.
-     */
-    private String handleDelete(HttpExchange httpExchange) throws IOException {
-        String response = "Invalid DELETE request";
-        URI uri = httpExchange.getRequestURI();
-        String query = uri.getRawQuery();
-
-        if (query != null) {
-            String usernameNPassword = query.substring(query.indexOf("=") + 1);
-
-            if (usernameNPassword != null) {
-
-                System.out.println("Queried for "); // TODO
-            } else {
-                response = "Recipe not found.";
-            }
-        }
-
-        return response;
-    }
 }
