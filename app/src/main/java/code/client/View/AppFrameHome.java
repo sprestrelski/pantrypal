@@ -79,7 +79,6 @@ public class AppFrameHome extends BorderPane {
 
         header = new Header();
         recipeList = new RecipeListUI();
-        updateDisplay();
         footer = new Footer();
         recipeList.loadRecipes();
         ScrollPane scroller = new ScrollPane(recipeList);
@@ -95,9 +94,17 @@ public class AppFrameHome extends BorderPane {
 
     public StackPane getRoot() {
         stack.getChildren().clear();
-        this.updateDisplay();
         stack.getChildren().add(this);
+        this.updateDisplay();
         return stack;
+    }
+
+    public void updateDisplay() {
+        recipeList.update();
+        for (int i = 0; i < recipeList.getChildren().size(); i++) {
+            RecipeUI currRecipe = (RecipeUI) recipeList.getChildren().get(i);
+        }
+        this.setCenter(recipeList);
     }
 
     public void setMain(Scene main) {
@@ -114,14 +121,6 @@ public class AppFrameHome extends BorderPane {
             currRecipe.getDetailsButton().setOnAction(eventHandler);
             // currRecipe.getDeleteButton().setOnAction(eventHandler);
         }
-    }
-
-    public void updateDisplay() {
-        recipeList.update();
-        for (int i = 0; i < recipeList.getChildren().size(); i++) {
-            RecipeUI currRecipe = (RecipeUI) recipeList.getChildren().get(i);
-        }
-        this.setCenter(recipeList);
     }
 
     public Button getNewButton() {

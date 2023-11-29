@@ -1,10 +1,8 @@
-package code;
+package code.client.Model;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import code.client.Model.IHttpConnection;
 
 public class MockHttpConnection implements IHttpConnection {
     private int responseCode;
@@ -43,14 +41,9 @@ public class MockHttpConnection implements IHttpConnection {
 
     @Override
     public void setRequestProperty(String key, String value) {
-
     }
 
     @Override
     public void setDoOutput(boolean output) {
-    }
-
-    @Override
-    public void disconnect() {
     }
 }

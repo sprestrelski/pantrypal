@@ -9,10 +9,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class RealHttpConnection implements IHttpConnection {
+public class AppHttpConnection implements IHttpConnection {
     private HttpURLConnection connection;
 
-    public RealHttpConnection(String apiEndPoint)
+    public AppHttpConnection(String apiEndPoint)
             throws URISyntaxException, IOException {
         URL url = new URI(apiEndPoint).toURL();
         this.connection = (HttpURLConnection) url.openConnection();
@@ -52,9 +52,4 @@ public class RealHttpConnection implements IHttpConnection {
     public void setDoOutput(boolean output) {
         connection.setDoOutput(output);
     }
-
-    @Override
-    public void disconnect() {
-    }
-
 }

@@ -2,34 +2,30 @@ package code.server;
 
 import com.sun.net.httpserver.*;
 
+import code.client.Model.AppConfig;
 import code.client.Model.IRecipeDb;
 import code.client.Model.Recipe;
-import code.client.Model.RecipeReader;
-import code.client.Model.RecipeWriter;
+import code.client.Model.RecipeCSVReader;
+import code.client.Model.RecipeListDb;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.InsertManyOptions;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class RequestHandler implements HttpHandler {
-    private static final String CSV_FILE = "recipes.csv";
+public class RecipeRequestHandler implements HttpHandler {
     private IRecipeDb recipeDb;
 
-    public RequestHandler() {
+    public RecipeRequestHandler(IRecipeDb recipeDb) {
+        this.recipeDb = recipeDb;
     }
 
+    @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         String response = "Request Received";
         String method = httpExchange.getRequestMethod();
-        loadRecipes();
+
         try {
             if (method.equals("GET")) {
                 response = handleGet(httpExchange);
@@ -54,44 +50,65 @@ public class RequestHandler implements HttpHandler {
         outStream.close();
     }
 
+    private String getRecipeById(String id) {
+        String response;
+        Recipe recipe = recipeDb.find(new ObjectId(id));
+
+        if (recipe != null) {
+            response = recipe.toString();
+            System.out.println("Queried for " + id + " and found " + recipe.getTitle());
+        } else {
+            response = "Recipe not found.";
+        }
+
+        return response;
+    }
+
+    private String getAllRecipes() {
+        List<Recipe> recipeList = recipeDb.getList();
+        StringBuilder responseBuilder = new StringBuilder();
+        for (Recipe recipe : recipeList) {
+            responseBuilder.append(recipe).append("\n");
+        }
+        String response = responseBuilder.toString();
+        return response;
+    }
+
     /*
-     * Expects UUID
+     * Expects ID
      */
     private String handleGet(HttpExchange httpExchange) throws IOException {
         String response = "Invalid GET request";
         URI uri = httpExchange.getRequestURI();
         String query = uri.getRawQuery();
 
-        if (query != null) {
-            UUID uuid = UUID.fromString(query.substring(query.indexOf("=") + 1));
-            Recipe recipe = recipeDb.find(uuid);
-            if (recipe != null) {
-                response = recipe.getHttpString();
-                System.out.println("Queried for " + uuid + " and found " + recipe.getTitle());
-            } else {
-                response = "Recipe not found.";
+        if (query == null) {
+            response = getAllRecipes();
+        } else {
+            int equalSignIndex = query.indexOf("=");
+            String key = query.substring(0, equalSignIndex);
+            String value = query.substring(equalSignIndex + 1);
+
+            if (key.equals("id")) {
+                response = getRecipeById(value);
             }
         }
 
         return response;
     }
 
-    private Recipe buildRecipe(String postData) throws IOException {
+    private Recipe buildRecipeFromPostData(String postData) throws IOException {
         Reader reader = new StringReader(postData);
-        // System.out.println("building recipe from: " + postData);
-        RecipeReader recipeReader = new RecipeReader(reader);
-        Recipe recipe = recipeReader.readRecipe();
+        RecipeCSVReader recipeCSVReader = new RecipeCSVReader(reader);
+        Recipe recipe = recipeCSVReader.readRecipe();
         return recipe;
     }
 
-    /*
-     * Expects recipe as recipe| ingredients | instructions
-     */
     private String handlePost(HttpExchange httpExchange) throws IOException {
         InputStream inStream = httpExchange.getRequestBody();
         Scanner scanner = new Scanner(inStream);
         String postData = scanner.nextLine();
-        Recipe recipe = buildRecipe(postData);
+        Recipe recipe = buildRecipeFromPostData(postData);
         recipeDb.add(recipe);
         String response = "Posted entry " + recipe.getTitle();
         System.out.println(response);
@@ -99,25 +116,16 @@ public class RequestHandler implements HttpHandler {
         return response;
     }
 
-    /*
-     * Expects recipe as recipe| ingredients | instructions
-     */
     private String handlePut(HttpExchange httpExchange) throws IOException {
         InputStream inStream = httpExchange.getRequestBody();
         Scanner scanner = new Scanner(inStream);
         String postData = scanner.nextLine();
-        Recipe recipe = buildRecipe(postData);
-
-        Recipe previous = recipeDb.find(recipe.getId());
-        if (previous != null) {
-            recipeDb.remove(previous);
-        }
-
+        Recipe recipe = buildRecipeFromPostData(postData);
+        recipeDb.remove(recipe.getId());
         recipeDb.add(recipe);
-        String response = "Added entry " + recipe.getTitle();
+        String response = "Updated entry " + recipe.getTitle();
         System.out.println(response);
         scanner.close();
-
         return response;
     }
 
@@ -127,12 +135,11 @@ public class RequestHandler implements HttpHandler {
         String query = uri.getRawQuery();
 
         if (query != null) {
-            UUID uuid = UUID.fromString(query.substring(query.indexOf("=") + 1));
-            Recipe recipe = recipeDb.find(uuid);
+            ObjectId id = new ObjectId(query.substring(query.indexOf("=") + 1));
+            Recipe recipe = recipeDb.remove(id);
             if (recipe != null) {
-                recipeDb.remove(recipe);
-                response = recipe.getHttpString();
-                System.out.println("Queried for " + uuid + " and found " + recipe.getTitle());
+                response = recipe.toString();
+                System.out.println("Queried for " + id + " and found " + recipe.getTitle());
             } else {
                 System.out.println("Recipe not found.");
             }
@@ -141,28 +148,16 @@ public class RequestHandler implements HttpHandler {
         return response;
     }
 
-    // /*
-    // * Save recipes to a file called "recipes.csv"
-    // */
-    // public void saveRecipes() {
-    // try {
-    // Writer writer = new BufferedWriter(new FileWriter(CSV_FILE));
-    // RecipeWriter recipeWriter = new RecipeWriter(writer);
-    // recipeWriter.writeRecipeDb(recipeDb);
-    // writer.close();
-    // } catch (IOException e) {
-    // System.out.println("Recipes could not be saved.");
-    // }
-    // }
-
     /*
+     * TODO: remove this to load from mongo instead
      * Load recipes from a file called "recipes.csv" to RecipeDb
      */
     public void loadRecipes() {
         try {
-            Reader reader = new FileReader(CSV_FILE);
-            RecipeReader recipeReader = new RecipeReader(reader);
-            recipeDb = recipeReader.readRecipeDb();
+            Reader reader = new FileReader(AppConfig.CSV_FILE);
+            RecipeCSVReader recipeReader = new RecipeCSVReader(reader);
+            recipeDb = new RecipeListDb();
+            recipeReader.readRecipeDb(recipeDb);
             System.out.println("Recipes loaded");
         } catch (IOException e) {
             System.out.println("Recipes could not be loaded.");

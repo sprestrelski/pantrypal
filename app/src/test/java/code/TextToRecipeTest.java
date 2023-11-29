@@ -2,20 +2,20 @@ package code;
 
 import org.junit.jupiter.api.Test;
 
-import code.client.Model.ITextToRecipe;
+import code.client.Model.TextToRecipe;
 import code.client.Model.Recipe;
-import code.client.Model.ChatGPTService;
+import code.client.Model.MockGPTService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ChatGPTTest {
+public class TextToRecipeTest {
 
     @Test
     /**
      * Integration test for provide recipe
      */
     public void testPromptBuild() {
-        ITextToRecipe textToRecipe = new ChatGPTService();
+        TextToRecipe textToRecipe = new MockGPTService();
         String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Lunch. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
         String response = textToRecipe.buildPrompt("Lunch", "I have rice, shrimp, chicken, and eggs.");
         assertEquals(prompt, response);
@@ -26,8 +26,8 @@ public class ChatGPTTest {
      * Unit tests for Recipe features
      */
     public void testParseJSON() {
-        ITextToRecipe textToRecipe = new ChatGPTService();
-        String mealType = "BREakFast";
+        TextToRecipe textToRecipe = new MockGPTService();
+        String mealType = "BREAKFAST";
         String responseText = """
                 Fried Chicken and Egg Fried Rice
 
@@ -85,7 +85,7 @@ public class ChatGPTTest {
 
     @Test
     public void testParseNoIndentsAndNewLines() {
-        ITextToRecipe textToRecipe = new ChatGPTService();
+        TextToRecipe textToRecipe = new MockGPTService();
         String mealType = "LUNCH";
         String responseText = """
                 Cheesy pasta bake
@@ -145,7 +145,7 @@ public class ChatGPTTest {
 
     @Test
     public void testParseDifferentLineSpacing() {
-        ITextToRecipe textToRecipe = new ChatGPTService();
+        TextToRecipe textToRecipe = new MockGPTService();
         String mealType = "DINNER";
         String responseText = """
 
@@ -217,7 +217,7 @@ public class ChatGPTTest {
 
     @Test
     public void testParseRemoveDashesAndNumbers() {
-        ITextToRecipe textToRecipe = new ChatGPTService();
+        TextToRecipe textToRecipe = new MockGPTService();
         String mealType = "LUNCH";
         String responseText = """
 

@@ -10,7 +10,7 @@ public class RecipeUI extends HBox {
     private Button deleteButton, detailsButton;
     private Recipe recipe;
 
-    RecipeUI() {
+    RecipeUI(Recipe recipe) {
         // Index of the recipe in the recipe list
         recipeIndex = new Label();
         recipeIndex.setPrefSize(30, 100);
@@ -26,25 +26,16 @@ public class RecipeUI extends HBox {
         deleteButton.setPrefSize(100, 100);
         deleteButton.setAlignment(Pos.CENTER);
         deleteButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
+
+        this.recipe = recipe;
+        this.detailsButton.setText(recipe.getTitle());
+
         // Add all the elements to the recipe UI
         this.getChildren().addAll(recipeIndex, detailsButton, deleteButton);
     }
 
     public Recipe getRecipe() {
         return this.recipe;
-    }
-
-    public void setRecipe(Recipe recipe) {
-        this.recipe = recipe;
-        this.detailsButton.setText(recipe.getTitle());
-    }
-
-    public int getRecipeIndex() {
-        return Integer.parseInt(this.recipeIndex.getText());
-    }
-
-    public void setRecipeIndex(int num) {
-        this.recipeIndex.setText(Integer.toString(num));
     }
 
     public Button getDetailsButton() {

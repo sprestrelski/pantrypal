@@ -6,14 +6,12 @@ import java.net.URISyntaxException;
 import org.junit.jupiter.api.Test;
 
 import code.client.Model.IHttpConnection;
-import code.client.Model.IVoiceToText;
-import code.client.Model.MockWhisper;
-import code.client.Model.WhisperService;
-
+import code.client.Model.MockHttpConnection;
+import code.client.Model.MockWhisperService;
+import code.client.Model.VoiceToText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class VoiceRetrievalTest {
-
+public class VoiceToTextTest {
     /*
      * Integration Test
      */
@@ -24,17 +22,17 @@ public class VoiceRetrievalTest {
                 new ByteArrayInputStream("{\"text\":\"Breakfast.\"}".getBytes()),
                 new ByteArrayOutputStream());
 
-        WhisperService audioProcessor = new WhisperService(connection);
-        String response = audioProcessor.processAudio();
+        VoiceToText voiceToText = new MockWhisperService(connection);
+        String response = voiceToText.processAudio();
         assertEquals("Breakfast.", response);
 
-        audioProcessor.setConnection(
-                new MockHttpConnection(
-                        200,
-                        new ByteArrayInputStream("{\"text\":\"Chicken, cheese.\"}".getBytes()),
-                        null));
+        connection = new MockHttpConnection(
+                200,
+                new ByteArrayInputStream("{\"text\":\"Chicken, cheese.\"}".getBytes()),
+                null);
 
-        response = audioProcessor.processAudio();
+        voiceToText = new MockWhisperService(connection);
+        response = voiceToText.processAudio();
         assertEquals("Chicken, cheese.", response);
 
     }
@@ -49,8 +47,8 @@ public class VoiceRetrievalTest {
                 new ByteArrayInputStream("Error text".getBytes()),
                 null);
 
-        WhisperService audioProcessor = new WhisperService(connection);
-        String response = audioProcessor.processAudio();
+        VoiceToText voiceToText = new MockWhisperService(connection);
+        String response = voiceToText.processAudio();
         assertEquals("Error text", response);
     }
 
@@ -67,15 +65,6 @@ public class VoiceRetrievalTest {
         int responseCode = connection.getResponseCode();
         assertEquals(responseCode, 200);
         assertEquals(connection.getInputStream(), connection.getErrorStream());
-    }
-
-    /*
-     * Unit test
-     */
-    @Test
-    void testMockWhisper() throws IOException, URISyntaxException {
-        IVoiceToText mockWhisper = new MockWhisper();
-        assertEquals("Invoked mock audio processing", mockWhisper.processAudio());
     }
 
 }

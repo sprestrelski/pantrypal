@@ -5,11 +5,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
-import javax.swing.Action;
-
-import code.client.View.DetailsAppFrame;
-import code.client.View.HomeScreen;
-import code.client.View.RecipeDetailsUI;
 import code.client.View.RecipeListUI;
 import code.client.View.RecipeUI;
 import code.client.View.View;
@@ -27,12 +22,13 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import code.client.Model.*;
+import code.client.View.AppAlert;
 
 public class Controller {
     private Model model;
     private View view;
     private Recipe recipe;
-    private RecipeWriter recipeWriter;
+    private RecipeCSVWriter recipeWriter;
     private String title;
     private String defaultButtonStyle, onStyle, offStyle, blinkStyle;
 
@@ -46,7 +42,6 @@ public class Controller {
         offStyle = "-fx-font-style: italic; -fx-background-color: #FF7377; -fx-font-weight: bold; -fx-font: 11 arial;";
         blinkStyle = "-fx-background-color: #00FFFF; -fx-border-width: 0;";
 
-        // this.view.getAppFrameHome().setGetButtonAction(this::handleGetButton);
         this.view.getAppFrameHome().setNewRecipeButtonAction(event -> {
             try {
                 handleNewButton(event);
@@ -68,7 +63,7 @@ public class Controller {
         this.title = title;
     }
 
-    private void handlePostButton(ActionEvent event) throws IOException {
+    private void handleRecipePostButton(ActionEvent event) throws IOException {
         Recipe postedRecipe = view.getDetailedView().getDisplayedRecipe();
 
         Button saveButtonFromDetailed = view.getDetailedView().getSaveButton();
@@ -78,25 +73,24 @@ public class Controller {
         pause.play();
 
         Writer writer = new StringWriter();
-        recipeWriter = new RecipeWriter(writer);
+        recipeWriter = new RecipeCSVWriter(writer);
         recipeWriter.writeRecipe(postedRecipe);
 
         String recipe = writer.toString();
-
         // Debugging
         System.out.println("Posting: " + recipe);
 
-        model.performRequest("POST", recipe, null);
+        model.performRecipeRequest("POST", recipe, null);
     }
 
     private void handleGetButton(ActionEvent event) {
         String uuid = UUID.fromString(title).toString();
-        model.performRequest("GET", null, uuid);
+        model.performRecipeRequest("GET", null, uuid);
     }
 
     private void handleDeleteButton(ActionEvent event) {
         String uuid = UUID.fromString(title).toString();
-        model.performRequest("DELETE", null, uuid);
+        model.performRecipeRequest("DELETE", null, uuid);
     }
 
     private void handleNewButton(ActionEvent event) throws URISyntaxException, IOException {
@@ -118,7 +112,7 @@ public class Controller {
             currRecipe.getDeleteButton().setOnAction(e -> {
                 setTitle(currRecipe.getRecipeName());
                 String uuid = currRecipe.getId();
-                model.performRequest("DELETE", null, uuid);
+                model.performRecipeRequest("DELETE", null, uuid);
             });
             currRecipe.getDetailsButton().setOnAction(e -> {
                 view.goToDetailedView(currRecipe.getRecipe(), true);
@@ -139,11 +133,11 @@ public class Controller {
         String mealType = inputs.get(0);
         String ingredients = inputs.get(1);
         if (mealType != null && ingredients != null) {
-            ITextToRecipe caller = new MockGPT();// new ChatGPTService();
+            TextToRecipe caller = new MockGPTService();// new ChatGPTService();
             try {
                 String audioOutput1 = mealType;
                 String audioOutput2 = ingredients;// audio.processAudio();
-                String responseText = caller.getChatGPTResponse(audioOutput1, audioOutput2);
+                String responseText = caller.getResponse(audioOutput1, audioOutput2);
                 Recipe chatGPTrecipe = caller.mapResponseToRecipe(mealType, responseText);
 
                 // TODO Changes UI to Detailed Recipe Screen
@@ -152,20 +146,19 @@ public class Controller {
                 handleDetailedViewListeners();
 
             } catch (IOException | URISyntaxException | InterruptedException exception) {
-                view.showAlert("Connection Error", "Something went wrong. Please check your connection and try again.");
+                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
                 exception.printStackTrace();
             }
         } else {
-            view.showAlert("Input Error", "Invalid meal type or ingredients, please try again!");
+            AppAlert.show("Input Error", "Invalid meal type or ingredients, please try again!");
         }
-
     }
 
     private void handleDetailedViewListeners() {
         // Saving recipe or editing recipe from Detailed View
         this.view.getDetailedView().setPostButtonAction(event -> {
             try {
-                handlePostButton(event);
+                handleRecipePostButton(event);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -210,7 +203,7 @@ public class Controller {
         } else {
             // Continue with account creation logic
             System.out.println("Account Created!\nUsername: " + username + "\nPassword: " + password);
-
+            model.performUserRequest("PUT", username, password);
             // Show success message
             showSuccessPane(grid);
             view.goToLoginUI();
@@ -312,7 +305,11 @@ public class Controller {
 
     private boolean performLogin(String username, String password) {
         // Will add logic for failed login later
-        return true;
+        String response = model.performUserRequest("GET", username, password);
+        if (response.equals("Username and Password are correct."))
+            return true;
+        else
+            return false;
     }
     ///////////////////////////////
 
