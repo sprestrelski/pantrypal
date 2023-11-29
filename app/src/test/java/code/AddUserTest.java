@@ -39,14 +39,25 @@ public class AddUserTest {
             MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
             MongoCollection<Document> userCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
             IAccountDb accountDb = new AccountMongoDB(userCollection);
-            Account test = new Account("Bob", "Ross"); // 6566cd345582f05a5158fd6a
-            // accountDb.add(test);
-            // assertEquals(0, accountDb.size());
-            assertTrue(true);
+            Account account = new Account("Bob", "Ross");
+            accountDb.add(account);
+            assertEquals(1, accountDb.size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void findUserTest() {
+        try (MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN)) {
+            MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
+            MongoCollection<Document> userCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
+            IAccountDb accountDb = new AccountMongoDB(userCollection);
+            Account test = accountDb.find("Bob");
+            assertTrue(test != null);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

@@ -48,13 +48,12 @@ public class AccountMongoDB implements IAccountDb {
 
     @Override
     public boolean add(Account account) {
-        if (find(account.getUsername()) == null) {
-            return false;
-        }
+        // if (find(account.getUsername()) == null) {
+        // return false;
+        // }
 
         Document accountDocument = new Document("_id", account.getId());
-        accountDocument.append("username", account.getUsername());
-        accountDocument.append("password", account.getPassword());
+        accountDocument.append("username", account.getUsername()).append("password", account.getPassword());
         accountDocumentCollection.insertOne(accountDocument);
         return true;
     }

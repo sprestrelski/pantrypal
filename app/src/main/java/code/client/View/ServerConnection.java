@@ -26,8 +26,10 @@ public class ServerConnection {
             Socket socket = new Socket();
             socket.connect(socketAddr, 500);
             socket.close();
+            System.out.print("Server is online");
             return true;
         } catch (Exception e) {
+            System.out.print("Server is offline");
             return false;
         }
     }
