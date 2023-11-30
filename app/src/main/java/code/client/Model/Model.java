@@ -28,7 +28,7 @@ public class Model {
                 out.write(user + "," + password);
                 out.flush();
                 out.close();
-            } // return recipe list
+            }
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String response = in.readLine();
             in.close();

@@ -38,14 +38,15 @@ public class LoginUI {
     private PasswordField passwordField;
     private GridPane grid;
 
-    public static final String CSVFILE = "userCredentials.csv";
-    LoginUI() {
+    public static final String CSVFILE = "usercredentials.csv";
+
+    public LoginUI() {
         loadCredentials();
         if (savedAccount != null) {
             accountSaved = true;
         }
-        
-        //this.primaryStage.setTitle("Pantry Pal - Login");
+
+        // this.primaryStage.setTitle("Pantry Pal - Login");
 
         grid = new GridPane();
         grid.setAlignment(javafx.geometry.Pos.CENTER);
@@ -81,16 +82,16 @@ public class LoginUI {
         loginButton = new Button("Login");
         grid.add(loginButton, 1, 4);
 
-        goToCreate = new Hyperlink("Click here");;
+        goToCreate = new Hyperlink("Click here");
+        ;
 
         FlowPane flow = new FlowPane();
         flow.getChildren().addAll(
-            new Text("Don't have an account? "), goToCreate
-        );
-        grid.add(flow,1,5);
+                new Text("Don't have an account? "), goToCreate);
+        grid.add(flow, 1, 5);
 
         loginButton.setOnAction(e -> {
-            
+
         });
 
         if (accountSaved) {
@@ -134,8 +135,7 @@ public class LoginUI {
                 savedAccount = new Account(credentials[0], credentials[1]);
             }
             reader.close();
-        } 
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("No account credentials saved currently.");
         }
     }

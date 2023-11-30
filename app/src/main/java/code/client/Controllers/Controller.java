@@ -189,7 +189,6 @@ public class Controller {
     ////////////////////////////////////////
     private void handleCreateAcc(ActionEvent event) {
         // Simulating existing usernames
-        String[] existingUsernames = { "user1", "user2", "user3" };
         GridPane grid = view.getAccountCreationUI().getRoot();
         String username = view.getAccountCreationUI().getUsernameTextField().getText();
         String password = view.getAccountCreationUI().getPasswordField().getText();
@@ -197,7 +196,7 @@ public class Controller {
         if (username.isEmpty() || password.isEmpty()) {
             // Display an error message if username or password is empty
             showErrorPane(grid, "Error. Please provide a username and password.");
-        } else if (isUsernameTaken(username, existingUsernames)) {
+        } else if (isUsernameTaken(username)) {
             // Display an error message if the username is already taken
             showErrorPane(grid, "Error. This username is already taken. Please choose another one.");
         } else {
@@ -215,7 +214,7 @@ public class Controller {
         errorText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         errorText.setFill(Color.RED);
 
-        grid.add(errorText, 1, 4);
+        grid.add(errorText, 1, 6);
 
         // Fade away after 5 seconds
         Timeline timeline = new Timeline(
@@ -229,7 +228,7 @@ public class Controller {
         successText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         successText.setFill(Color.GREEN);
 
-        grid.add(successText, 1, 4);
+        grid.add(successText, 1, 6);
 
         // Fade away after 5 seconds
         Timeline timeline = new Timeline(
@@ -238,15 +237,12 @@ public class Controller {
         timeline.play();
     }
 
-    private boolean isUsernameTaken(String username, String[] existingUsernames) {
+    private boolean isUsernameTaken(String username) {
         // Check if the username is already taken
         // temporary logic, no database yet
-        for (String existingUsername : existingUsernames) {
-            if (existingUsername.equals(username)) {
-                return true;
-            }
-        }
-        return false;
+        String response = model.performUserRequest("GET", username, "");
+        System.out.println("Response for usernameTaken : " + response);
+        return (response.equals("Username is taken"));
     }
     ////////////////////////////////////////
 
@@ -255,19 +251,24 @@ public class Controller {
         String password = view.getLoginUI().getPasswordField().getText();
         GridPane grid = view.getLoginUI().getRoot();
         // Perform login logic here
-        boolean loginSuccessful = performLogin(username, password);
-
-        if (loginSuccessful) {
-            showLoginSuccessPane(grid, true); // useless
-
-            view.goToRecipeList();
-            addListenersToList();
-
-            if (view.getLoginUI().getRememberLogin()) {
-                saveCredentials(username, password);
-            }
+        if (username.isEmpty() || password.isEmpty()) {
+            // Display an error message if username or password is empty
+            showErrorPane(grid, "Error. Please provide a username and password.");
         } else {
-            showLoginSuccessPane(grid, false);
+            boolean loginSuccessful = performLogin(username, password);
+
+            if (loginSuccessful) {
+                showLoginSuccessPane(grid, true); // useless
+
+                view.goToRecipeList();
+                addListenersToList();
+
+                if (view.getLoginUI().getRememberLogin()) {
+                    saveCredentials(username, password);
+                }
+            } else {
+                showLoginSuccessPane(grid, false);
+            }
         }
     }
 

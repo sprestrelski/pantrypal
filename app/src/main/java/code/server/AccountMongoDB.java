@@ -27,9 +27,6 @@ public class AccountMongoDB implements IAccountDb {
 
     @Override
     public Account find(String username) {
-        if (size() < 1) {
-            return null;
-        }
         Bson filter = eq("username", username);
         var accountDocumentIter = accountDocumentCollection.find(filter);
         Document accountDocument = accountDocumentIter.first();
@@ -51,9 +48,7 @@ public class AccountMongoDB implements IAccountDb {
 
     @Override
     public boolean add(Account account) {
-        if (account.getUsername() == "") {
-            return false;
-        } else if (find(account.getUsername()) != null) {
+        if (find(account.getUsername()) != null) {
             return false;
         }
 
