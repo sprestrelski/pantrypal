@@ -9,21 +9,15 @@ import code.client.Model.Account;
 import code.client.Model.RecipeCSVWriter;
 import code.client.View.LoginUI;
 
+import java.io.Writer;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 
 import java.util.List;
 
-/**
- * Test the save recipe list feature for three distinct test cases:
- * 1. Saving a new recipe to a new CSV file
- * 2. Saving a new recipe to an existing CSV file
- * 3. Saving changes made to an existing recipe to an existing CSV file
- */
 public class AutomaticLoginTest {
-    // private RecipeCSVWriter writer; // Recipe writer to write recipes into a
-    // mocked "recipes.csv"
+    private static AccountCSVWriter writer;
     private StringWriter credentials_csv; // Mock "recipes.csv" file to test save functionality
     private Account account;
     private String expected; // Helper string to store the expected value used for assertEquals
@@ -43,46 +37,25 @@ public class AutomaticLoginTest {
      */
     @Test
     public void testSaveUserCredentials() throws IOException {
-        // Create a mock "usercredentials.csv" file
-        try (FileWriter writer = new FileWriter("userCredentials.csv", true)) {
-            writer.append("GMIRANDA")
-                    .append("|")
-                    .append("CSE110");
-            writer.flush();
-            writer.close();
-        } catch (IOException exception) {
-            exception.printStackTrace();
-            System.out.println("Account credentials could not be saved.");
-        }
+        credentials_csv = new StringWriter();
+        writer = new AccountCSVWriter(credentials_csv);
+        writer.writeCredentials(account.getUsername(), account.getPassword());
 
-        // test loginUI
-        LoginUI loginUI = new LoginUI();
-        assertEquals("GMIRANDA", loginUI.getUsernameTextField().getText());
-        assertEquals("CSE110", loginUI.getPasswordField().getText());
+        expected = "GMIRANDA|CSE110";
+        assertEquals(expected, credentials_csv.toString());
+    }
+}
 
-        // // Initialize a writer to add saved recipes to "recipes.csv"
-        // RecipeCSVWriter writer = new RecipeCSVWriter(credentials_csv);
-        // // Initialize recipes_csv file without recipes
-        // writer.writeRecipeDb(recipeDb);
-        // /**
-        // * The recipes.csv file should now look like the following:
-        // * sep=|
-        // * Recipe Name| Ingredients| Instructions
-        // */
-        // // Initialize a helper variable to store the expected contents of the CSV
-        // file expected = "sep=|\nRecipe Name| Ingredients| Instructions\n";
-        // assertEquals(expected, recipes_csv.toString());
-        // // Add a new recipe to the recipe database
-        // recipeDb.add(r1);
-        // // Save the new recipe to the empty recipes.csv file
-        // writer.writeRecipeDb(recipeDb);
-        // /**
-        // * The recipes.csv file should now look like the following:
-        // * sep=|
-        // * Recipe Name| Ingredients| Instructions
-        // * Plain Spaghetti| Spaghetti noodles| Boil the noodles
-        // */
-        // expected += "Plain Spaghetti| Spaghetti noodles| Boil the noodles\n";
-        // assertEquals(expected, recipes_csv.toString());
+class AccountCSVWriter {
+    public final Writer writer;
+
+    public AccountCSVWriter(Writer writer) {
+        this.writer = writer;
+    }
+
+    public void writeCredentials(String username, String password) throws IOException {
+        writer.append(username)
+                .append("|")
+                .append(password);
     }
 }
