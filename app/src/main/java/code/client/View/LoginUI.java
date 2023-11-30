@@ -40,7 +40,7 @@ public class LoginUI {
 
     public static final String CSVFILE = "usercredentials.csv";
 
-    LoginUI() {
+    public LoginUI() {
         loadCredentials();
         if (savedAccount != null) {
             accountSaved = true;
