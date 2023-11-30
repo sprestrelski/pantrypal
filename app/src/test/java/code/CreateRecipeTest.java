@@ -11,7 +11,7 @@ public class CreateRecipeTest {
      */
     @Test
     public void testCreateRecipe() {
-        Recipe recipe = new Recipe("Fried Rice");
+        Recipe recipe = new Recipe("Fried Rice", "Lunch");
         assertEquals("Fried Rice", recipe.getTitle());
         recipe.addIngredient("Rice");
         recipe.addIngredient("Fried");
@@ -20,13 +20,14 @@ public class CreateRecipeTest {
         String recipeString = recipe.toString();
         String parsedResponse = """
                 Title: Fried Rice
+                Meal tag: Lunch
                 Ingredients:
                 Rice
                 Fried
                 Instructions:
                 A shrimp fried this rice?
                 """;
-        assertEquals(recipeString, parsedResponse);
+        assertEquals(parsedResponse, recipeString);
     }
 
 }

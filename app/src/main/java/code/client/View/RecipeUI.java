@@ -6,16 +6,16 @@ import javafx.geometry.Pos;
 import code.client.Model.Recipe;
 
 public class RecipeUI extends HBox {
-    private Label recipeIndex;
+    private Button mealType;
     private Button deleteButton, detailsButton;
     private Recipe recipe;
 
     RecipeUI(Recipe recipe) {
         // Index of the recipe in the recipe list
-        recipeIndex = new Label();
-        recipeIndex.setPrefSize(30, 100);
-        recipeIndex.setAlignment(Pos.CENTER);
-        recipeIndex.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
+        mealType = new Button();
+        mealType.setDisable(true);
+        mealType.setPrefSize(250, 50);
+        mealType.setAlignment(Pos.CENTER);
         // Button to enter detailed recipe display
         detailsButton = new Button();
         detailsButton.setPrefSize(570, 100);
@@ -31,7 +31,27 @@ public class RecipeUI extends HBox {
         this.detailsButton.setText(recipe.getTitle());
 
         // Add all the elements to the recipe UI
-        this.getChildren().addAll(recipeIndex, detailsButton, deleteButton);
+        styleTags(mealType);
+        this.getChildren().addAll(mealType, detailsButton, deleteButton);
+    }
+
+    private void styleTags(Button mealType) {
+        switch (recipe.getMealTag().toLowerCase()) {
+            case "breakfast":
+                mealType.setStyle("-fx-background-color: #89CFF0; -fx-border-width: 0;");
+                mealType.setText("Breakfast");
+                break;
+
+            case "lunch":
+                mealType.setStyle("-fx-background-color: #00FFFF; -fx-border-width: 0;");
+                mealType.setText("Lunch");
+                break;
+
+            case "dinner":
+                mealType.setStyle("-fx-background-color: #00FF00; -fx-border-width: 0;");
+                mealType.setText("Dinner");
+                break;
+        }
     }
 
     public Recipe getRecipe() {

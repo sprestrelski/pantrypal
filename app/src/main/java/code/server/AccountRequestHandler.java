@@ -60,12 +60,14 @@ public class AccountRequestHandler implements HttpHandler {
 
                 // If only provided username
                 try {
+                    Account takenUsername = accountMongoDB.find(split[0]);
+                    System.out.println("ID: " + takenUsername.getId().toString());
                     if (split.length < 2) {
-                        Account takenUsername = accountMongoDB.find(split[0]);
+                        // Account takenUsername = accountMongoDB.find(split[0]);
                         response = (takenUsername == null) ? "Username is not taken" : "Username is taken";
                     } else {
                         if (accountMongoDB.validate(split[0], split[1])) {
-                            response = "Username and Password are correct.";
+                            response = "Username and Password are correct." + takenUsername.getId().toString();
                         } else {
                             response = "Password is not correct.";
                         }

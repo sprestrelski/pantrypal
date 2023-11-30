@@ -5,6 +5,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
+import org.bson.types.ObjectId;
+
 import code.client.View.RecipeListUI;
 import code.client.View.RecipeUI;
 import code.client.View.View;
@@ -25,6 +27,7 @@ import code.client.Model.*;
 import code.client.View.AppAlert;
 
 public class Controller {
+    private Account account;
     private Model model;
     private View view;
     private Recipe recipe;
@@ -126,10 +129,7 @@ public class Controller {
     private void handleDetailedViewFromNewRecipeButton(ActionEvent event) {
         // Get ChatGPT response from the Model
         List<String> inputs = view.getAppFrameMic().getVoiceResponse();
-        // Testing
-        inputs.set(0, "w");
-        inputs.set(1, "s");
-        // Testing
+
         String mealType = inputs.get(0);
         String ingredients = inputs.get(1);
         if (mealType != null && ingredients != null) {
@@ -307,9 +307,14 @@ public class Controller {
     private boolean performLogin(String username, String password) {
         // Will add logic for failed login later
         String response = model.performUserRequest("GET", username, password);
-        if (response.equals("Username and Password are correct."))
+        String canLogin = "Username and Password are correct.";
+        if (response.contains(canLogin)) {
+            String userID = response.substring(response.indexOf(canLogin) + canLogin.length());
+
+            System.out.println("UserID " + userID + "\n" + response);
+            account = new Account(new ObjectId(userID), username, password);
             return true;
-        else
+        } else
             return false;
     }
     ///////////////////////////////
