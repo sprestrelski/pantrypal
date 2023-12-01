@@ -4,4 +4,4 @@ PantryPals - the application that provides you with recipes that YOU have curren
 ## How to run the app
 1. Clone the repository
 2. Change or create a `.vscode/launch.json`, and change the `vmArgs` to point to your JavaFX lib.
-3. Run from `Main.java`.
+3. Run from `App.java`.

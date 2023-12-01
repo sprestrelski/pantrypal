@@ -1,8 +1,9 @@
 package code;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.stage.Stage;
-
+import javafx.stage.WindowEvent;
 import code.client.Model.*;
 import code.client.View.*;
 import code.server.AppServer;
@@ -51,6 +52,14 @@ public class App extends Application {
         primaryStage.setMinWidth(620);
         primaryStage.setMinHeight(620);
         primaryStage.show();
+
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent we) {
+                // System.out.println("Stage is closing");
+                primaryStage.close();
+                System.exit(1);
+            }
+        });
     }
 
     private IRecipeDb initDb() throws IOException {
