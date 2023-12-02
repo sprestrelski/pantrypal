@@ -41,8 +41,9 @@ public class AppServer extends BaseServer {
                 new InetSocketAddress(hostName, port),
                 0);
         // create the context to map urls
-        httpServer.createContext("/recipes", new RecipeRequestHandler(recipeDb));
+        httpServer.createContext("/recipe", new RecipeRequestHandler(recipeDb));
         httpServer.createContext("/user", new AccountRequestHandler(accountMongoDB));
+        httpServer.createContext("/recipes/", new RecipeSharingHandler(accountMongoDB));
         // set the executor
         httpServer.setExecutor(threadPoolExecutor);
         // start the server
