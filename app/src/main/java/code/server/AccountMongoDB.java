@@ -5,6 +5,8 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mongodb.client.MongoCollection;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -21,7 +23,12 @@ public class AccountMongoDB implements IAccountDb {
 
     private Account jsonToAccount(Document accountDocument) {
         Gson gson = new Gson();
+        System.out.println(accountDocument.toJson().toString());
         Account account = gson.fromJson(accountDocument.toJson(), Account.class);
+
+        JsonObject jsonObj = JsonParser.parseString(accountDocument.toJson().toString()).getAsJsonObject();
+        ObjectId id = new ObjectId(jsonObj.getAsJsonObject("_id").get("$oid").getAsString());
+        account.setId(id);
         return account;
     }
 

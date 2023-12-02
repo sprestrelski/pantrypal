@@ -57,7 +57,7 @@ public class DetailsAppFrame {
     }
 
     private void setupGrowingUI() {
-        for(int i = 0; i < detailedUI.getChildren().size(); i++) {
+        for (int i = 0; i < detailedUI.getChildren().size(); i++) {
             VBox.setVgrow(detailedUI.getChildren().get(i), Priority.ALWAYS);
         }
         VBox.setVgrow(detailedUI, Priority.ALWAYS);
@@ -72,7 +72,7 @@ public class DetailsAppFrame {
         String[] ingr = ingredients.split("\n");
         String[] instr = instructions.split("\n");
 
-        Recipe edit = new Recipe(title);
+        Recipe edit = new Recipe(title, currentRecipe.getMealTag());
         for (String ingredient : ingr) {
             edit.addIngredient(ingredient);
         }
@@ -90,7 +90,7 @@ public class DetailsAppFrame {
      */
     private Recipe getMockedRecipe() {
         // Hardcoded value for now, recipe value for it should be changing
-        Recipe temp = new Recipe("Fried Chicken and Egg Fried Rice");
+        Recipe temp = new Recipe("Fried Chicken and Egg Fried Rice", "BREAKFAST");
         temp.addIngredient("2 chicken breasts, diced");
         temp.addIngredient("2 large eggs");
         temp.addIngredient("2 cups cooked rice");
@@ -114,17 +114,17 @@ public class DetailsAppFrame {
         HBox topButtons = new HBox();
         topButtons.setSpacing(100);
         topButtons.setAlignment(Pos.CENTER);
-        topButtons.getChildren().addAll(backToHomeButton,refreshButton);
+        topButtons.getChildren().addAll(backToHomeButton, refreshButton);
         HBox.setHgrow(topButtons, Priority.ALWAYS);
 
         detailedUI.getChildren().addAll(topButtons, title);
         setupContainer.getChildren().add(recipeInfo);
         detailedUI.getChildren().add(setupContainer);
 
-        HBox botButtons = new HBox(); 
+        HBox botButtons = new HBox();
         botButtons.setSpacing(100);
         botButtons.setAlignment(Pos.CENTER);
-        botButtons.getChildren().addAll(editButton,deleteButton,saveButton,shareButton);
+        botButtons.getChildren().addAll(editButton, deleteButton, saveButton, shareButton);
 
         detailedUI.getChildren().add(botButtons);
     }
@@ -155,10 +155,9 @@ public class DetailsAppFrame {
 
     public VBox getRoot(Recipe recipe, boolean old) {
         currentRecipe = recipe;
-        if(!old) {
+        if (!old) {
             deleteButton.setVisible(false);
-        }
-        else {
+        } else {
             deleteButton.setVisible(true);
         }
         updateDisplay();

@@ -60,7 +60,8 @@ public class TextToRecipeTest {
                 8. Drizzle with sesame oil, season with more salt and pepper if desired, and serve. Enjoy!
                 """;
         String parsedResponse = """
-                Title: Breakfast: Fried Chicken and Egg Fried Rice
+                Title: Fried Chicken and Egg Fried Rice
+                Meal tag: BREAKFAST
                 Ingredients:
                 2 chicken breasts, diced
                 2 large eggs
@@ -114,7 +115,8 @@ public class TextToRecipeTest {
                 9. Serve the cheesy pasta bake with garlic bread. Enjoy!
                 """;
         String parsedResponse = """
-                Title: Lunch: Cheesy pasta bake
+                Title: Cheesy pasta bake
+                Meal tag: LUNCH
                 Ingredients:
                 1 lb pasta
                 1 lb ground beef
@@ -187,7 +189,8 @@ public class TextToRecipeTest {
                 11. Enjoy!
                     """;
         String parsedResponse = """
-                Title: Dinner: Savory Beef Pasta Bake
+                Title: Savory Beef Pasta Bake
+                Meal tag: DINNER
                 Ingredients:
                 ½ pound of ground beef
                 1 box of your favorite pasta noodles
@@ -259,7 +262,8 @@ public class TextToRecipeTest {
                 11. Enjoy!
                     """;
         String parsedResponse = """
-                Title: Lunch: Savory Beef Pasta Bake
+                Title: Savory Beef Pasta Bake
+                Meal tag: LUNCH
                 Ingredients:
                 ½ pound of ground beef
                 1 box of your favorite pasta noodles

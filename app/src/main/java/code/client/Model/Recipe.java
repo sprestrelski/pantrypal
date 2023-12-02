@@ -7,21 +7,37 @@ import org.bson.types.ObjectId;
 
 public class Recipe {
     private final ObjectId id;
+    private ObjectId accountId;
     private String title;
+    private String mealTag;
     private final List<String> ingredients = new ArrayList<>();
     private final List<String> instructions = new ArrayList<>();
 
-    public Recipe(ObjectId id, String title) {
+    public Recipe(ObjectId id, ObjectId accountId, String title, String mealTag) {
         this.id = id;
+        this.accountId = accountId;
         this.title = title;
+        this.mealTag = mealTag;
     }
 
-    public Recipe(String title) {
-        this(new ObjectId(), title);
+    public Recipe(ObjectId accountId, String title, String mealTag) {
+        this(new ObjectId(), accountId, title, mealTag);
+    }
+
+    public Recipe(String title, String mealTag) {
+        this(null, title, mealTag);
     }
 
     public ObjectId getId() {
         return id;
+    }
+
+    public void setAccountId(ObjectId accountId) {
+        this.accountId = accountId;
+    }
+
+    public ObjectId getAccountId() {
+        return accountId;
     }
 
     public void setTitle(String title) {
@@ -30,6 +46,14 @@ public class Recipe {
 
     public String getTitle() {
         return title;
+    }
+
+    public void setMealTag(String mealTag) {
+        this.mealTag = mealTag;
+    }
+
+    public String getMealTag() {
+        return mealTag;
     }
 
     public void addIngredient(String ingredient) {
@@ -52,6 +76,7 @@ public class Recipe {
     public String toString() {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("Title: ").append(title).append("\n");
+        strBuilder.append("Meal tag: ").append(mealTag).append("\n");
         strBuilder.append("Ingredients:").append("\n");
         for (String ingredient : ingredients) {
             strBuilder.append(ingredient).append("\n");

@@ -18,7 +18,9 @@ public class RecipeCSVWriter {
         String ingredient, instruction;
 
         strBuilder.append(recipe.getId().toString()).append("::");
+        strBuilder.append(recipe.getAccountId().toString()).append("::");
         strBuilder.append(recipe.getTitle()).append("::");
+        strBuilder.append(recipe.getMealTag()).append("::");
 
         while (ingredientIter.hasNext()) {
             ingredient = ingredientIter.next();
@@ -47,7 +49,7 @@ public class RecipeCSVWriter {
         // use "::" as a delimiter for the csv files
         strBuilder.append("sep=::").append("\n");
         // add labels for the columns of the csv file
-        strBuilder.append("ID::Title::Ingredients::Instructions").append("\n");
+        strBuilder.append("ID::Account::Title::Tag::Ingredients::Instructions").append("\n");
         writer.write(strBuilder.toString());
 
         for (Recipe recipe : recipeDb.getList()) {

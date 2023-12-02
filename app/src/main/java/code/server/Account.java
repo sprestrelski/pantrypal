@@ -3,7 +3,7 @@ package code.server;
 import org.bson.types.ObjectId;
 
 public class Account {
-    private final ObjectId id;
+    private ObjectId id;
     private String username;
     private String password;
 
@@ -21,6 +21,10 @@ public class Account {
         return id;
     }
 
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -28,7 +32,7 @@ public class Account {
     public void setPassword(String password) {
         this.password = password;
     }
-    
+
     public String getUsername() {
         return this.username;
     }

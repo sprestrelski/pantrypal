@@ -1,12 +1,24 @@
 package code.client.Model;
 
+import org.bson.types.ObjectId;
+
 public class Account {
+    private final ObjectId id;
     private String username;
     private String password;
 
-    public Account(String username, String password) {
+    public Account(ObjectId id, String username, String password) {
+        this.id = id;
         this.username = username;
         this.password = password;
+    }
+
+    public Account(String username, String password) {
+        this(new ObjectId(), username, password);
+    }
+
+    public ObjectId getId() {
+        return id;
     }
 
     public void setUsername(String username) {
@@ -16,7 +28,7 @@ public class Account {
     public void setPassword(String password) {
         this.password = password;
     }
-    
+
     public String getUsername() {
         return this.username;
     }
@@ -33,6 +45,6 @@ public class Account {
         if (!(obj instanceof Account account)) {
             return false;
         }
-        return username.equals(account.username) && password.equals(account.password);
+        return id.equals(account.id);
     }
 }

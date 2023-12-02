@@ -10,7 +10,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 
 public class View {
-    // private IWindowUI home, audioCapture, detailedRecipe, currentScene;
     private AppFrameHome home;
     private AppFrameMic audioCapture;
     private DetailsAppFrame detailedRecipe;
@@ -79,13 +78,5 @@ public class View {
 
     public AccountCreationUI getAccountCreationUI() {
         return createAcc;
-    }
-
-    public void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }

@@ -20,11 +20,11 @@ import javafx.event.*;
 
 class Footer extends HBox {
     // Button for creating a new recipe
-    private Button newButton;
+    private Button newButton, logOutButton;
 
     Footer() {
-
-        this.setPrefSize(700, 60);
+        GridPane grid = new GridPane();
+        this.setPrefSize(620, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
         this.setSpacing(15);
 
@@ -33,12 +33,20 @@ class Footer extends HBox {
         newButton = new Button("New Recipe");
         newButton.setStyle(defaultButtonStyle);
 
-        this.getChildren().addAll(newButton);
-        this.setAlignment(Pos.CENTER);
+        logOutButton = new Button("Log out");
+        logOutButton.setStyle(defaultButtonStyle);
+        grid.add(logOutButton, 3, 0);
+        grid.add(newButton,11,0);
+        grid.setHgap(20);
+        this.getChildren().add(grid);
+        this.setAlignment(Pos.CENTER_LEFT);
     }
 
     public Button getNewButton() {
         return this.newButton;
+    }
+    public Button getLogOutButton() {
+        return this.logOutButton;
     }
 }
 
@@ -55,7 +63,7 @@ class Header extends HBox {
         sortButton = new Button("Sort");
         sortButton.setStyle(defaultButtonStyle);
 
-        this.setPrefSize(700, 60);
+        this.setPrefSize(620, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
 
         Text titleText = new Text("Recipe List");
@@ -70,7 +78,7 @@ public class AppFrameHome extends BorderPane {
     private Header header;
     private Footer footer;
     private RecipeListUI recipeList;
-    private Button newButton;
+    private Button newButton, logOutButton;
     private Scene mainScene;
     private StackPane stack;
 
@@ -90,6 +98,7 @@ public class AppFrameHome extends BorderPane {
         this.setBottom(footer);
 
         newButton = footer.getNewButton();
+        logOutButton = footer.getLogOutButton();
     }
 
     public StackPane getRoot() {
@@ -113,6 +122,9 @@ public class AppFrameHome extends BorderPane {
 
     public void setNewRecipeButtonAction(EventHandler<ActionEvent> eventHandler) {
         newButton.setOnAction(eventHandler);
+    }
+    public void setLogOutButtonAction(EventHandler<ActionEvent> eventHandler) {
+        logOutButton.setOnAction(eventHandler);
     }
 
     public void setRecipeDetailsButtonAction(EventHandler<ActionEvent> eventHandler) {

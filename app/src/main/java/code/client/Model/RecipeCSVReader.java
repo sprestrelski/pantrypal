@@ -15,10 +15,12 @@ public class RecipeCSVReader {
     private Recipe readRecipe(String recipeStr) throws IOException {
         String[] recipeTokens = recipeStr.split("::");
         String id = recipeTokens[0];
-        String title = recipeTokens[1];
-        String[] ingredientTokens = recipeTokens[2].split(";;");
-        String[] instructionTokens = recipeTokens[3].split(";;");
-        Recipe recipe = new Recipe(new ObjectId(id), title);
+        String accountId = recipeTokens[1];
+        String title = recipeTokens[2];
+        String mealTag = recipeTokens[3];
+        String[] ingredientTokens = recipeTokens[4].split(";;");
+        String[] instructionTokens = recipeTokens[5].split(";;");
+        Recipe recipe = new Recipe(new ObjectId(id), new ObjectId(accountId), title, mealTag);
 
         for (String ingredient : ingredientTokens) {
             recipe.addIngredient(ingredient);
