@@ -43,7 +43,7 @@ public class RecipeMongoDb implements IRecipeDb {
 
     @Override
     public boolean add(Recipe recipe) {
-        Document recipeDocument = new Document("_id", recipe.getId());
+        Document recipeDocument = new Document("_id", new ObjectId(recipe.getId()));
         recipeDocument.append("title", recipe.getTitle())
                 .append("ingredients", Lists.newArrayList(recipe.getIngredientIterator()))
                 .append("instructions", Lists.newArrayList(recipe.getInstructionIterator()));
@@ -52,8 +52,8 @@ public class RecipeMongoDb implements IRecipeDb {
     }
 
     @Override
-    public Recipe find(ObjectId id) {
-        Bson filter = eq("_id", id);
+    public Recipe find(String id) {
+        Bson filter = eq("_id", new ObjectId(id));
         var recipeDocumentIter = recipeDocumentCollection.find(filter);
         Document recipeDocument = recipeDocumentIter.first();
         if (recipeDocument == null) {
@@ -75,8 +75,8 @@ public class RecipeMongoDb implements IRecipeDb {
     }
 
     @Override
-    public Recipe remove(ObjectId id) {
-        Bson filter = eq("_id", id);
+    public Recipe remove(String id) {
+        Bson filter = eq("_id", new ObjectId(id));
         Document recipeDocument = recipeDocumentCollection.findOneAndDelete(filter);
         if (recipeDocument == null) {
             // Recipe does not exist

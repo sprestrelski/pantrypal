@@ -5,8 +5,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
-import org.bson.types.ObjectId;
-
 import code.client.View.RecipeListUI;
 import code.client.View.RecipeUI;
 import code.client.View.View;
@@ -16,7 +14,6 @@ import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -214,7 +211,7 @@ public class Controller {
         } else {
             // Continue with account creation logic
             System.out.println("Account Created!\nUsername: " + username + "\nPassword: " + password);
-            model.performUserRequest("PUT", username, password);
+            model.performAccountRequest("PUT", username, password);
             // Show success message
             showSuccessPane(grid);
             view.goToLoginUI();
@@ -252,7 +249,7 @@ public class Controller {
     private boolean isUsernameTaken(String username) {
         // Check if the username is already taken
         // temporary logic, no database yet
-        String response = model.performUserRequest("GET", username, "");
+        String response = model.performAccountRequest("GET", username, "");
         System.out.println("Response for usernameTaken : " + response);
         return (response.equals("Username is taken"));
     }
@@ -319,7 +316,7 @@ public class Controller {
             String[] credentials;
             while ((line = reader.readLine()) != null) {
                 credentials = line.split("\\|");
-                account = new Account(new ObjectId(credentials[2]),credentials[0], credentials[1]);
+                account = new Account(credentials[2],credentials[0], credentials[1]);
             }
             reader.close();
         } catch (IOException e) {
@@ -348,13 +345,12 @@ public class Controller {
 
     private boolean performLogin(String username, String password) {
         // Will add logic for failed login later
-        String response = model.performUserRequest("GET", username, password);
-        String canLogin = "Username and Password are correct.";
+        String response = model.performAccountRequest("GET", username, password);
+        String canLogin = "Username and password are correct.";
         if (response.contains(canLogin)) {
             String userID = response.substring(response.indexOf(canLogin) + canLogin.length());
-
             System.out.println("UserID " + userID + "\n" + response);
-            account = new Account(new ObjectId(userID), username, password);
+            account = new Account(userID, username, password);
             return true;
         } else
             return false;

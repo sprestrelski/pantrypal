@@ -16,7 +16,6 @@ public class CreateRecipeTest {
         recipe.addIngredient("Rice");
         recipe.addIngredient("Fried");
         recipe.addInstruction("A shrimp fried this rice?");
-
         String recipeString = recipe.toString();
         String parsedResponse = """
                 Title: Fried Rice

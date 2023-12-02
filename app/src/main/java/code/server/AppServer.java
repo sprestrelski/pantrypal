@@ -4,7 +4,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.internal.connection.tlschannel.impl.TlsChannelImpl.EofException;
 import com.sun.net.httpserver.*;
 
 import code.client.Model.AppConfig;
@@ -17,7 +16,7 @@ import org.bson.Document;
 
 public class AppServer extends BaseServer {
     private IRecipeDb recipeDb;
-    private AccountMongoDB accountMongoDB;
+    private AccountMongoDb accountMongoDB;
 
     private final static int NUM_THREADS = 10;
     private HttpServer httpServer;
@@ -28,7 +27,7 @@ public class AppServer extends BaseServer {
         MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN);
         MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
         MongoCollection<Document> userCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
-        accountMongoDB = new AccountMongoDB(userCollection);
+        accountMongoDB = new AccountMongoDb(userCollection);
     }
 
     @Override
@@ -41,9 +40,9 @@ public class AppServer extends BaseServer {
                 new InetSocketAddress(hostName, port),
                 0);
         // create the context to map urls
-        httpServer.createContext("/recipe", new RecipeRequestHandler(recipeDb));
-        httpServer.createContext("/user", new AccountRequestHandler(accountMongoDB));
-        httpServer.createContext("/recipes/", new RecipeSharingHandler(accountMongoDB));
+        httpServer.createContext(AppConfig.RECIPE_PATH, new RecipeRequestHandler(recipeDb));
+        httpServer.createContext(AppConfig.ACCOUNT_PATH, new AccountRequestHandler(accountMongoDB));
+        httpServer.createContext(AppConfig.SHARE_PATH, new ShareRequestHandler(accountMongoDB));
         // set the executor
         httpServer.setExecutor(threadPoolExecutor);
         // start the server

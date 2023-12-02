@@ -8,20 +8,19 @@ import java.net.URL;
 import java.net.URI;
 
 public class Model {
-
-    public String performUserRequest(String method, String user, String password) {
+    public String performAccountRequest(String method, String user, String password) {
         try {
-            String urlString = AppConfig.SERVER_URL + "/user/";
+            String urlString = AppConfig.SERVER_URL + AppConfig.ACCOUNT_PATH;
             urlString += "?=" + user + ":" + password;
             URL url = new URI(urlString).toURL();
             // POSSIBLY this later --> "url/username=123&&password=345"
             // Temporarily THIS --> "url/?=123:345"
-
             // send GET request to see if user exists
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
             System.out.println("Method is " + method);
+            
             // make a new user
             if (method.equals("PUT")) {
                 OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
@@ -29,6 +28,7 @@ public class Model {
                 out.flush();
                 out.close();
             }
+            
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String response = in.readLine();
             in.close();
@@ -39,13 +39,14 @@ public class Model {
         }
     }
 
-    public String performRecipeRequest(String method, String recipe, String uuid) {
+    public String performRecipeRequest(String method, String recipe, String id) {
         // Implement your HTTP request logic here and return the response
         try {
-            String urlString = AppConfig.SERVER_URL + "/recipe";
-            if (uuid != null) {
-                urlString += "?=" + uuid;
+            String urlString = AppConfig.SERVER_URL + AppConfig.RECIPE_PATH;
+            if (id != null) {
+                urlString += "?=" + id;
             }
+            
             URL url = new URI(urlString).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);

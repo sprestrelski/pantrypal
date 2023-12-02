@@ -17,4 +17,8 @@ public class AppConfig {
     public static final String SERVER_HOST = "localhost";
     public static final int SERVER_PORT = 8100;
     public static final String SERVER_URL = "http://" + SERVER_HOST + ":" + SERVER_PORT;
+    public static final String RECIPE_PATH = "/recipes";
+    public static final String ACCOUNT_PATH = "/accounts";
+    public static final String SHARE_PATH = "/share";
+    public static final String LOGIN_OK = "User and password are correct.";
 }
