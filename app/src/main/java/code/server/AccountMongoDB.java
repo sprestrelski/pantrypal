@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class AccountMongoDb implements IAccountDb {
-    private MongoCollection<Document> accountDocumentCollection;
+    private MongoCollection<Document> accountDocumentCollection1;
 
     public AccountMongoDb(MongoCollection<Document> accountDocumentCollection) {
-        this.accountDocumentCollection = accountDocumentCollection;
+        this.accountDocumentCollection1 = accountDocumentCollection;
     }
 
     private Account jsonToAccount(Document accountDocument) {
@@ -33,7 +33,7 @@ public class AccountMongoDb implements IAccountDb {
     @Override
     public Account findByUsername(String username) {
         Bson filter = eq("username", username);
-        var accountDocumentIter = accountDocumentCollection.find(filter);
+        var accountDocumentIter = accountDocumentCollection1.find(filter);
         Document accountDocument = accountDocumentIter.first();
         if (accountDocument == null) {
             // Account does not exist
@@ -45,7 +45,7 @@ public class AccountMongoDb implements IAccountDb {
     @Override
     public Account findById(String id) {
         Bson filter = eq("_id", new ObjectId(id));
-        var accountDocumentIter = accountDocumentCollection.find(filter);
+        var accountDocumentIter = accountDocumentCollection1.find(filter);
         Document accountDocument = accountDocumentIter.first();
         if (accountDocument == null) {
             // Account does not exist
@@ -71,7 +71,7 @@ public class AccountMongoDb implements IAccountDb {
         Document accountDocument = new Document("_id", new ObjectId(account.getId()));
         accountDocument.append("username", username)
                 .append("password", account.getPassword());
-        accountDocumentCollection.insertOne(accountDocument);
+        accountDocumentCollection1.insertOne(accountDocument);
         return true;
     }
 
@@ -79,7 +79,7 @@ public class AccountMongoDb implements IAccountDb {
     public List<Account> getList() {
         Account account;
         Document accountDocument;
-        var accountDocumentCursor = accountDocumentCollection.find().cursor();
+        var accountDocumentCursor = accountDocumentCollection1.find().cursor();
         List<Account> accountList = new ArrayList<>();
 
         while (accountDocumentCursor.hasNext()) {
@@ -105,7 +105,7 @@ public class AccountMongoDb implements IAccountDb {
     @Override
     public Account removeById(String id) {
         Bson filter = eq("_id", new ObjectId(id));
-        Document accountDocument = accountDocumentCollection.findOneAndDelete(filter);
+        Document accountDocument = accountDocumentCollection1.findOneAndDelete(filter);
         if (accountDocument == null) {
             // Account does not exist
             return null;
@@ -116,7 +116,7 @@ public class AccountMongoDb implements IAccountDb {
     @Override
     public Account removeByUsername(String username) {
         Bson filter = eq("username", username);
-        Document accountDocument = accountDocumentCollection.findOneAndDelete(filter);
+        Document accountDocument = accountDocumentCollection1.findOneAndDelete(filter);
         if (accountDocument == null) {
             // Account does not exist
             return null;
@@ -126,11 +126,11 @@ public class AccountMongoDb implements IAccountDb {
 
     @Override
     public void clear() {
-        accountDocumentCollection.drop();
+        accountDocumentCollection1.drop();
     }
 
     @Override
     public int size() {
-        return (int) accountDocumentCollection.countDocuments();
+        return (int) accountDocumentCollection1.countDocuments();
     }
 }
