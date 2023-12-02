@@ -77,7 +77,11 @@ public class RecipeSharingHandler implements HttpHandler {
         String[] ingr = ingredients.split(";;");
         String instructions = "1. Heat the vegetable oil in a large pan over medium-high heat.";
         String[] instr = instructions.split(";;");
+        return formatRecipe(title, ingr, instr);
+        
+    }
 
+    private String formatRecipe(String title, String[] ingr, String[] instr) {
         StringBuilder htmlBuilder = new StringBuilder();
         htmlBuilder
         .append("<html>")
