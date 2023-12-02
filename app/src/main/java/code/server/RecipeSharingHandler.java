@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 
+import org.bson.types.ObjectId;
+
 import com.sun.net.httpserver.*;
 
 public class RecipeSharingHandler implements HttpHandler {
@@ -30,7 +32,7 @@ public class RecipeSharingHandler implements HttpHandler {
         // System.out.println("\n" + uri.toString());
         // System.out.println(username);
         // System.out.println(recipeID);
-        response = getMockedRecipe();//getSharedRecipe(username,recipeID);
+        response = getSharedRecipe(username,recipeID);
         // Sending back response to the client
         httpExchange.sendResponseHeaders(200, response.length());
         OutputStream outStream = httpExchange.getResponseBody();
@@ -41,17 +43,12 @@ public class RecipeSharingHandler implements HttpHandler {
     private String getSharedRecipe(String username, String recipeID) {
         Account checkUser = accountMongoDB.find(username);
         if(checkUser == null) return nonExistentRecipe();
+        ObjectId accID = checkUser.getId();
         
-        StringBuilder htmlBuilder = new StringBuilder();
-        htmlBuilder
-        .append("<style>parent{display: flex;}")
-        .append("child{justify-content: center;\nalign-items: center;}")
-        .append("</style>")
-        .append("<div class=\"parent\"> ")
-        .append("<iframe class=\"child\" width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1\" title=\"YouTube video player\" frameborder=\"0\"allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen ></iframe>")
-        .append("</div> ");
+        // Recipe
+        // - accountID
 
-        return htmlBuilder.toString();
+        return getMockedRecipe();//htmlBuilder.toString(); 
     }
 
     private String nonExistentRecipe() {
@@ -75,8 +72,8 @@ public class RecipeSharingHandler implements HttpHandler {
         String[] ingr = ingredients.split(";;");
         String instructions = "1. Heat the vegetable oil in a large pan over medium-high heat.";
         String[] instr = instructions.split(";;");
-        return formatRecipe(title, ingr, instr);
-        
+        //return formatRecipe(title, ingr, instr);
+        return title;
     }
 
     private String formatRecipe(String title, String[] ingr, String[] instr) {

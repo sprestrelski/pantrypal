@@ -10,13 +10,16 @@ import org.bson.types.ObjectId;
 import code.client.View.RecipeListUI;
 import code.client.View.RecipeUI;
 import code.client.View.View;
+import java.net.URL;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -25,6 +28,7 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import code.client.Model.*;
 import code.client.View.AppAlert;
+import code.client.View.DetailsAppFrame;
 
 public class Controller {
     private Account account;
@@ -96,11 +100,6 @@ public class Controller {
         model.performRecipeRequest("GET", null, uuid);
     }
 
-    private void handleDeleteButton(ActionEvent event) {
-        String uuid = UUID.fromString(title).toString();
-        model.performRecipeRequest("DELETE", null, uuid);
-    }
-
     private void handleNewButton(ActionEvent event) throws URISyntaxException, IOException {
         view.goToAudioCapture();
         this.view.getAppFrameMic().setGoToDetailedButtonAction(this::handleDetailedViewFromNewRecipeButton);
@@ -168,22 +167,58 @@ public class Controller {
 
     private void handleDetailedViewListeners() {
         // Saving recipe or editing recipe from Detailed View
-        this.view.getDetailedView().setPostButtonAction(event -> {
+        DetailsAppFrame detailedView = this.view.getDetailedView();
+        detailedView.setPostButtonAction(event -> {
             try {
                 handleRecipePostButton(event);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-        this.view.getDetailedView().setEditButtonAction(this::handleEditButton);
-        this.view.getDetailedView().setDeleteButtonAction(this::handleDeleteButton);
-        this.view.getDetailedView().setHomeButtonAction(this::handleHomeButton);
+        detailedView.setEditButtonAction(this::handleEditButton);
+        detailedView.setDeleteButtonAction(this::handleDeleteButton);
+        detailedView.setHomeButtonAction(this::handleHomeButton);
+        detailedView.setShareButtonAction(this::handleShareButton);
     }
 
     private void handleEditButton(ActionEvent event) {
         Button edit = view.getDetailedView().getEditButton();
         view.getDetailedView().getRecipeDetailsUI().setEditable();
         changeEditButtonColor(edit);
+    }
+
+    private void handleDeleteButton(ActionEvent event) {
+        String uuid = UUID.fromString(title).toString();
+        model.performRecipeRequest("DELETE", null, uuid);
+    }
+    
+    private void handleShareButton(ActionEvent event) {
+        Recipe shownRecipe = this.view.getDetailedView().getDisplayedRecipe();
+        String id = shownRecipe.getId().toString();
+
+        String styleAlert = "-fx-background-color: #F1FFCB; -fx-font-weight: bold;";
+        Hyperlink textArea = new Hyperlink("https://localhost:8100/" + account.getUsername() + "/" + id);
+        textArea.setOnAction(action -> {
+            try {
+                java.awt.Desktop.getDesktop().browse(new URL("https://localhost:8100/" + account.getUsername() + "/" + id).toURI());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        });
+        textArea.setWrapText(true);  
+        GridPane gridPane = new GridPane();
+        gridPane.setMaxWidth(Double.MAX_VALUE);
+        gridPane.add(textArea, 0, 0);
+        gridPane.setStyle(styleAlert);
+        gridPane.setPrefSize(220,220);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Share this recipe!");
+        alert.setHeaderText("Share this recipe with a friend!");
+        alert.getDialogPane().setContent(gridPane);
+        alert.showAndWait();
     }
 
     private void changeEditButtonColor(Button edit) {

@@ -73,6 +73,7 @@ public class DetailsAppFrame {
         String[] instr = instructions.split("\n");
 
         Recipe edit = new Recipe(title, currentRecipe.getMealTag());
+        edit.setAccountId(currentRecipe.getAccountId());
         for (String ingredient : ingr) {
             edit.addIngredient(ingredient);
         }
