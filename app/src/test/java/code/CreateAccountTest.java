@@ -2,7 +2,7 @@ package code;
 
 import code.server.Account;
 import code.client.Model.AppConfig;
-import code.server.AccountMongoDb;
+import code.server.AccountMongoDB;
 import code.server.IAccountDb;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +22,7 @@ public class CreateAccountTest {
         try (MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN)) {
             MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
             MongoCollection<Document> accountCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
-            AccountMongoDb accountDb = new AccountMongoDb(accountCollection);
+            AccountMongoDB accountDb = new AccountMongoDB(accountCollection);
             Account account1 = new Account("Bob", "Ross");
             accountDb.add(account1);
             Account account2 = accountDb.findByUsername("Bob");
@@ -38,7 +38,7 @@ public class CreateAccountTest {
         try (MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN)) {
             MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
             MongoCollection<Document> accountCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
-            AccountMongoDb accountDb = new AccountMongoDb(accountCollection);
+            AccountMongoDB accountDb = new AccountMongoDB(accountCollection);
             Account account1 = new Account("", "Robert");
             Account account2 = new Account("Bob", "Robert");
             assertTrue(accountDb.checkPassword("Bob", "Ross"));
@@ -56,7 +56,7 @@ public class CreateAccountTest {
         try (MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN)) {
             MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
             MongoCollection<Document> accountCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
-            IAccountDb accountDb = new AccountMongoDb(accountCollection);
+            IAccountDb accountDb = new AccountMongoDB(accountCollection);
             Account account = accountDb.findByUsername("Greg Miranda");
             assertNull(account);
         } catch (Exception e) {

@@ -16,7 +16,7 @@ import org.bson.Document;
 
 public class AppServer extends BaseServer {
     private IRecipeDb recipeDb;
-    private AccountMongoDb accountMongoDB;
+    private AccountMongoDB accountMongoDB;
 
     private final static int NUM_THREADS = 10;
     private HttpServer httpServer;
@@ -27,7 +27,7 @@ public class AppServer extends BaseServer {
         MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN);
         MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
         MongoCollection<Document> userCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
-        accountMongoDB = new AccountMongoDb(userCollection);
+        accountMongoDB = new AccountMongoDB(userCollection);
     }
 
     @Override

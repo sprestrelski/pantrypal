@@ -14,10 +14,10 @@ import static com.mongodb.client.model.Filters.eq;
 import java.util.List;
 import java.util.ArrayList;
 
-public class AccountMongoDb implements IAccountDb {
+public class AccountMongoDB implements IAccountDb {
     private MongoCollection<Document> accountDocumentCollection;
 
-    public AccountMongoDb(MongoCollection<Document> accountDocumentCollection) {
+    public AccountMongoDB(MongoCollection<Document> accountDocumentCollection) {
         this.accountDocumentCollection = accountDocumentCollection;
     }
 
