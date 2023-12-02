@@ -43,11 +43,20 @@ public class AddUserTest {
             MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
             MongoCollection<Document> userCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
             AccountMongoDB accountDb = new AccountMongoDB(userCollection);
+
+            // make an account
+            Account account = new Account("Bob", "Ross");
+            accountDb.add(account);
+            Account test1 = accountDb.find("Bob");
+            assertNotEquals(test1, null);
+
+            // try to make an account with the same username
             Account temp1 = new Account("", "Robert");
             Account temp2 = new Account("Bob", "Robert");
             assertTrue(accountDb.validate("Bob", "Ross"));
             assertFalse(accountDb.add(temp1));
             assertFalse(accountDb.add(temp2));
+            accountDb.remove(test1);
             accountDb.remove(temp1);
             accountDb.remove(temp2);
         } catch (Exception e) {
@@ -68,5 +77,4 @@ public class AddUserTest {
         }
     }
 
-    
 }
