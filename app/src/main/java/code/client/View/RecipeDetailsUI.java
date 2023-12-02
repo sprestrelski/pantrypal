@@ -5,7 +5,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import java.util.Iterator;
 
-import code.client.Model.Recipe;
+import code.server.Recipe;
 
 public class RecipeDetailsUI extends HBox {
     private TextField titleTextField;

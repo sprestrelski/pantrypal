@@ -1,9 +1,10 @@
 package code.client.Model;
 
-import org.bson.types.ObjectId;
-
 import java.util.List;
+
 import java.util.ArrayList;
+import code.server.Recipe;
+import code.server.IRecipeDb;
 
 public class RecipeListDb implements IRecipeDb {
     private final List<Recipe> recipeList = new ArrayList<>();
@@ -19,7 +20,7 @@ public class RecipeListDb implements IRecipeDb {
     }
 
     @Override
-    public Recipe find(ObjectId id) {
+    public Recipe find(String id) {
         for (Recipe recipe : recipeList) {
             if (recipe.getId().equals(id)) {
                 return recipe;
@@ -31,7 +32,7 @@ public class RecipeListDb implements IRecipeDb {
 
     @Override
     public boolean update(Recipe updatedRecipe) {
-        ObjectId id = updatedRecipe.getId();
+        String id = updatedRecipe.getId();
         Recipe recipe = find(id);
 
         if (recipe == null) {
@@ -44,7 +45,7 @@ public class RecipeListDb implements IRecipeDb {
     }
 
     @Override
-    public Recipe remove(ObjectId id) {
+    public Recipe remove(String id) {
         Recipe recipe;
 
         for (int i = 0; i < recipeList.size(); i++) {
@@ -71,5 +72,11 @@ public class RecipeListDb implements IRecipeDb {
     @Override
     public List<Recipe> getList() {
         return recipeList;
+    }
+
+    @Override
+    public List<Recipe> getList(String accountId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getList'");
     }
 }

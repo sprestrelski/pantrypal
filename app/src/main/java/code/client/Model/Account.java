@@ -3,21 +3,21 @@ package code.client.Model;
 import org.bson.types.ObjectId;
 
 public class Account {
-    private final ObjectId id;
+    private final String id;
     private String username;
     private String password;
 
-    public Account(ObjectId id, String username, String password) {
+    public Account(String id, String username, String password) {
         this.id = id;
         this.username = username;
         this.password = password;
     }
 
     public Account(String username, String password) {
-        this(new ObjectId(), username, password);
+        this(new ObjectId().toHexString(), username, password);
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 

@@ -2,7 +2,8 @@ package code;
 
 import org.junit.jupiter.api.Test;
 
-import code.client.Model.Recipe;
+import code.server.*;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CreateRecipeTest {
@@ -16,7 +17,6 @@ public class CreateRecipeTest {
         recipe.addIngredient("Rice");
         recipe.addIngredient("Fried");
         recipe.addInstruction("A shrimp fried this rice?");
-
         String recipeString = recipe.toString();
         String parsedResponse = """
                 Title: Fried Rice

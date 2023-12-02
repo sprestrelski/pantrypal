@@ -1,4 +1,4 @@
-package code.client.Model;
+package code.server;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -6,37 +6,37 @@ import java.util.List;
 import org.bson.types.ObjectId;
 
 public class Recipe {
-    private final ObjectId id;
-    private ObjectId accountId;
+    private final String id;
+    private String accountId;
     private String title;
     private String mealTag;
     private final List<String> ingredients = new ArrayList<>();
     private final List<String> instructions = new ArrayList<>();
 
-    public Recipe(ObjectId id, ObjectId accountId, String title, String mealTag) {
+    public Recipe(String id, String accountId, String title, String mealTag) {
         this.id = id;
         this.accountId = accountId;
         this.title = title;
         this.mealTag = mealTag;
     }
 
-    public Recipe(ObjectId accountId, String title, String mealTag) {
-        this(new ObjectId(), accountId, title, mealTag);
+    public Recipe(String accountId, String title, String mealTag) {
+        this(new ObjectId().toHexString(), accountId, title, mealTag);
     }
 
     public Recipe(String title, String mealTag) {
         this(null, title, mealTag);
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setAccountId(ObjectId accountId) {
+    public void setAccountId(String accountId) {
         this.accountId = accountId;
     }
 
-    public ObjectId getAccountId() {
+    public String getAccountId() {
         return accountId;
     }
 

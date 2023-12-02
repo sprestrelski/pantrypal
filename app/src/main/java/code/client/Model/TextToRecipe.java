@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import code.server.Recipe;
 
 public abstract class TextToRecipe {
     public abstract String getResponse(String mealType, String ingredients)

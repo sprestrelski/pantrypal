@@ -3,6 +3,8 @@ package code.client.Model;
 import java.io.Writer;
 import java.io.IOException;
 import java.util.Iterator;
+import code.server.Recipe;
+import code.server.IRecipeDb;
 
 public class RecipeCSVWriter {
     private final Writer writer;

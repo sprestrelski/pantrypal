@@ -5,30 +5,36 @@ import java.net.URI;
 
 import org.bson.types.ObjectId;
 
+import java.util.Iterator;
+import java.util.List;
+
+import code.client.Model.*;
+
 import com.sun.net.httpserver.*;
 
-public class RecipeSharingHandler implements HttpHandler {
+public class ShareRequestHandler implements HttpHandler {
 
     private AccountMongoDB accountMongoDB;
+    private IRecipeDb recipeMongoDb;
 
-    public RecipeSharingHandler(AccountMongoDB accountMongoDB) {
+    public ShareRequestHandler(AccountMongoDB accountMongoDB, IRecipeDb recipeMongoDb) {
         this.accountMongoDB = accountMongoDB;
+        this.recipeMongoDb = recipeMongoDb;
     }
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        String route = "/recipes/";
         String response = "Request Received";
         String method = httpExchange.getRequestMethod();
         URI uri = httpExchange.getRequestURI();
         String query = uri.toString();
-        int usernameStart = query.indexOf(route);
-
-        String username = query.substring( usernameStart + route.length());
+        int usernameStart = query.indexOf(AppConfig.SHARE_PATH);
+        String username = query.substring(usernameStart + AppConfig.SHARE_PATH.length());
         String recipeID = username.substring(username.indexOf("/") + 1);
         username = username.substring(0,username.indexOf("/"));
 
-         
+        // Format: localhost:8100/recipes/username/recipeID
+
         // System.out.println("\n" + uri.toString());
         // System.out.println(username);
         // System.out.println(recipeID);
@@ -41,14 +47,26 @@ public class RecipeSharingHandler implements HttpHandler {
     }
 
     private String getSharedRecipe(String username, String recipeID) {
-        Account checkUser = accountMongoDB.find(username);
-        if(checkUser == null) return nonExistentRecipe();
-        ObjectId accID = checkUser.getId();
+        Account checkUser = accountMongoDB.findByUsername(username);
         
-        // Recipe
-        // - accountID
-
-        return getMockedRecipe();//htmlBuilder.toString(); 
+        if(checkUser == null) {
+            return nonExistentRecipe();
+        }
+        System.out.println("Found user" + checkUser.getUsername());
+        String accountID = checkUser.getId();
+        List<Recipe> accRecipes = recipeMongoDb.getList(accountID);
+        Recipe foundRecipe = null;
+        for(int i = 0; i < accRecipes.size(); i++) {
+            if(accRecipes.get(i).getId().equals(recipeID)) {
+                foundRecipe = accRecipes.get(i);
+            }
+        }
+        
+        if(foundRecipe == null) {
+            return nonExistentRecipe();
+        }
+        System.out.println("Found recipe" + foundRecipe.getTitle());
+        return formatRecipe(foundRecipe);
     }
 
     private String nonExistentRecipe() {
@@ -76,21 +94,23 @@ public class RecipeSharingHandler implements HttpHandler {
         return title;
     }
 
-    private String formatRecipe(String title, String[] ingr, String[] instr) {
+    private String formatRecipe(Recipe recipe) {
+        Iterator<String> ingr = recipe.getIngredientIterator();
+        Iterator<String> instr = recipe.getInstructionIterator();
         StringBuilder htmlBuilder = new StringBuilder();
         htmlBuilder
         .append("<html>")
-        .append("<title>" + title + "</title>")
+        .append("<title>" + recipe.getTitle() + "</title>")
         .append("<body>")
 
-        .append("<h1>" + title + "</h2>")
+        .append("<h1>" + recipe.getTitle() + "</h2>")
         .append("<h2>")
             .append("Ingredients: ")
         .append("</h2>")
             .append("<p>")
                 .append("<ul>");
-                    for(int i = 0; i < ingr.length; i++) {
-                        htmlBuilder.append("<li>" + ingr[i] + "</li>");
+                    while(ingr.hasNext()) {
+                        htmlBuilder.append("<li>" + ingr.next() + "</li>");
                     }
             htmlBuilder
                 .append("</ul>")
@@ -101,9 +121,9 @@ public class RecipeSharingHandler implements HttpHandler {
         .append("</h2>")
             .append("<p>")
                 .append("<ul>");
-                    for(int i = 0; i < instr.length; i++) {
-                        htmlBuilder.append("    " + instr[i]);
-                    }
+                    while(instr.hasNext()) {
+                        htmlBuilder.append("<li>" + instr.next() + "</li>");
+                    } 
             htmlBuilder
                 .append("</ul>")
             .append("</p>")

@@ -1,8 +1,7 @@
-package code.client.Model;
+package code.server;
 
 import java.io.Reader;
 
-import code.server.Recipe;
 import code.server.IRecipeDb;
 
 import java.io.BufferedReader;

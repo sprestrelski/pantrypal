@@ -1,4 +1,4 @@
-package code.client.Model;
+package code.server;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -7,6 +7,8 @@ import org.bson.types.ObjectId;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.mongodb.client.MongoCollection;
+
+import code.server.Recipe;
 
 import static com.mongodb.client.model.Filters.eq;
 import java.util.List;
@@ -42,9 +44,15 @@ public class RecipeMongoDb implements IRecipeDb {
     }
 
     @Override
+    public List<Recipe> getList(String accountId) {
+        return null;
+    }
+
+    @Override
     public boolean add(Recipe recipe) {
-        Document recipeDocument = new Document("_id", recipe.getId());
-        recipeDocument.append("title", recipe.getTitle())
+        Document recipeDocument = new Document("_id", new ObjectId(recipe.getId()));
+        recipeDocument.append("userID", recipe.getAccountId())
+                .append("title", recipe.getTitle())
                 .append("ingredients", Lists.newArrayList(recipe.getIngredientIterator()))
                 .append("instructions", Lists.newArrayList(recipe.getInstructionIterator()));
         recipeDocumentCollection.insertOne(recipeDocument);
@@ -52,8 +60,8 @@ public class RecipeMongoDb implements IRecipeDb {
     }
 
     @Override
-    public Recipe find(ObjectId id) {
-        Bson filter = eq("_id", id);
+    public Recipe find(String id) {
+        Bson filter = eq("_id", new ObjectId(id));
         var recipeDocumentIter = recipeDocumentCollection.find(filter);
         Document recipeDocument = recipeDocumentIter.first();
         if (recipeDocument == null) {
@@ -75,8 +83,8 @@ public class RecipeMongoDb implements IRecipeDb {
     }
 
     @Override
-    public Recipe remove(ObjectId id) {
-        Bson filter = eq("_id", id);
+    public Recipe remove(String id) {
+        Bson filter = eq("_id", new ObjectId(id));
         Document recipeDocument = recipeDocumentCollection.findOneAndDelete(filter);
         if (recipeDocument == null) {
             // Recipe does not exist
@@ -94,4 +102,5 @@ public class RecipeMongoDb implements IRecipeDb {
     public int size() {
         return (int) recipeDocumentCollection.countDocuments();
     }
+
 }

@@ -3,7 +3,7 @@ package code;
 import org.junit.jupiter.api.Test;
 
 import code.client.Model.TextToRecipe;
-import code.client.Model.Recipe;
+import code.server.*;
 import code.client.Model.MockGPTService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

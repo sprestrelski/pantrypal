@@ -14,17 +14,17 @@ import java.io.ByteArrayOutputStream;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerConnectionTest {
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private final PrintStream originalOut = System.out;
+    private final ByteArrayOutputStream outData = new ByteArrayOutputStream();
+    private final PrintStream outStream = System.out;
 
     @BeforeEach
     public void setUpStreams() {
-        System.setOut(new PrintStream(outContent));
+        System.setOut(new PrintStream(outData));
     }
 
     @AfterEach
     public void restoreStreams() {
-        System.setOut(originalOut);
+        System.setOut(outStream);
     }
 
     @Test
@@ -32,7 +32,7 @@ public class ServerConnectionTest {
         MockServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
         ServerConnection connection = new ServerConnection(server);
         assertFalse(connection.isOnline());
-        assertEquals("Server is offline", outContent.toString());
+        assertEquals("Server is offline", outData.toString());
     }
 
     @Test
@@ -42,6 +42,6 @@ public class ServerConnectionTest {
         ServerConnection connection = new ServerConnection(server);
         server.start();
         assertTrue(connection.isOnline());
-        assertEquals("Server is online", outContent.toString());
+        assertEquals("Server is online", outData.toString());
     }
 }

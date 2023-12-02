@@ -5,9 +5,9 @@ import java.io.*;
 import java.util.List;
 
 import code.client.Model.AppConfig;
-import code.client.Model.IRecipeDb;
-import code.client.Model.Recipe;
+import code.server.Recipe;
 import code.client.Model.RecipeListDb;
+import code.server.IRecipeDb;
 import code.client.Model.RecipeCSVReader;
 import code.client.Model.RecipeCSVWriter;
 
@@ -44,7 +44,7 @@ public class RecipeListUI extends VBox {
      */
     public void loadRecipes() {
         try {
-            Reader reader = new FileReader(AppConfig.CSV_FILE);
+            Reader reader = new FileReader(AppConfig.RECIPE_CSV_FILE);
             RecipeCSVReader recipeReader = new RecipeCSVReader(reader);
             recipeDb = new RecipeListDb();
             recipeReader.readRecipeDb(recipeDb);

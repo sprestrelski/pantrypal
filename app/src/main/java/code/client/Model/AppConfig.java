@@ -4,7 +4,8 @@ import javax.sound.sampled.AudioFileFormat;
 
 public class AppConfig {
     public static final String APP_NAME = "Pantry Pal";
-    public static final String CSV_FILE = "recipes.csv";
+    public static final String RECIPE_CSV_FILE = "recipes.csv";
+    public static final String CREDENTIALS_CSV_FILE = "userCredentials.csv";
     public static final String AUDIO_FILE = "recording.wav";
     public static final AudioFileFormat.Type AUDIO_TYPE = AudioFileFormat.Type.WAVE;
     public static final String API_KEY = "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";
@@ -17,4 +18,8 @@ public class AppConfig {
     public static final String SERVER_HOST = "localhost";
     public static final int SERVER_PORT = 8100;
     public static final String SERVER_URL = "http://" + SERVER_HOST + ":" + SERVER_PORT;
+    public static final String RECIPE_PATH = "/recipe";
+    public static final String ACCOUNT_PATH = "/accounts";
+    public static final String SHARE_PATH = "/recipes/";
+    public static final String SHARE_LINK = "https://localhost:8100/recipes/";
 }

@@ -5,11 +5,11 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
-import org.bson.types.ObjectId;
-
 import code.client.View.RecipeListUI;
 import code.client.View.RecipeUI;
 import code.client.View.View;
+import code.server.AccountRequestHandler;
+
 import java.net.URL;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -29,6 +29,7 @@ import javafx.util.Duration;
 import code.client.Model.*;
 import code.client.View.AppAlert;
 import code.client.View.DetailsAppFrame;
+import code.server.Recipe;
 
 public class Controller {
     private Account account;
@@ -37,7 +38,6 @@ public class Controller {
     private RecipeCSVWriter recipeWriter;
     private String title;
     private String defaultButtonStyle, onStyle, offStyle, blinkStyle;
-    public static final String CSVFILE = "usercredentials.csv";
 
     public Controller(View view, Model model) {
 
@@ -56,6 +56,7 @@ public class Controller {
                 e.printStackTrace();
             }
         });
+
         this.view.getAppFrameHome().setLogOutButtonAction(event -> {
             handleLogOutOutButton(event);
         });
@@ -64,7 +65,7 @@ public class Controller {
         this.view.getLoginUI().setGoToCreateAction(this::handleGoToCreateLogin);
         this.view.getLoginUI().setLoginButtonAction(this::handleLoginButton);
         loadCredentials();
-        if(account != null) {
+        if (account != null) {
             this.view.getLoginUI().setLoginCreds(account);
             this.view.goToRecipeList();
             addListenersToList();
@@ -197,10 +198,10 @@ public class Controller {
         String id = shownRecipe.getId().toString();
 
         String styleAlert = "-fx-background-color: #F1FFCB; -fx-font-weight: bold;";
-        Hyperlink textArea = new Hyperlink("https://localhost:8100/" + account.getUsername() + "/" + id);
+        Hyperlink textArea = new Hyperlink(AppConfig.SHARE_LINK + account.getUsername() + "/" + id);
         textArea.setOnAction(action -> {
             try {
-                java.awt.Desktop.getDesktop().browse(new URL("https://localhost:8100/" + account.getUsername() + "/" + id).toURI());
+                java.awt.Desktop.getDesktop().browse(new URL(AppConfig.SHARE_LINK + account.getUsername() + "/" + id).toURI());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (URISyntaxException e) {
@@ -249,7 +250,7 @@ public class Controller {
         } else {
             // Continue with account creation logic
             System.out.println("Account Created!\nUsername: " + username + "\nPassword: " + password);
-            model.performUserRequest("PUT", username, password);
+            model.performAccountRequest("PUT", username, password);
             // Show success message
             showSuccessPane(grid);
             view.goToLoginUI();
@@ -287,7 +288,7 @@ public class Controller {
     private boolean isUsernameTaken(String username) {
         // Check if the username is already taken
         // temporary logic, no database yet
-        String response = model.performUserRequest("GET", username, "");
+        String response = model.performAccountRequest("GET", username, "");
         System.out.println("Response for usernameTaken : " + response);
         return (response.equals("Username is taken"));
     }
@@ -312,8 +313,7 @@ public class Controller {
 
                 if (!view.getLoginUI().getRememberLogin()) {
                     clearCredentials();
-                }
-                else {
+                } else {
                     saveCredentials(account);
                 }
             } else {
@@ -323,7 +323,7 @@ public class Controller {
     }
 
     private void clearCredentials() {
-        try (FileWriter writer = new FileWriter("userCredentials.csv", false)) {
+        try (FileWriter writer = new FileWriter(AppConfig.CREDENTIALS_CSV_FILE, false)) {
             writer.write("");
             writer.flush();
             writer.close();
@@ -334,7 +334,7 @@ public class Controller {
     }
 
     private void saveCredentials(Account acc) {
-        try (FileWriter writer = new FileWriter("userCredentials.csv", true)) {
+        try (FileWriter writer = new FileWriter(AppConfig.CREDENTIALS_CSV_FILE, true)) {
             writer.append(acc.getUsername())
                     .append("|")
                     .append(acc.getPassword())
@@ -347,14 +347,15 @@ public class Controller {
             System.out.println("Account credentials could not be saved.");
         }
     }
+
     private void loadCredentials() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(CSVFILE));
+            BufferedReader reader = new BufferedReader(new FileReader(AppConfig.CREDENTIALS_CSV_FILE));
             String line;
             String[] credentials;
             while ((line = reader.readLine()) != null) {
                 credentials = line.split("\\|");
-                account = new Account(new ObjectId(credentials[2]),credentials[0], credentials[1]);
+                account = new Account(credentials[2], credentials[0], credentials[1]);
             }
             reader.close();
         } catch (IOException e) {
@@ -383,16 +384,17 @@ public class Controller {
 
     private boolean performLogin(String username, String password) {
         // Will add logic for failed login later
-        String response = model.performUserRequest("GET", username, password);
-        String canLogin = "Username and Password are correct.";
-        if (response.contains(canLogin)) {
-            String userID = response.substring(response.indexOf(canLogin) + canLogin.length());
-
-            System.out.println("UserID " + userID + "\n" + response);
-            account = new Account(new ObjectId(userID), username, password);
-            return true;
-        } else
+        String response = model.performAccountRequest("GET", username, password);
+        if (response.equals(AccountRequestHandler.USERNAME_NOT_FOUND) ||
+                response.equals(AccountRequestHandler.INCORRECT_PASSWORD) ||
+                response.equals(AccountRequestHandler.TAKEN_USERNAME)) {
             return false;
+        }
+        // The response is the account id
+        String accountId = response;
+        System.out.println("Account ID " + accountId + "\n" + response);
+        account = new Account(accountId, username, password);
+        return true;
     }
     ///////////////////////////////
 
