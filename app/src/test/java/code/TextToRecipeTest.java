@@ -61,6 +61,7 @@ public class TextToRecipeTest {
                 """;
         String parsedResponse = """
                 Title: Fried Chicken and Egg Fried Rice
+                Meal tag: BREAKFAST
                 Ingredients:
                 2 chicken breasts, diced
                 2 large eggs
@@ -115,6 +116,7 @@ public class TextToRecipeTest {
                 """;
         String parsedResponse = """
                 Title: Cheesy pasta bake
+                Meal tag: LUNCH
                 Ingredients:
                 1 lb pasta
                 1 lb ground beef
@@ -188,6 +190,7 @@ public class TextToRecipeTest {
                     """;
         String parsedResponse = """
                 Title: Savory Beef Pasta Bake
+                Meal tag: DINNER
                 Ingredients:
                 ½ pound of ground beef
                 1 box of your favorite pasta noodles
@@ -260,6 +263,7 @@ public class TextToRecipeTest {
                     """;
         String parsedResponse = """
                 Title: Savory Beef Pasta Bake
+                Meal tag: LUNCH
                 Ingredients:
                 ½ pound of ground beef
                 1 box of your favorite pasta noodles

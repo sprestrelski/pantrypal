@@ -64,8 +64,6 @@ public class RecipeSharingHandler implements HttpHandler {
         .append("</h1>")
         .append("</body>")
         .append("</html>");
-
-
         // encode HTML content
         return htmlBuilder.toString();
     }
