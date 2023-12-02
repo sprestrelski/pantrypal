@@ -1,16 +1,16 @@
 package code.server;
 
 import java.util.List;
-import org.bson.types.ObjectId;
 
 public interface IAccountDb {
     List<Account> getList();
-    boolean validate(String username, String password);
+    boolean checkPassword(String username, String password);
     boolean add(Account account);
-    Account find(ObjectId id);
-    Account find(String username);
+    Account findById(String id);
+    Account findByUsername(String username);
     boolean update(Account updatedAccount);
-    Account remove(ObjectId id);
+    Account removeById(String id);
+    Account removeByUsername(String username);
     void clear();
     int size();
 }

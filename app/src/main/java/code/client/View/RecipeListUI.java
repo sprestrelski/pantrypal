@@ -44,7 +44,7 @@ public class RecipeListUI extends VBox {
      */
     public void loadRecipes() {
         try {
-            Reader reader = new FileReader(AppConfig.CSV_FILE);
+            Reader reader = new FileReader(AppConfig.RECIPE_CSV_FILE);
             RecipeCSVReader recipeReader = new RecipeCSVReader(reader);
             recipeDb = new RecipeListDb();
             recipeReader.readRecipeDb(recipeDb);

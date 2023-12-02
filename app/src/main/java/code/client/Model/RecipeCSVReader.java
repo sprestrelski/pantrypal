@@ -3,7 +3,6 @@ package code.client.Model;
 import java.io.Reader;
 import java.io.BufferedReader;
 import java.io.IOException;
-import org.bson.types.ObjectId;
 
 public class RecipeCSVReader {
     private final BufferedReader buffReader;
@@ -20,7 +19,7 @@ public class RecipeCSVReader {
         String mealTag = recipeTokens[3];
         String[] ingredientTokens = recipeTokens[4].split(";;");
         String[] instructionTokens = recipeTokens[5].split(";;");
-        Recipe recipe = new Recipe(new ObjectId(id), new ObjectId(accountId), title, mealTag);
+        Recipe recipe = new Recipe(id, accountId, title, mealTag);
 
         for (String ingredient : ingredientTokens) {
             recipe.addIngredient(ingredient);

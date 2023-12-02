@@ -4,7 +4,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.internal.connection.tlschannel.impl.TlsChannelImpl.EofException;
 import com.sun.net.httpserver.*;
 
 import code.client.Model.AppConfig;
@@ -41,9 +40,9 @@ public class AppServer extends BaseServer {
                 new InetSocketAddress(hostName, port),
                 0);
         // create the context to map urls
-        httpServer.createContext("/recipe", new RecipeRequestHandler(recipeDb));
-        httpServer.createContext("/user", new AccountRequestHandler(accountMongoDB));
-        httpServer.createContext("/recipes/", new RecipeSharingHandler(accountMongoDB));
+        httpServer.createContext(AppConfig.RECIPE_PATH, new RecipeRequestHandler(recipeDb));
+        httpServer.createContext(AppConfig.ACCOUNT_PATH, new AccountRequestHandler(accountMongoDB));
+        httpServer.createContext(AppConfig.SHARE_PATH, new ShareRequestHandler(accountMongoDB));
         // set the executor
         httpServer.setExecutor(threadPoolExecutor);
         // start the server
