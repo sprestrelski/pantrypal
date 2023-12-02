@@ -33,9 +33,10 @@ public class App extends Application {
     private void drawUI(Stage primaryStage) throws IOException, URISyntaxException {
         View view = new View();
         Model model = new Model();
-        Controller controller = new Controller(view, model);
         Scene login = new Scene(view.getLoginUI().getRoot());
         view.setScene(login);
+        Controller controller = new Controller(view, model);
+        
         ServerConnection connection = new ServerConnection(server);
 
         if (connection.isOnline()) {
@@ -51,6 +52,8 @@ public class App extends Application {
         primaryStage.setResizable(true);
         primaryStage.setMinWidth(620);
         primaryStage.setMinHeight(620);
+        primaryStage.setHeight(620);
+        primaryStage.setWidth(620);
         primaryStage.show();
 
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {

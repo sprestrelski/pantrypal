@@ -38,16 +38,8 @@ public class LoginUI {
     private PasswordField passwordField;
     private GridPane grid;
 
-    public static final String CSVFILE = "usercredentials.csv";
-
     public LoginUI() {
-        loadCredentials();
-        if (savedAccount != null) {
-            accountSaved = true;
-        }
-
         // this.primaryStage.setTitle("Pantry Pal - Login");
-
         grid = new GridPane();
         grid.setAlignment(javafx.geometry.Pos.CENTER);
         grid.setHgap(10);
@@ -80,25 +72,21 @@ public class LoginUI {
         });
 
         loginButton = new Button("Login");
+        loginButton.setDefaultButton(true);
         grid.add(loginButton, 1, 4);
 
         goToCreate = new Hyperlink("Click here");
-        ;
 
         FlowPane flow = new FlowPane();
         flow.getChildren().addAll(
                 new Text("Don't have an account? "), goToCreate);
         grid.add(flow, 1, 5);
+    }
 
-        loginButton.setOnAction(e -> {
-
-        });
-
-        if (accountSaved) {
-            usernameField.setText(savedAccount.getUsername());
-            passwordField.setText(savedAccount.getPassword());
-        }
-
+    public void setLoginCreds(Account account) {
+        usernameField.setText(account.getUsername());
+        passwordField.setText(account.getPassword());
+        savedAccount = account;
     }
 
     public GridPane getRoot() {
@@ -125,18 +113,4 @@ public class LoginUI {
         loginButton.setOnAction(eventHandler);
     }
 
-    public void loadCredentials() {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(CSVFILE));
-            String line;
-            String[] credentials;
-            while ((line = reader.readLine()) != null) {
-                credentials = line.split("\\|");
-                savedAccount = new Account(credentials[0], credentials[1]);
-            }
-            reader.close();
-        } catch (IOException e) {
-            System.out.println("No account credentials saved currently.");
-        }
-    }
 }

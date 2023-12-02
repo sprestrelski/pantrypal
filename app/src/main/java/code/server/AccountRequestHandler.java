@@ -61,7 +61,7 @@ public class AccountRequestHandler implements HttpHandler {
                 // If only provided username
                 try {
                     Account takenUsername = accountMongoDB.find(split[0]);
-                    System.out.println("ID: " + takenUsername.getId().toString());
+                    //System.out.println("ID: " + takenUsername.getId().toString());
                     if (split.length < 2) {
                         // Account takenUsername = accountMongoDB.find(split[0]);
                         response = (takenUsername == null) ? "Username is not taken" : "Username is taken";

@@ -30,10 +30,10 @@ public class Controller {
     private Account account;
     private Model model;
     private View view;
-    private Recipe recipe;
     private RecipeCSVWriter recipeWriter;
     private String title;
     private String defaultButtonStyle, onStyle, offStyle, blinkStyle;
+    public static final String CSVFILE = "usercredentials.csv";
 
     public Controller(View view, Model model) {
 
@@ -52,14 +52,19 @@ public class Controller {
                 e.printStackTrace();
             }
         });
+        this.view.getAppFrameHome().setLogOutButtonAction(event -> {
+            handleLogOutOutButton(event);
+        });
 
         this.view.getAccountCreationUI().setCreateAccountButtonAction(this::handleCreateAcc);
         this.view.getLoginUI().setGoToCreateAction(this::handleGoToCreateLogin);
         this.view.getLoginUI().setLoginButtonAction(this::handleLoginButton);
-    }
-
-    public void setRecipe(Recipe recipe) {
-        this.recipe = recipe;
+        loadCredentials();
+        if(account != null) {
+            this.view.getLoginUI().setLoginCreds(account);
+            this.view.goToRecipeList();
+            addListenersToList();
+        }
     }
 
     public void setTitle(String title) {
@@ -101,6 +106,13 @@ public class Controller {
         this.view.getAppFrameMic().setGoToDetailedButtonAction(this::handleDetailedViewFromNewRecipeButton);
         this.view.getAppFrameMic().setGoToHomeButtonAction(this::handleHomeButton);
 
+    }
+
+    private void handleLogOutOutButton(ActionEvent event) {
+        clearCredentials();
+        view.goToLoginUI();
+        view.getLoginUI().getUsernameTextField().clear();
+        view.getLoginUI().getPasswordField().clear();
     }
 
     private void handleHomeButton(ActionEvent event) {
@@ -263,8 +275,11 @@ public class Controller {
                 view.goToRecipeList();
                 addListenersToList();
 
-                if (view.getLoginUI().getRememberLogin()) {
-                    saveCredentials(username, password);
+                if (!view.getLoginUI().getRememberLogin()) {
+                    clearCredentials();
+                }
+                else {
+                    saveCredentials(account);
                 }
             } else {
                 showLoginSuccessPane(grid, false);
@@ -272,16 +287,43 @@ public class Controller {
         }
     }
 
-    private void saveCredentials(String username, String password) {
+    private void clearCredentials() {
+        try (FileWriter writer = new FileWriter("userCredentials.csv", false)) {
+            writer.write("");
+            writer.flush();
+            writer.close();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            System.out.println("Account credentials could not be erased.");
+        }
+    }
+
+    private void saveCredentials(Account acc) {
         try (FileWriter writer = new FileWriter("userCredentials.csv", true)) {
-            writer.append(username)
+            writer.append(acc.getUsername())
                     .append("|")
-                    .append(password);
+                    .append(acc.getPassword())
+                    .append("|")
+                    .append(acc.getId().toString());
             writer.flush();
             writer.close();
         } catch (IOException exception) {
             exception.printStackTrace();
             System.out.println("Account credentials could not be saved.");
+        }
+    }
+    private void loadCredentials() {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(CSVFILE));
+            String line;
+            String[] credentials;
+            while ((line = reader.readLine()) != null) {
+                credentials = line.split("\\|");
+                account = new Account(new ObjectId(credentials[2]),credentials[0], credentials[1]);
+            }
+            reader.close();
+        } catch (IOException e) {
+            System.out.println("No account credentials saved currently.");
         }
     }
 
@@ -296,7 +338,7 @@ public class Controller {
         }
 
         successText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        grid.add(successText, 1, 5);
+        grid.add(successText, 1, 6);
 
         Timeline timeline = new Timeline(
                 new KeyFrame(Duration.seconds(0), new KeyValue(successText.opacityProperty(), 1.0)),
