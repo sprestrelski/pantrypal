@@ -15,14 +15,14 @@ public class ShareRequestHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        String route = "/recipes/";
+        String route1 = "/recipes/";
         String response = "Request received";
         String method = httpExchange.getRequestMethod();
         URI uri = httpExchange.getRequestURI();
         String query = uri.toString();
-        int usernameStart = query.indexOf(route);
+        int usernameStart = query.indexOf(route1);
 
-        String username = query.substring(usernameStart + route.length());
+        String username = query.substring(usernameStart + route1.length());
         String recipeID = username.substring(username.indexOf("/") + 1);
         username = username.substring(0, username.indexOf("/"));
 
