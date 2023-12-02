@@ -11,7 +11,6 @@ public class AccountRequestHandler implements HttpHandler {
     public static final String USERNAME_NOT_FOUND = "Username is not found";
     public static final String INCORRECT_PASSWORD = "Incorrect password";
     public static final String TAKEN_USERNAME = "Username has already been taken";
-    public static final String LOGIN_OK = "Login OK";
 
     public AccountRequestHandler(IAccountDb accountMongoDB) {
         this.accountDB = accountMongoDB;
@@ -64,7 +63,7 @@ public class AccountRequestHandler implements HttpHandler {
                 } else if (!accountDB.checkPassword(username, password)) {
                     response = INCORRECT_PASSWORD;
                 } else {
-                    response = LOGIN_OK;
+                    response = account.getId();
                 }
             }
         }

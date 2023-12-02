@@ -8,6 +8,7 @@ import java.util.UUID;
 import code.client.View.RecipeListUI;
 import code.client.View.RecipeUI;
 import code.client.View.View;
+import code.server.AccountRequestHandler;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.PauseTransition;
@@ -30,7 +31,6 @@ public class Controller {
     private RecipeCSVWriter recipeWriter;
     private String title;
     private String defaultButtonStyle, onStyle, offStyle, blinkStyle;
-    public static final String CSVFILE = "usercredentials.csv";
 
     public Controller(View view, Model model) {
 
@@ -49,6 +49,7 @@ public class Controller {
                 e.printStackTrace();
             }
         });
+
         this.view.getAppFrameHome().setLogOutButtonAction(event -> {
             handleLogOutOutButton(event);
         });
@@ -57,7 +58,7 @@ public class Controller {
         this.view.getLoginUI().setGoToCreateAction(this::handleGoToCreateLogin);
         this.view.getLoginUI().setLoginButtonAction(this::handleLoginButton);
         loadCredentials();
-        if(account != null) {
+        if (account != null) {
             this.view.getLoginUI().setLoginCreds(account);
             this.view.goToRecipeList();
             addListenersToList();
@@ -274,8 +275,7 @@ public class Controller {
 
                 if (!view.getLoginUI().getRememberLogin()) {
                     clearCredentials();
-                }
-                else {
+                } else {
                     saveCredentials(account);
                 }
             } else {
@@ -285,7 +285,7 @@ public class Controller {
     }
 
     private void clearCredentials() {
-        try (FileWriter writer = new FileWriter("userCredentials.csv", false)) {
+        try (FileWriter writer = new FileWriter(AppConfig.CREDENTIALS_CSV_FILE, false)) {
             writer.write("");
             writer.flush();
             writer.close();
@@ -296,7 +296,7 @@ public class Controller {
     }
 
     private void saveCredentials(Account acc) {
-        try (FileWriter writer = new FileWriter("userCredentials.csv", true)) {
+        try (FileWriter writer = new FileWriter(AppConfig.CREDENTIALS_CSV_FILE, true)) {
             writer.append(acc.getUsername())
                     .append("|")
                     .append(acc.getPassword())
@@ -309,14 +309,15 @@ public class Controller {
             System.out.println("Account credentials could not be saved.");
         }
     }
+
     private void loadCredentials() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(CSVFILE));
+            BufferedReader reader = new BufferedReader(new FileReader(AppConfig.CREDENTIALS_CSV_FILE));
             String line;
             String[] credentials;
             while ((line = reader.readLine()) != null) {
                 credentials = line.split("\\|");
-                account = new Account(credentials[2],credentials[0], credentials[1]);
+                account = new Account(credentials[2], credentials[0], credentials[1]);
             }
             reader.close();
         } catch (IOException e) {
@@ -346,14 +347,16 @@ public class Controller {
     private boolean performLogin(String username, String password) {
         // Will add logic for failed login later
         String response = model.performAccountRequest("GET", username, password);
-        String canLogin = "Username and password are correct.";
-        if (response.contains(canLogin)) {
-            String userID = response.substring(response.indexOf(canLogin) + canLogin.length());
-            System.out.println("UserID " + userID + "\n" + response);
-            account = new Account(userID, username, password);
-            return true;
-        } else
+        if (response.equals(AccountRequestHandler.USERNAME_NOT_FOUND) ||
+                response.equals(AccountRequestHandler.INCORRECT_PASSWORD) ||
+                response.equals(AccountRequestHandler.TAKEN_USERNAME)) {
             return false;
+        }
+        // The response is the account id
+        String accountId = response;
+        System.out.println("Account ID " + accountId + "\n" + response);
+        account = new Account(accountId, username, password);
+        return true;
     }
     ///////////////////////////////
 

@@ -67,7 +67,7 @@ public class App extends Application {
 
     private IRecipeDb initDb() throws IOException {
         recipeDb = new RecipeListDb();
-        RecipeCSVReader csvReader = new RecipeCSVReader(new FileReader(AppConfig.CSV_FILE));
+        RecipeCSVReader csvReader = new RecipeCSVReader(new FileReader(AppConfig.RECIPE_CSV_FILE));
         csvReader.readRecipeDb(recipeDb);
         csvReader.close();
         return recipeDb;
