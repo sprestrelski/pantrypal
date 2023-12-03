@@ -59,7 +59,7 @@ public class DallEService extends RecipeToImage {
                     .getJSONObject(0).getString("b64_json");
         } catch (Exception e) {
             // badly formatted json
-            generatedImageData = "An error occurred.";
+            generatedImageData = "error";
             e.printStackTrace();
         }
         return generatedImageData;

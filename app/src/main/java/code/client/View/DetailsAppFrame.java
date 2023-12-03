@@ -67,6 +67,7 @@ public class DetailsAppFrame {
         String title = recipeInfo.getTitleField().getText();
         String ingredients = recipeInfo.getIngredientsField().getText();
         String instructions = recipeInfo.getInstructionsField().getText();
+        String image = recipeInfo.getImageString();
 
         /// Use Trung's deformatting here.
         String[] ingr = ingredients.split("\n");
@@ -79,6 +80,7 @@ public class DetailsAppFrame {
         for (String instruction : instr) {
             edit.addInstruction(instruction);
         }
+        edit.setImage(image);
 
         return edit;
     }
