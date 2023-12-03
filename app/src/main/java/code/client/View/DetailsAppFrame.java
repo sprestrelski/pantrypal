@@ -52,6 +52,8 @@ public class DetailsAppFrame {
         shareButton.setStyle(defaultButtonStyle);
         shareButton.setAlignment(Pos.BOTTOM_RIGHT);
 
+        
+
         // Default recipe
         currentRecipe = getMockedRecipe();
     }

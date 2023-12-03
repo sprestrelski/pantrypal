@@ -12,9 +12,12 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -23,8 +26,14 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import code.client.Model.*;
 import code.client.View.AppAlert;
+import code.client.View.AppFrameHome;
 
 public class Controller {
+    private final int NEWEST_TO_OLDEST_INDEX = 0; // Index of newest to oldest in sorting drop down menu 
+    private final int OLDEST_TO_NEWEST_INDEX = 1; // Index of oldest to newest in sorting drop down menu
+    private final int A_TO_Z_INDEX = 2; // Index of A to Z in sorting drop down menu
+    private final int Z_TO_A_INDEX = 3; // Index of Z to A in sorting drop down menu
+    
     private Model model;
     private View view;
     private Recipe recipe;
@@ -50,6 +59,15 @@ public class Controller {
             }
         });
 
+        this.view.getAppFrameHome().setSortMenuButtonAction(event -> {
+            try {
+                handleSortMenuButton(event);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        this.view.getAppFrameHome().setSortMenuButtonAction(this::handleSortMenuButton);
         this.view.getAccountCreationUI().setCreateAccountButtonAction(this::handleCreateAcc);
         this.view.getLoginUI().setGoToCreateAction(this::handleGoToCreateLogin);
         this.view.getLoginUI().setLoginButtonAction(this::handleLoginButton);
@@ -97,7 +115,68 @@ public class Controller {
         view.goToAudioCapture();
         this.view.getAppFrameMic().setGoToDetailedButtonAction(this::handleDetailedViewFromNewRecipeButton);
         this.view.getAppFrameMic().setGoToHomeButtonAction(this::handleHomeButton);
+    }
 
+    // private void handleSortButton(ActionEvent event) {
+    //     ChoiceBox<String> sortChoiceBox = view.getAppFrameHome().getSortChoiceBox();
+    //     RecipeListUI list = view.getAppFrameHome().getRecipeList();
+    //     view.getAppFrameHome().getSortButton().setOnAction(e -> {
+    //         sortChoiceBox.show();
+    //     });
+    // }
+
+    private void handleSortMenuButton(ActionEvent event) {
+        RecipeListUI list = view.getAppFrameHome().getRecipeList();
+        MenuButton sortMenuButton = view.getAppFrameHome().getSortMenuButton();
+        ObservableList<MenuItem> sortMenuItems = sortMenuButton.getItems();
+        RecipeSorter recipeSorter = new RecipeSorter(list.getRecipeDB().getList());
+        
+        // Setting action for newest to oldest sorting criteria
+        sortMenuItems.get(NEWEST_TO_OLDEST_INDEX).setOnAction(e -> {
+            
+        });
+        // Setting action for oldest to newest sorting criteria
+        sortMenuItems.get(OLDEST_TO_NEWEST_INDEX).setOnAction(e -> {
+            
+        });
+        // Setting action for A to Z sorting criteria
+        sortMenuItems.get(A_TO_Z_INDEX).setOnAction(e -> {
+            recipeSorter.sortAToZ();
+            list.update();
+        });
+        // Setting action for Z to A sorting criteria
+        sortMenuItems.get(Z_TO_A_INDEX).setOnAction(e -> {
+            recipeSorter.sortZToA();
+            list.update();
+        });
+
+
+        //; Setting action for oldest to newest sorting criteria
+        
+
+        // for (MenuItem menuItem : sortMenuButton.getItems()) {
+        //     menuItem.setOnAction(menuEvent -> {
+        //         String sortingOption = menuItem.getText();
+        //         switch (sortingOption) {
+        //             case "Sort by date (Newest to Oldest)":
+        //                 //...
+        //                 break;
+        //             case "Sort by date (Oldest to Newest)":
+        //                 //...
+        //                 break;
+        //             case "Sort alphabetically (A-Z)":
+        //                 recipeSorter.sortAToZ();
+        //                 list.update();
+                        
+        //             case "Sort alphabetically (Z-A)":
+        //                 //...
+        //                 break;
+        //             default:
+        //                 break;
+        //         }
+        //         list.loadRecipes();
+        //     });
+        // }
     }
 
     private void handleHomeButton(ActionEvent event) {

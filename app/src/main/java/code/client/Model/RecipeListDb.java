@@ -25,7 +25,6 @@ public class RecipeListDb implements IRecipeDb {
                 return recipe;
             }
         }
-
         return null;
     }
 
