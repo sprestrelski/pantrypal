@@ -13,8 +13,8 @@ public class RecipeBuilder {
 
     public RecipeBuilder(String userID, String title) {
         recipe = new Recipe(new ObjectId().toHexString(),
-                            new ObjectId().toHexString(),
-                            "", 
+                            userID,
+                            title, 
                             "",
                             0,
                             getDefaultImage());

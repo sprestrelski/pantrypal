@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.Iterator;
+
+import org.bson.types.ObjectId;
+
 import java.util.*;
 import code.client.Model.*;
 
@@ -39,7 +42,7 @@ public class Recipe implements Comparable<Recipe> {
 
     // Keep this for one testing purposes please :)
     public Recipe(String title, String mealTag) {
-        this(null, null,title, mealTag, 1,"");
+        this(new ObjectId().toHexString(), new ObjectId().toHexString(), title, mealTag, 1, "");
         setDefaultImage();
     }
 

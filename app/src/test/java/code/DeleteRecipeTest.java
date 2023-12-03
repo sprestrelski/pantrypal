@@ -44,13 +44,13 @@ public class DeleteRecipeTest {
     @Test
     public void testDeleteAllRecipes() {
         // Check that the size of the recipe list is 3 before deletion
-        assertEquals(recipeDb.size(), 3);
+        assertEquals(3, recipeDb.size());
         // Delete all of the recipes from the RecipeDb
         recipeDb.remove(r1.getId());
         recipeDb.remove(r2.getId());
         recipeDb.remove(r3.getId());
         // Check that the size of the recipe list is now 0
-        assertEquals(recipeDb.size(), 0);
+        assertEquals(0, recipeDb.size());
     }
 
     /**

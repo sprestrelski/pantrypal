@@ -15,7 +15,7 @@ public class AutologinTest {
     private Account account;
 
     /**
-     * Before running the tests, set up a recipe database and initialize two recipes
+     * Before running the test, set up an account for automatic log in
      */
     @BeforeEach
     public void setUp() throws IOException {
@@ -23,8 +23,8 @@ public class AutologinTest {
     }
 
     /**
-     * Test case: Saving a new recipe to a new recipes.csv file
-     * Expected result: A new recipes.csv file is created with the new recipe
+     * Save user credentials to a file called userCredentials.csv
+     * Expected result: A userCredentials.csv file with the user credentials
      */
     @Test
     public void testSaveUserCredentials() throws IOException {

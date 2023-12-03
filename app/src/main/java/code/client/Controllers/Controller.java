@@ -201,23 +201,29 @@ public class Controller {
         // Setting action for newest to oldest sorting criteria
         sortMenuItems.get(NEWEST_TO_OLDEST_INDEX).setOnAction(e -> {
             recipeSorter.sortNewestToOldest();
+            // String msg = sortMenuItems.get(NEWEST_TO_OLDEST_INDEX).getText();
+            // sortMenuItems.get(NEWEST_TO_OLDEST_INDEX).setText(msg + "✔");
             this.view.getAppFrameHome().updateDisplay();
         });
         // Setting action for oldest to newest sorting criteria
         sortMenuItems.get(OLDEST_TO_NEWEST_INDEX).setOnAction(e -> {
             recipeSorter.sortOldestToNewest();
+            // String msg = sortMenuItems.get(OLDEST_TO_NEWEST_INDEX).getText();
+            // sortMenuItems.get(OLDEST_TO_NEWEST_INDEX).setText(msg + "✔");
             this.view.getAppFrameHome().updateDisplay();
         });
         // Setting action for A to Z sorting criteria
         sortMenuItems.get(A_TO_Z_INDEX).setOnAction(e -> {
-            System.out.println("Sort from A-Z");
             recipeSorter.sortAToZ();
+            // String msg = sortMenuItems.get(A_TO_Z_INDEX).getText();
+            // sortMenuItems.get(A_TO_Z_INDEX).setText(msg + "✔");
             this.view.getAppFrameHome().updateDisplay();
         });
         // Setting action for Z to A sorting criteria
         sortMenuItems.get(Z_TO_A_INDEX).setOnAction(e -> {
-            System.out.println("Sort from Z-A");
             recipeSorter.sortZToA();
+            // String msg = sortMenuItems.get(Z_TO_A_INDEX).getText();
+            // sortMenuItems.get(Z_TO_A_INDEX).setText(msg + "✔");
             this.view.getAppFrameHome().updateDisplay();
         });
     }
