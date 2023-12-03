@@ -1,30 +1,70 @@
-package code.client.Model;
+package code.server;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Base64;
 import java.util.Comparator;
-import org.bson.types.ObjectId;
+import java.util.Iterator;
+import java.util.*;
+import code.client.Model.*;
 
 public class Recipe implements Comparable<Recipe> {
-    private final ObjectId id;
-    private final int date;
+    private String id;
+    private String userID;
     private String title;
+    private String mealTag;
+    private long date;
+    private String image;
     private final List<String> ingredients = new ArrayList<>();
     private final List<String> instructions = new ArrayList<>();
 
-    public Recipe(ObjectId id, String title) {
+    public Recipe(String id, String accountId, String title, String mealTag, long date, String image) {
         this.id = id;
+        this.userID = accountId;
         this.title = title;
-        this.date = 0;
+        this.mealTag = mealTag;
+        this.date = date;
+        this.image = image;
     }
 
-    public Recipe(String title) {
-        this(new ObjectId(), title);
+    // public Recipe(String accountId, String title, String mealTag, String image) {
+    //     this(new ObjectId().toHexString(), accountId, title, mealTag, image);
+    // }
+
+    // public Recipe(String accountId, String title, String mealTag) {
+    //     this(accountId, title, mealTag, null);
+    //     setDefaultImage();
+    // }
+
+    // Keep this for one testing purposes please :)
+    public Recipe(String title, String mealTag) {
+        this(null, null,title, mealTag, 1,"");
+        setDefaultImage();
     }
 
-    public ObjectId getId() {
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
+    }
+
+    public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setAccountId(String accountId) {
+        this.userID = accountId;
+    }
+
+    public String getAccountId() {
+        return userID;
     }
 
     public void setTitle(String title) {
@@ -35,8 +75,30 @@ public class Recipe implements Comparable<Recipe> {
         return title;
     }
 
-    public int getDate() {
-        return date;
+    public void setMealTag(String mealTag) {
+        this.mealTag = mealTag;
+    }
+
+    public String getMealTag() {
+        return mealTag;
+    }
+
+    public void setDefaultImage() {
+        File file = new File(AppConfig.RECIPE_IMG_FILE);
+        try {
+            byte[] imageBytes = Files.readAllBytes(file.toPath());
+            this.image = Base64.getEncoder().encodeToString(imageBytes);
+        } catch (Exception fileError) {
+            fileError.printStackTrace();
+        }
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getImage() {
+        return image;
     }
 
     public void addIngredient(String ingredient) {
@@ -59,6 +121,7 @@ public class Recipe implements Comparable<Recipe> {
     public String toString() {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("Title: ").append(title).append("\n");
+        strBuilder.append("Meal tag: ").append(mealTag).append("\n");
         strBuilder.append("Ingredients:").append("\n");
         for (String ingredient : ingredients) {
             strBuilder.append(ingredient).append("\n");
@@ -78,8 +141,12 @@ public class Recipe implements Comparable<Recipe> {
         if (!(obj instanceof Recipe recipe)) {
             return false;
         }
-        return id.equals(recipe.id);
+        return title.equals(recipe.getTitle()) &&
+                mealTag.equals(recipe.mealTag) &&
+                ingredients.equals(recipe.ingredients) &&
+                instructions.equals(recipe.instructions);
     }
+
 
     @Override
     public int compareTo(Recipe recipe) {
@@ -93,7 +160,7 @@ public class Recipe implements Comparable<Recipe> {
             (Recipe r1, Recipe r2) -> r1.getTitle().compareTo(r2.getTitle());
 
         public static final Comparator<Recipe> DATE = 
-            (Recipe r1, Recipe r2) -> Integer.compare(r1.getDate(), r2.getDate());
+            (Recipe r1, Recipe r2) -> Long.compare(r1.getDate(), r2.getDate()); 
         
         // public static Comparator<Recipe> TITLE = new Comparator<>() {
         //     @Override
@@ -109,4 +176,5 @@ public class Recipe implements Comparable<Recipe> {
         //     }
         // };
     }
+
 }

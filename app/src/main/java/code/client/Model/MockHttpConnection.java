@@ -9,6 +9,10 @@ public class MockHttpConnection implements IHttpConnection {
     private InputStream inputStream;
     private OutputStream outputStream;
 
+    public MockHttpConnection(int responseCode) {
+        this.responseCode = responseCode;
+    }
+
     public MockHttpConnection(int responseCode, InputStream inputStream, OutputStream outputStream) {
         this.responseCode = responseCode;
         this.inputStream = inputStream;

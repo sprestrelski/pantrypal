@@ -17,22 +17,14 @@ public class VoiceToTextTest {
      */
     @Test
     void testSuccessfulProcessAudio() throws IOException, URISyntaxException {
-        IHttpConnection connection = new MockHttpConnection(
-                200,
-                new ByteArrayInputStream("{\"text\":\"Breakfast.\"}".getBytes()),
-                new ByteArrayOutputStream());
+        IHttpConnection connection = new MockHttpConnection(200);
 
         VoiceToText voiceToText = new MockWhisperService(connection);
-        String response = voiceToText.processAudio();
+        String response = voiceToText.processAudio("mealtype");
         assertEquals("Breakfast.", response);
 
-        connection = new MockHttpConnection(
-                200,
-                new ByteArrayInputStream("{\"text\":\"Chicken, cheese.\"}".getBytes()),
-                null);
-
         voiceToText = new MockWhisperService(connection);
-        response = voiceToText.processAudio();
+        response = voiceToText.processAudio("ingredients");
         assertEquals("Chicken, cheese.", response);
 
     }
@@ -42,13 +34,10 @@ public class VoiceToTextTest {
      */
     @Test
     void testFailedProcessAudio() throws IOException, URISyntaxException {
-        IHttpConnection connection = new MockHttpConnection(
-                404,
-                new ByteArrayInputStream("Error text".getBytes()),
-                null);
+        IHttpConnection connection = new MockHttpConnection(404);
 
         VoiceToText voiceToText = new MockWhisperService(connection);
-        String response = voiceToText.processAudio();
+        String response = voiceToText.processAudio("error");
         assertEquals("Error text", response);
     }
 

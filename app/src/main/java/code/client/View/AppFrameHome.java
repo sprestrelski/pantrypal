@@ -7,26 +7,17 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import java.io.*;
-import java.lang.StackWalker.StackFrame;
-
 import javafx.geometry.Pos;
-import java.util.ArrayList;
-import java.util.UUID;
-
-import code.client.Model.*;
-import code.client.View.*;
-import code.client.Controllers.*;
 import javafx.event.*;
 
-import javafx.collections.FXCollections;
 
 class Footer extends HBox {
     // Button for creating a new recipe
-    private Button newButton;
+    private Button newButton, logOutButton;
 
     Footer() {
-
-        this.setPrefSize(700, 60);
+        GridPane grid = new GridPane();
+        this.setPrefSize(620, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
         this.setSpacing(15);
 
@@ -35,12 +26,21 @@ class Footer extends HBox {
         newButton = new Button("New Recipe");
         newButton.setStyle(defaultButtonStyle);
 
-        this.getChildren().addAll(newButton);
-        this.setAlignment(Pos.CENTER);
+        logOutButton = new Button("Log out");
+        logOutButton.setStyle(defaultButtonStyle);
+        grid.add(logOutButton, 3, 0);
+        grid.add(newButton, 11, 0);
+        grid.setHgap(20);
+        this.getChildren().add(grid);
+        this.setAlignment(Pos.CENTER_LEFT);
     }
 
     public Button getNewButton() {
         return this.newButton;
+    }
+
+    public Button getLogOutButton() {
+        return this.logOutButton;
     }
 }
 
@@ -76,14 +76,24 @@ class Header extends HBox {
 
         sortMenuButton.getItems().addAll(sortNewToOld, sortOldToNew, sortAToZ, sortZToA);
 
-        this.setPrefSize(700, 60);
+        EventHandler<ActionEvent> event1 = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e)
+            {
+                System.out.println(((MenuItem)e.getSource()).getText() + " selected");
+            }
+        };
+
+        sortMenuButton.getItems().get(2).setOnAction(event1);
+        sortMenuButton.getItems().get(3).setOnAction(event1);
+        
+        this.setPrefSize(620, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
 
         Text titleText = new Text("Recipe List");
         titleText.setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
         this.getChildren().addAll(filterMenuButton, titleText, sortMenuButton);
         this.setAlignment(Pos.CENTER);
-        this.setSpacing(200);
+        this.setSpacing(150);
     }
 
     public MenuButton getSortMenuButton() {
@@ -99,9 +109,8 @@ public class AppFrameHome extends BorderPane {
     private Header header;
     private Footer footer;
     private RecipeListUI recipeList;
-    private Button newButton;
     private MenuButton filterMenuButton, sortMenuButton;
-    private Scene mainScene;
+    private Button newButton, logOutButton;
     private StackPane stack;
 
     AppFrameHome() throws IOException {
@@ -110,7 +119,6 @@ public class AppFrameHome extends BorderPane {
         header = new Header();
         recipeList = new RecipeListUI();
         footer = new Footer();
-        recipeList.loadRecipes();
         ScrollPane scroller = new ScrollPane(recipeList);
         scroller.setFitToWidth(true);
         scroller.setFitToHeight(true);
@@ -122,6 +130,7 @@ public class AppFrameHome extends BorderPane {
         newButton = footer.getNewButton();
         filterMenuButton = header.getFilterMenuButton();
         sortMenuButton = header.getSortMenuButton();
+        logOutButton = footer.getLogOutButton();
     }
 
     public StackPane getRoot() {
@@ -133,26 +142,18 @@ public class AppFrameHome extends BorderPane {
 
     public void updateDisplay() {
         recipeList.update();
-        for (int i = 0; i < recipeList.getChildren().size(); i++) {
-            RecipeUI currRecipe = (RecipeUI) recipeList.getChildren().get(i);
-        }
+        // for (int i = 0; i < recipeList.getChildren().size(); i++) {
+        //     RecipeUI currRecipe = (RecipeUI) recipeList.getChildren().get(i);
+        // }
         this.setCenter(recipeList);
-    }
-
-    public void setMain(Scene main) {
-        mainScene = main;
     }
 
     public void setNewRecipeButtonAction(EventHandler<ActionEvent> eventHandler) {
         newButton.setOnAction(eventHandler);
     }
 
-    public void setFilterMenuButtonAction(EventHandler<ActionEvent> eventHandler) {
-        filterMenuButton.setOnAction(eventHandler);
-    }
-
-    public void setSortMenuButtonAction(EventHandler<ActionEvent> eventHandler) {
-        sortMenuButton.setOnAction(eventHandler);
+    public void setLogOutButtonAction(EventHandler<ActionEvent> eventHandler) {
+        logOutButton.setOnAction(eventHandler);
     }
 
     public void setRecipeDetailsButtonAction(EventHandler<ActionEvent> eventHandler) {

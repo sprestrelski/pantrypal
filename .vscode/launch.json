@@ -21,10 +21,10 @@
         },
         {
             "type": "java",
-            "name": "Main",
+            "name": "App",
             "request": "launch",
             "mainClass": "code.App",
-            "vmArgs": "--module-path 'C:/Users/allen/Desktop/CSE110/CSE110-MiniProject/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.base,javafx.fxml,javafx.graphics,javafx.media,javafx.web --add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED --add-exports javafx.base/com.sun.javafx.event=ALL-UNNAMED"
+            "vmArgs": "--module-path 'C:\\JavaFX\\openjfx-21_windows-x64_bin-sdk\\javafx-sdk-21\\lib' --add-modules javafx.controls,javafx.base,javafx.fxml,javafx.graphics,javafx.media,javafx.web --add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED --add-exports javafx.base/com.sun.javafx.event=ALL-UNNAMED"
         },
         {
             "type": "java",
@@ -35,21 +35,7 @@
         },
         {
             "type": "java",
-            "name": "ThreadingNoThread",
-            "request": "launch",
-            "mainClass": "multithreading.ThreadingNoThread",
-            "projectName": "cse110-lab5_d0dfa5ee"
-        },
-        {
-            "type": "java",
-            "name": "ThreadingWithThread",
-            "request": "launch",
-            "mainClass": "multithreading.ThreadingWithThread",
-            "projectName": "cse110-lab5_d0dfa5ee"
-        },
-        {
-            "type": "java",
-            "name": "MyServer",
+            "name": "AppServer",
             "request": "launch",
             "mainClass": "code.server.AppServer"
         }

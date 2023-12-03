@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 
 import code.client.Model.*;
+import code.server.IRecipeDb;
+import code.server.Recipe;
 
 /**
  * Test the delete recipe feature for four distinct test cases:
@@ -26,9 +28,9 @@ public class DeleteRecipeTest {
     public void setUp() {
         recipeDb = new RecipeListDb();
         // Create three different recipes
-        r1 = new Recipe("French Toast");
-        r2 = new Recipe("Mac and Cheese");
-        r3 = new Recipe("Steak and Potatoes");
+        r1 = new Recipe("French Toast", "Breakfast");
+        r2 = new Recipe("Mac and Cheese", "Lunch");
+        r3 = new Recipe("Steak and Potatoes", "Dinner");
         // Add the three recipes to the RecipeDb
         recipeDb.add(r1);
         recipeDb.add(r2);

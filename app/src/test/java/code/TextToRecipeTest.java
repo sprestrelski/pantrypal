@@ -3,7 +3,7 @@ package code;
 import org.junit.jupiter.api.Test;
 
 import code.client.Model.TextToRecipe;
-import code.client.Model.Recipe;
+import code.server.*;
 import code.client.Model.MockGPTService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +30,7 @@ public class TextToRecipeTest {
         String mealType = "BREAKFAST";
         String responseText = """
                 Fried Chicken and Egg Fried Rice
-
+                BREAKFAST
                 Ingredients:
 
                 - 2 chicken breasts, diced
@@ -60,7 +60,8 @@ public class TextToRecipeTest {
                 8. Drizzle with sesame oil, season with more salt and pepper if desired, and serve. Enjoy!
                 """;
         String parsedResponse = """
-                Title: Breakfast: Fried Chicken and Egg Fried Rice
+                Title: Fried Chicken and Egg Fried Rice
+                Meal tag: BREAKFAST
                 Ingredients:
                 2 chicken breasts, diced
                 2 large eggs
@@ -89,6 +90,7 @@ public class TextToRecipeTest {
         String mealType = "LUNCH";
         String responseText = """
                 Cheesy pasta bake
+                LUNCH
                 Ingredients:
                 - 1 lb pasta
                 - 1 lb ground beef
@@ -114,7 +116,8 @@ public class TextToRecipeTest {
                 9. Serve the cheesy pasta bake with garlic bread. Enjoy!
                 """;
         String parsedResponse = """
-                Title: Lunch: Cheesy pasta bake
+                Title: Cheesy pasta bake
+                Meal tag: LUNCH
                 Ingredients:
                 1 lb pasta
                 1 lb ground beef
@@ -149,8 +152,8 @@ public class TextToRecipeTest {
         String mealType = "DINNER";
         String responseText = """
 
-
                 Savory Beef Pasta Bake
+                DINNER
                 Ingredients:
                 - ½ pound of ground beef
                 - 1 box of your favorite pasta noodles
@@ -187,7 +190,8 @@ public class TextToRecipeTest {
                 11. Enjoy!
                     """;
         String parsedResponse = """
-                Title: Dinner: Savory Beef Pasta Bake
+                Title: Savory Beef Pasta Bake
+                Meal tag: DINNER
                 Ingredients:
                 ½ pound of ground beef
                 1 box of your favorite pasta noodles
@@ -223,6 +227,7 @@ public class TextToRecipeTest {
 
 
                 Savory Beef Pasta Bake
+                LUNCH
                 Ingredients:
                 - ½ pound of ground beef
                 - 1 box of your favorite pasta noodles
@@ -259,7 +264,8 @@ public class TextToRecipeTest {
                 11. Enjoy!
                     """;
         String parsedResponse = """
-                Title: Lunch: Savory Beef Pasta Bake
+                Title: Savory Beef Pasta Bake
+                Meal tag: LUNCH
                 Ingredients:
                 ½ pound of ground beef
                 1 box of your favorite pasta noodles

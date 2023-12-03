@@ -3,6 +3,10 @@ package code.client.Model;
 import java.io.Writer;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
+
+import code.server.Recipe;
+import code.server.IRecipeDb;
 
 public class RecipeCSVWriter {
     private final Writer writer;
@@ -18,8 +22,11 @@ public class RecipeCSVWriter {
         String ingredient, instruction;
 
         strBuilder.append(recipe.getId().toString()).append("::");
+        strBuilder.append(recipe.getAccountId().toString()).append("::");
         strBuilder.append(recipe.getTitle()).append("::");
+        strBuilder.append(recipe.getMealTag()).append("::");
 
+        // ingredients
         while (ingredientIter.hasNext()) {
             ingredient = ingredientIter.next();
             strBuilder.append(ingredient);
@@ -27,9 +34,9 @@ public class RecipeCSVWriter {
                 strBuilder.append(";;");
             }
         }
-
         strBuilder.append("::");
 
+        // instructions
         while (instructionIter.hasNext()) {
             instruction = instructionIter.next();
             strBuilder.append(instruction);
@@ -37,6 +44,13 @@ public class RecipeCSVWriter {
                 strBuilder.append(";;");
             }
         }
+        strBuilder.append("::");
+        // date
+        strBuilder.append(recipe.getDate());
+        strBuilder.append("::");
+
+        // image
+        strBuilder.append(recipe.getImage());
 
         strBuilder.append("\n");
         writer.write(strBuilder.toString());
@@ -47,10 +61,23 @@ public class RecipeCSVWriter {
         // use "::" as a delimiter for the csv files
         strBuilder.append("sep=::").append("\n");
         // add labels for the columns of the csv file
-        strBuilder.append("ID::Title::Ingredients::Instructions").append("\n");
+        strBuilder.append("ID::Account::Title::Tag::Ingredients::Instructions::Date::Image").append("\n");
         writer.write(strBuilder.toString());
 
         for (Recipe recipe : recipeDb.getList()) {
+            writeRecipe(recipe);
+        }
+    }
+
+    public void writeRecipeList(List<Recipe> recipes) throws IOException {
+        StringBuilder strBuilder = new StringBuilder();
+        // use "::" as a delimiter for the csv files
+        strBuilder.append("sep=::").append("\n");
+        // add labels for the columns of the csv file
+        strBuilder.append("ID::Account::Title::Tag::Ingredients::Instructions::Date::Image").append("\n");
+        writer.write(strBuilder.toString());
+
+        for (Recipe recipe : recipes) {
             writeRecipe(recipe);
         }
     }

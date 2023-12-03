@@ -1,13 +1,15 @@
 package code;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.stage.Stage;
-
+import javafx.stage.WindowEvent;
 import code.client.Model.*;
 import code.client.View.*;
 import code.server.AppServer;
 import code.client.Controllers.*;
 import javafx.scene.Scene;
+import code.server.IRecipeDb;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -19,7 +21,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        initDb();
+        // initDb(); To use CSV file
         initServer();
         server.start();
         drawUI(primaryStage);
@@ -32,9 +34,10 @@ public class App extends Application {
     private void drawUI(Stage primaryStage) throws IOException, URISyntaxException {
         View view = new View();
         Model model = new Model();
-        Controller controller = new Controller(view, model);
         Scene login = new Scene(view.getLoginUI().getRoot());
         view.setScene(login);
+        Controller controller = new Controller(view, model);
+
         ServerConnection connection = new ServerConnection(server);
 
         if (connection.isOnline()) {
@@ -50,18 +53,28 @@ public class App extends Application {
         primaryStage.setResizable(true);
         primaryStage.setMinWidth(620);
         primaryStage.setMinHeight(620);
+        primaryStage.setHeight(620);
+        primaryStage.setWidth(620);
         primaryStage.show();
+
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent we) {
+                // System.out.println("Stage is closing");
+                primaryStage.close();
+                System.exit(1);
+            }
+        });
     }
 
     private IRecipeDb initDb() throws IOException {
         recipeDb = new RecipeListDb();
-        RecipeCSVReader csvReader = new RecipeCSVReader(new FileReader(AppConfig.CSV_FILE));
+        RecipeCSVReader csvReader = new RecipeCSVReader(new FileReader(AppConfig.RECIPE_CSV_FILE));
         csvReader.readRecipeDb(recipeDb);
         csvReader.close();
         return recipeDb;
     }
 
     private void initServer() throws IOException {
-        server = new AppServer(recipeDb, AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+        server = new AppServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
     }
 }

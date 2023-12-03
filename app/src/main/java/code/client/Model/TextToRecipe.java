@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import code.server.Recipe;
 
 public abstract class TextToRecipe {
     public abstract String getResponse(String mealType, String ingredients)
@@ -22,10 +23,6 @@ public abstract class TextToRecipe {
     }
 
     public Recipe mapResponseToRecipe(String mealType, String responseText) {
-        char firstChar = mealType.charAt(0);
-        String lowerCased = mealType.toLowerCase();
-        String mealTypeTitle = Character.toUpperCase(firstChar) + lowerCased.substring(1);
-
         // Split the tokens into lines
         String[] tokenArr = responseText.split("\n");
         List<String> tokenList = new ArrayList<>(Arrays.asList(tokenArr));
@@ -41,11 +38,11 @@ public abstract class TextToRecipe {
         }
 
         // Create a new recipe with a title
-        Recipe recipe = new Recipe(mealTypeTitle + ": " + tokenList.get(0));
+        Recipe recipe = new Recipe(tokenList.get(0), tokenList.get(1));
 
         // Parse recipe's ingredients
         String ingredient;
-        for (i = 2; !tokenList.get(i).equals("Instructions:"); ++i) {
+        for (i = 3; !tokenList.get(i).equals("Instructions:"); ++i) {
             ingredient = removeDashFromIngredient(tokenList.get(i).trim());
             recipe.addIngredient(ingredient);
         }
