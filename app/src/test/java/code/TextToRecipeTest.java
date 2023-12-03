@@ -3,10 +3,19 @@ package code;
 import org.junit.jupiter.api.Test;
 
 import code.client.Model.TextToRecipe;
+import code.client.Model.VoiceToText;
 import code.server.*;
+import code.client.Model.MockDallEService;
 import code.client.Model.MockGPTService;
+import code.client.Model.MockWhisperService;
+import code.client.Model.RecipeToImage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class TextToRecipeTest {
 
@@ -14,6 +23,32 @@ public class TextToRecipeTest {
     /**
      * Integration test for provide recipe
      */
+    public void testProvideRecipeIntegration() throws IOException, URISyntaxException, InterruptedException {
+        // record and process audio
+        VoiceToText voiceToText = new MockWhisperService();
+        String mealType = voiceToText.processAudio("mealtype");
+        String ingredients = voiceToText.processAudio("ingredients");
+
+        // build prompt for chatGPT
+        TextToRecipe textToRecipe = new MockGPTService();
+        String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Breakfast. Chicken, eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
+        String response = textToRecipe.buildPrompt(mealType, ingredients);
+        assertEquals(prompt, response);
+
+        // create Recipe object from response
+        String responseText = textToRecipe.getResponse(mealType, ingredients);
+        Recipe chatGPTrecipe = textToRecipe.mapResponseToRecipe(mealType, responseText);
+        RecipeToImage recipeToImage = new MockDallEService();
+        chatGPTrecipe.setImage(recipeToImage.getResponse(chatGPTrecipe.getTitle()));
+        assertEquals("Fried Chicken", chatGPTrecipe.getTitle());
+        assertEquals("Breakfast", chatGPTrecipe.getMealTag());
+        assertNotNull(chatGPTrecipe.getImage());
+    }
+
+    /**
+     * Unit tests for Recipe features
+     */
+    @Test
     public void testPromptBuild() {
         TextToRecipe textToRecipe = new MockGPTService();
         String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Lunch. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
@@ -22,9 +57,40 @@ public class TextToRecipeTest {
     }
 
     @Test
-    /**
-     * Unit tests for Recipe features
-     */
+    public void testRefreshRecipe() throws IOException, InterruptedException, URISyntaxException {
+        TextToRecipe textToRecipe = new MockGPTService();
+        String initialResponse = textToRecipe.getResponse("breakfast", "chicken, eggs");
+        String expectedResponse = """
+                Fried Chicken
+                breakfast
+                Ingredients:
+                - 2 chicken breasts, diced
+                - 2 eggs
+                Instructions:
+                1. Crack 2 eggs into bowl.
+                2. Add chicken into bowl and then fry.
+                3. Enjoy!
+                """;
+        assertEquals(expectedResponse, initialResponse);
+
+        // simulate refresh
+        textToRecipe.setSampleRecipe("""
+                Fried Chicken and Egg Fried Rice
+                breakfast
+                Ingredients:
+
+                - 2 chicken breasts, diced
+                - 2 large eggs
+                - 2 cups cooked rice
+                - 2 tablespoons vegetable oil
+                - 2 tablespoons soy sauce
+                - 1 teaspoon sesame oil
+                - Salt and pepper to taste""");
+        String refreshResponse = textToRecipe.getResponse("breakfast", "chicken, eggs");
+        assertNotEquals(initialResponse, refreshResponse);
+    }
+
+    @Test
     public void testParseJSON() {
         TextToRecipe textToRecipe = new MockGPTService();
         String mealType = "BREAKFAST";
