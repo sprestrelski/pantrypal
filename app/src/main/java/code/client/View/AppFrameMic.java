@@ -241,8 +241,8 @@ public class AppFrameMic extends BorderPane {
             // recordingLabel1.setStyle("");
 
             try {
-                voiceToText = new WhisperService();
-                mealType = voiceToText.processAudio().toLowerCase();
+                voiceToText = new MockWhisperService();
+                mealType = voiceToText.processAudio("mealtype").toLowerCase();
                 // type check
                 if (mealType.contains("breakfast")) {
                     mealTypeSelection.getMealType().setText("Breakfast");
@@ -276,8 +276,8 @@ public class AppFrameMic extends BorderPane {
             // recordingLabel2.setStyle("");
 
             try {
-                voiceToText = new WhisperService();
-                ingredients = voiceToText.processAudio();
+                voiceToText = new MockWhisperService();
+                ingredients = voiceToText.processAudio("ingredients");
                 String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
 
                 if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*") ||

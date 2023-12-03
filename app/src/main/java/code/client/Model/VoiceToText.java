@@ -14,7 +14,7 @@ public abstract class VoiceToText {
         this.connection = connection;
     }
 
-    public String processAudio() throws IOException, URISyntaxException {
+    public String processAudio(String type) throws IOException, URISyntaxException {
         return handleResponse();
     }
 

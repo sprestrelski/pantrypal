@@ -4,7 +4,7 @@ import code.client.Model.*;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Priority;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import code.server.Recipe;
 
@@ -68,6 +68,7 @@ public class DetailsAppFrame {
         String title = recipeInfo.getTitleField().getText();
         String ingredients = recipeInfo.getIngredientsField().getText();
         String instructions = recipeInfo.getInstructionsField().getText();
+        String image = recipeInfo.getImageString();
 
         /// Use Trung's deformatting here.
         String[] ingr = ingredients.split("\n");
@@ -81,6 +82,7 @@ public class DetailsAppFrame {
         for (String instruction : instr) {
             edit.addInstruction(instruction);
         }
+        edit.setImage(image);
 
         return edit;
     }
@@ -114,13 +116,17 @@ public class DetailsAppFrame {
         title.setAlignment(Pos.TOP_CENTER);
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
 
+        ImageView recipeImgView = new ImageView(recipeInfo.getImage());
+        recipeImgView.setFitHeight(100);
+        recipeImgView.setPreserveRatio(true);
+
         HBox topButtons = new HBox();
         topButtons.setSpacing(100);
         topButtons.setAlignment(Pos.CENTER);
         topButtons.getChildren().addAll(backToHomeButton, refreshButton);
         HBox.setHgrow(topButtons, Priority.ALWAYS);
 
-        detailedUI.getChildren().addAll(topButtons, title);
+        detailedUI.getChildren().addAll(topButtons, title, recipeImgView);
         setupContainer.getChildren().add(recipeInfo);
         detailedUI.getChildren().add(setupContainer);
 

@@ -73,7 +73,8 @@ public class RecipeMongoDb implements IRecipeDb {
                 .append("title", recipe.getTitle())
                 .append("mealTag", recipe.getMealTag())
                 .append("ingredients", Lists.newArrayList(recipe.getIngredientIterator()))
-                .append("instructions", Lists.newArrayList(recipe.getInstructionIterator()));
+                .append("instructions", Lists.newArrayList(recipe.getInstructionIterator()))
+                .append("image", recipe.getImage());
         recipeDocumentCollection.insertOne(recipeDocument);
         return true;
     }

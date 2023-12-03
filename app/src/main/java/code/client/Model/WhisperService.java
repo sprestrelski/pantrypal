@@ -12,10 +12,10 @@ public class WhisperService extends VoiceToText {
     }
 
     // https://stackoverflow.com/questions/25334139/how-to-mock-a-url-connection
-    public String processAudio() throws IOException, URISyntaxException {
+    public String processAudio(String type) throws IOException, URISyntaxException {
         // Send HTTP request
         sendHttpRequest();
-        return super.processAudio();
+        return super.processAudio(type);
     }
 
     private void sendHttpRequest() throws IOException, URISyntaxException {
