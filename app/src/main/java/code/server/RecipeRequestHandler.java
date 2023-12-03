@@ -133,20 +133,14 @@ public class RecipeRequestHandler implements HttpHandler {
 
     private String handleDelete(HttpExchange httpExchange) throws IOException {
         String response = "Invalid DELETE request";
-        URI uri = httpExchange.getRequestURI();
-        String query = uri.getRawQuery();
-
-        if (query != null) {
-            String id = query.substring(query.indexOf("=") + 1);
-            Recipe recipe = recipeDb.remove(id);
-            if (recipe != null) {
-                response = recipe.toString();
-                System.out.println("Queried for " + id + " and found " + recipe.getTitle());
-            } else {
-                System.out.println("Recipe not found.");
-            }
-        }
-
+        InputStream inStream = httpExchange.getRequestBody();
+        Scanner scanner = new Scanner(inStream);
+        String postData = scanner.nextLine();
+        Recipe recipe = buildRecipeFromPostData(postData);
+        recipeDb.remove(recipe.getId());
+        response = "Removed entry " + recipe.getTitle();
+        System.out.println(response);
+        scanner.close();
         return response;
     }
 }

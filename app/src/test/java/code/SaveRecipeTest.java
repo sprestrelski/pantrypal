@@ -11,8 +11,6 @@ import code.client.Model.RecipeCSVWriter;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
-import java.util.List;
 
 /**
  * Test the save recipe list feature for three distinct test cases:
@@ -39,10 +37,10 @@ public class SaveRecipeTest {
                 // Initialize a RecipeDb
                 recipeDb = new RecipeListDb();
                 // Initialize two simple recipes
-                r1 = new Recipe(RECIPE_ID1, ACCOUNT_ID, "Plain Spaghetti", "breakfast", "error");
+                r1 = new Recipe(RECIPE_ID1, ACCOUNT_ID, "Plain Spaghetti", "breakfast", 1, "error");
                 r1.addIngredient("Spaghetti noodles");
                 r1.addInstruction("Boil the noodles");
-                r2 = new Recipe(RECIPE_ID2, ACCOUNT_ID, "Steak", "lunch", "error");
+                r2 = new Recipe(RECIPE_ID2, ACCOUNT_ID, "Steak", "lunch", 1, "error");
                 r2.addIngredient("Raw beef");
                 r2.addInstruction("Cook the beef");
                 // Create a mock "recipes.csv" file
@@ -62,11 +60,11 @@ public class SaveRecipeTest {
                 /**
                  * The recipes.csv file should now look like the following:
                  * sep=::
-                 * ID::Account::Title::Tag::Ingredients::Instructions
+                 * ID::Account::Title::Tag::Ingredients::Instructions::Date::Image
                  */
                 // Initialize a helper variable to store the expected contents of the CSV file
                 expected = new StringBuilder();
-                expected.append("sep=::\nID::Account::Title::Tag::Ingredients::Instructions::Image\n");
+                expected.append("sep=::\nID::Account::Title::Tag::Ingredients::Instructions::Date::Image\n");
                 assertEquals(expected.toString(), writer.toString());
                 // Add a new recipe to the recipe database
                 recipeDb.clear();
@@ -78,7 +76,7 @@ public class SaveRecipeTest {
                 /**
                  * The recipes.csv file should now look like the following:
                  * sep=::
-                 * ID::Account::Title::Tag::Ingredients::Instructions::Image
+                 * ID::Account::Title::Tag::Ingredients::Instructions::Date::Image
                  * 107c7f79bcf86cd7994f6c0e::107c7f79bcf86cd7994f6c0e::Plain
                  * Spaghetti::breakfast::Spaghetti noodles::Boil the noodles::error
                  */
@@ -87,7 +85,7 @@ public class SaveRecipeTest {
                                 .append(ACCOUNT_ID)
                                 .append("::Plain Spaghetti::")
                                 .append("breakfast")
-                                .append("::Spaghetti noodles::Boil the noodles::error\n");
+                                .append("::Spaghetti noodles::Boil the noodles::1::error\n");
                 assertEquals(expected.toString(), strWriter.toString());
         }
 
@@ -112,26 +110,26 @@ public class SaveRecipeTest {
                 /**
                  * The recipes.csv file should look like the following:
                  * sep=::
-                 * ID::Account::Title::Tag::Ingredients::Instructions
+                 * ID::Account::Title::Tag::Ingredients::Instructions::Date::Image
                  * 107c7f79bcf86cd7994f6c0e::107c7f79bcf86cd7994f6c0e
                  * ::Plain Spaghetti::breakfast::Spaghetti noodles::Boil the noodles
                  * 107c7f79bcf86cd7994f6c0e::107c7f79bcf86cd7994f6c0e::Steak::lunch::Raw
                  * beef::Cook the beef
                  */
                 expected = new StringBuilder();
-                expected.append("sep=::\nID::Account::Title::Tag::Ingredients::Instructions::Image\n")
+                expected.append("sep=::\nID::Account::Title::Tag::Ingredients::Instructions::Date::Image\n")
                                 .append(RECIPE_ID1)
                                 .append("::")
                                 .append(ACCOUNT_ID)
                                 .append("::Plain Spaghetti::")
                                 .append("breakfast")
-                                .append("::Spaghetti noodles::Boil the noodles::error\n")
+                                .append("::Spaghetti noodles::Boil the noodles::1::error\n")
                                 .append(RECIPE_ID2)
                                 .append("::")
                                 .append(ACCOUNT_ID)
                                 .append("::Steak::")
                                 .append("lunch")
-                                .append("::Raw beef::Cook the beef::error\n");
+                                .append("::Raw beef::Cook the beef::1::error\n");
                 assertEquals(expected.toString(), strWriter.toString());
         }
 
@@ -155,26 +153,26 @@ public class SaveRecipeTest {
                 /**
                  * The recipes.csv file should look like the following:
                  * sep=::
-                 * ID::Account::Title::Tag::Ingredients::Instructions
+                 * ID::Account::Title::Tag::Ingredients::Instructions::Date::Image
                  * 107c7f79bcf86cd7994f6c0e::107c7f79bcf86cd7994f6c0e::Plain
                  * Spaghetti::breakfast::Spaghetti noodles::Boil the noodles
                  * 107c7f79bcf86cd7994f6c0e::107c7f79bcf86cd7994f6c0e
                  * ::Steak::lunch::Raw beef::Cook the beef;;Add steak sauce
                  */
                 expected = new StringBuilder();
-                expected.append("sep=::\nID::Account::Title::Tag::Ingredients::Instructions::Image\n")
+                expected.append("sep=::\nID::Account::Title::Tag::Ingredients::Instructions::Date::Image\n")
                                 .append(RECIPE_ID1)
                                 .append("::")
                                 .append(ACCOUNT_ID)
                                 .append("::Plain Spaghetti::")
                                 .append("breakfast")
-                                .append("::Spaghetti noodles::Boil the noodles::error\n")
+                                .append("::Spaghetti noodles::Boil the noodles::1::error\n")
                                 .append(RECIPE_ID2)
                                 .append("::")
                                 .append(ACCOUNT_ID)
                                 .append("::Steak::")
                                 .append("lunch")
-                                .append("::Raw beef::Cook the beef;;Add steak sauce::error\n");
+                                .append("::Raw beef::Cook the beef;;Add steak sauce::1::error\n");
                 assertEquals(expected.toString(), strWriter.toString());
         }
 }

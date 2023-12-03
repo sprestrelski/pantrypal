@@ -13,6 +13,7 @@ import code.client.Model.RecipeCSVWriter;
 
 public class RecipeListUI extends VBox {
     private IRecipeDb recipeDb;
+    private String name;
 
     RecipeListUI() throws IOException {
         this.setSpacing(5);

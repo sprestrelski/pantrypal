@@ -52,7 +52,7 @@ public class Model {
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
 
-            if (method.equals("POST") || method.equals("PUT")) {
+            if (method.equals("POST") || method.equals("PUT") || method.equals("DELETE")) {
                 OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
                 out.write(recipe);
                 out.flush();

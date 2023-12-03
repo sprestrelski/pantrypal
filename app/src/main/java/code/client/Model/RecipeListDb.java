@@ -7,7 +7,7 @@ import code.server.Recipe;
 import code.server.IRecipeDb;
 
 public class RecipeListDb implements IRecipeDb {
-    private final List<Recipe> recipeList = new ArrayList<>();
+    private List<Recipe> recipeList = new ArrayList<>();
 
     @Override
     public boolean add(Recipe recipe) {
@@ -26,7 +26,6 @@ public class RecipeListDb implements IRecipeDb {
                 return recipe;
             }
         }
-
         return null;
     }
 

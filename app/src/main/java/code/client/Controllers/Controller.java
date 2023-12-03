@@ -2,6 +2,7 @@ package code.client.Controllers;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,10 +17,13 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -28,10 +32,20 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import code.client.Model.*;
 import code.client.View.AppAlert;
+import code.client.View.AppFrameHome;
 import code.client.View.DetailsAppFrame;
 import code.server.Recipe;
 
 public class Controller {
+    // Index of newest to oldest in sorting drop down menu, index of breakfast in filtering drop down menu
+    private final int NEWEST_TO_OLDEST_INDEX = 0, BREAKFAST_INDEX = 0;
+    // Index of oldest to newest in sorting drop down menu, index of lunch in filtering drop down menu
+    private final int OLDEST_TO_NEWEST_INDEX = 1, LUNCH_INDEX = 1;
+    // Index of A to Z in sorting drop down menu, index of dinner in filtering drop down menu
+    private final int A_TO_Z_INDEX = 2, DINNER_INDEX = 2;
+    // Index of Z to A in sorting drop down menu, index of none in filtering drop down menu
+    private final int Z_TO_A_INDEX = 3, NONE_INDEX = 3;
+    
     private Account account;
     private Model model;
     private View view;
@@ -59,6 +73,22 @@ public class Controller {
             }
         });
 
+        // this.view.getAppFrameHome().setSortMenuButtonAction(event -> {
+        //     try {
+        //         handleSortMenuButton(event);
+        //     } catch (Exception e) {
+        //         e.printStackTrace();
+        //     }
+        // });
+
+        // this.view.getAppFrameHome().setFilterMenuButtonAction(event -> {
+        //     try {
+        //         handleFilterMenuButton(event);
+        //     } catch (Exception e) {
+        //         e.printStackTrace();
+        //     }
+        // });
+
         this.view.getAppFrameHome().setLogOutButtonAction(event -> {
             handleLogOutOutButton(event);
         });
@@ -79,6 +109,9 @@ public class Controller {
 
     private void handleRecipePostButton(ActionEvent event) throws IOException {
         Recipe postedRecipe = view.getDetailedView().getDisplayedRecipe();
+        Date currTime = new Date();
+        postedRecipe.setDate(currTime.getTime());
+
         Button saveButtonFromDetailed = view.getDetailedView().getSaveButton();
         saveButtonFromDetailed.setStyle(blinkStyle);
         PauseTransition pause = new PauseTransition(Duration.seconds(1));
@@ -127,7 +160,72 @@ public class Controller {
         view.goToAudioCapture();
         this.view.getAppFrameMic().setGoToDetailedButtonAction(this::handleDetailedViewFromNewRecipeButton);
         this.view.getAppFrameMic().setGoToHomeButtonAction(this::handleHomeButton);
+    }
 
+    // private void handleSortButton(ActionEvent event) {
+    //     ChoiceBox<String> sortChoiceBox = view.getAppFrameHome().getSortChoiceBox();
+    //     RecipeListUI list = view.getAppFrameHome().getRecipeList();
+    //     view.getAppFrameHome().getSortButton().setOnAction(e -> {
+    //         sortChoiceBox.show();
+    //     });
+    // }
+
+    private void addFilterListeners() {
+        RecipeListUI list = view.getAppFrameHome().getRecipeList();
+        MenuButton filterMenuButton = view.getAppFrameHome().getFilterMenuButton();
+        ObservableList<MenuItem> filterMenuItems = filterMenuButton.getItems();
+
+        // Filter to show only breakfast recipes when criteria is selected
+        filterMenuItems.get(BREAKFAST_INDEX).setOnAction(e -> {
+            System.out.println("Filter Breakfast");
+        });
+        // Filter to show only lunch recipes when criteria is selected
+        filterMenuItems.get(LUNCH_INDEX).setOnAction(e -> {
+            System.out.println("Filter Lunch");
+        });
+        // Filter to show only dinner recipes when criteria is selected
+        filterMenuItems.get(DINNER_INDEX).setOnAction(e -> {
+            System.out.println("Filter Dinner");
+        });
+        // Remove selected filter to show breakfast, lunch, and dinner recipes
+        filterMenuItems.get(NONE_INDEX).setOnAction(e -> {
+            System.out.println("Filter none");
+        });
+    }
+
+    private void addSortingListener() {
+        RecipeListUI list = this.view.getAppFrameHome().getRecipeList();
+        MenuButton sortMenuButton = view.getAppFrameHome().getSortMenuButton();
+        ObservableList<MenuItem> sortMenuItems = sortMenuButton.getItems();
+        RecipeSorter recipeSorter = new RecipeSorter(list.getRecipeDB().getList());
+        // Setting action for newest to oldest sorting criteria
+        sortMenuItems.get(NEWEST_TO_OLDEST_INDEX).setOnAction(e -> {
+            recipeSorter.sortNewestToOldest();
+            // String msg = sortMenuItems.get(NEWEST_TO_OLDEST_INDEX).getText();
+            // sortMenuItems.get(NEWEST_TO_OLDEST_INDEX).setText(msg + "✔");
+            this.view.getAppFrameHome().updateDisplay();
+        });
+        // Setting action for oldest to newest sorting criteria
+        sortMenuItems.get(OLDEST_TO_NEWEST_INDEX).setOnAction(e -> {
+            recipeSorter.sortOldestToNewest();
+            // String msg = sortMenuItems.get(OLDEST_TO_NEWEST_INDEX).getText();
+            // sortMenuItems.get(OLDEST_TO_NEWEST_INDEX).setText(msg + "✔");
+            this.view.getAppFrameHome().updateDisplay();
+        });
+        // Setting action for A to Z sorting criteria
+        sortMenuItems.get(A_TO_Z_INDEX).setOnAction(e -> {
+            recipeSorter.sortAToZ();
+            // String msg = sortMenuItems.get(A_TO_Z_INDEX).getText();
+            // sortMenuItems.get(A_TO_Z_INDEX).setText(msg + "✔");
+            this.view.getAppFrameHome().updateDisplay();
+        });
+        // Setting action for Z to A sorting criteria
+        sortMenuItems.get(Z_TO_A_INDEX).setOnAction(e -> {
+            recipeSorter.sortZToA();
+            // String msg = sortMenuItems.get(Z_TO_A_INDEX).getText();
+            // sortMenuItems.get(Z_TO_A_INDEX).setText(msg + "✔");
+            this.view.getAppFrameHome().updateDisplay();
+        });
     }
 
     private void handleLogOutOutButton(ActionEvent event) {
@@ -142,13 +240,18 @@ public class Controller {
     }
 
     public void addListenersToList() {
+        addSortingListener();
+        addFilterListeners();
         RecipeListUI list = view.getAppFrameHome().getRecipeList();
         for (int i = 0; i < list.getChildren().size(); i++) {
             RecipeUI currRecipe = (RecipeUI) list.getChildren().get(i);
             currRecipe.getDeleteButton().setOnAction(e -> {
-                setTitle(currRecipe.getRecipeName());
-                String uuid = currRecipe.getId();
-                model.performRecipeRequest("DELETE", null, uuid);
+                try {
+                    deleteGivenRecipe(currRecipe.getRecipe());
+                } catch (IOException e1) {
+                    System.out.println("Could not delete recipe with id:title of " + currRecipe.getRecipe().getId() + ":" + currRecipe.getRecipe().getTitle() );
+                    e1.printStackTrace();
+                }
             });
             currRecipe.getDetailsButton().setOnAction(e -> {
                 view.goToDetailedView(currRecipe.getRecipe(), true);
@@ -202,7 +305,13 @@ public class Controller {
             }
         });
         detailedView.setEditButtonAction(this::handleEditButton);
-        detailedView.setDeleteButtonAction(this::handleDeleteButton);
+        detailedView.setDeleteButtonAction(event -> {
+            try {
+                handleDeleteButton(event);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         detailedView.setHomeButtonAction(this::handleHomeButton);
         detailedView.setShareButtonAction(this::handleShareButton);
         detailedView.setRefreshButtonAction(this::handleRefreshButton);
@@ -214,9 +323,22 @@ public class Controller {
         changeEditButtonColor(edit);
     }
 
-    private void handleDeleteButton(ActionEvent event) {
-        String uuid = UUID.fromString(title).toString();
-        model.performRecipeRequest("DELETE", null, uuid);
+    private void handleDeleteButton(ActionEvent event) throws IOException {
+        DetailsAppFrame detailsAppFrame = this.view.getDetailedView();
+        Recipe displayed = detailsAppFrame.getDisplayedRecipe();
+        deleteGivenRecipe(displayed);
+        
+    }
+    private void deleteGivenRecipe(Recipe recipe) throws IOException {
+        Writer writer = new StringWriter();
+        recipeWriter = new RecipeCSVWriter(writer);
+        recipeWriter.writeRecipe(recipe);
+
+        String recipeStr = writer.toString();
+
+        System.out.println("Deleting id: " + recipe.getId());
+        model.performRecipeRequest("DELETE", recipeStr, null);
+        this.view.getAppFrameHome().updateDisplay();
     }
 
     private void handleShareButton(ActionEvent event) {

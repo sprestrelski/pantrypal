@@ -28,7 +28,7 @@ public class RecipeMongoDb implements IRecipeDb {
         Recipe recipe = gson.fromJson(recipeDocument.toJson(), Recipe.class);
         JsonObject jsonObj = JsonParser.parseString(recipeDocument.toJson().toString()).getAsJsonObject();
         String recipeId = jsonObj.getAsJsonObject("_id").get("$oid").getAsString();
-        recipe.setID(recipeId);
+        recipe.setId(recipeId);
         // System.out.println(recipe.getId());
         return recipe;
     }
@@ -74,6 +74,7 @@ public class RecipeMongoDb implements IRecipeDb {
                 .append("mealTag", recipe.getMealTag())
                 .append("ingredients", Lists.newArrayList(recipe.getIngredientIterator()))
                 .append("instructions", Lists.newArrayList(recipe.getInstructionIterator()))
+                .append("date",recipe.getDate())
                 .append("image", recipe.getImage());
         recipeDocumentCollection.insertOne(recipeDocument);
         return true;

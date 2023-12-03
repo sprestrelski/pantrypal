@@ -1,10 +1,6 @@
 package code.server;
 
 import java.io.Reader;
-
-import code.server.Recipe;
-import code.server.IRecipeDb;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 
@@ -23,8 +19,9 @@ public class RecipeCSVReader {
         String mealTag = recipeTokens[3];
         String[] ingredientTokens = recipeTokens[4].split(";;");
         String[] instructionTokens = recipeTokens[5].split(";;");
-        String image = recipeTokens[6];
-        Recipe recipe = new Recipe(id, accountId, title, mealTag, image);
+        String date = recipeTokens[6];
+        String image = recipeTokens[7];
+        Recipe recipe = new Recipe(id, accountId, title, mealTag, Long.parseLong(date), image);
         // error occurred, images have a pretty long bytestring
         if (image.length() < 256) {
             recipe.setDefaultImage();

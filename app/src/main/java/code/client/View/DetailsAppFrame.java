@@ -1,5 +1,7 @@
 package code.client.View;
 
+import java.util.Date;
+
 import code.client.Model.*;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -7,7 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import code.server.Recipe;
-
+import code.server.RecipeBuilder;
 import javafx.event.*;
 
 public class DetailsAppFrame {
@@ -16,6 +18,7 @@ public class DetailsAppFrame {
     private Button backToHomeButton, editButton, saveButton, deleteButton, refreshButton, shareButton;
     private VBox detailedUI;
     private String defaultButtonStyle, onStyle, offStyle;
+    private boolean isOldRecipe;
 
     public DetailsAppFrame() {
 
@@ -53,6 +56,8 @@ public class DetailsAppFrame {
         shareButton.setStyle(defaultButtonStyle);
         shareButton.setAlignment(Pos.BOTTOM_RIGHT);
 
+        
+
         // Default recipe
         currentRecipe = getMockedRecipe();
     }
@@ -74,9 +79,19 @@ public class DetailsAppFrame {
         String[] ingr = ingredients.split("\n");
         String[] instr = instructions.split("\n");
 
-        Recipe edit = new Recipe(title, currentRecipe.getMealTag());
-        edit.setAccountId(currentRecipe.getAccountId());
-        edit.setID(currentRecipe.getId());
+        RecipeBuilder builder = new RecipeBuilder(currentRecipe.getAccountId(),title);
+            builder.setMealTag(currentRecipe.getMealTag());
+            builder.setId(currentRecipe.getId());
+
+        if(isOldRecipe) {
+            builder.setDate(currentRecipe.getDate());
+        }
+        else {
+            Date currDate = new Date();
+            builder.setDate(currDate.getTime());
+        }
+        
+        Recipe edit = builder.buildRecipe();
         for (String ingredient : ingr) {
             edit.addIngredient(ingredient);
         }
@@ -95,8 +110,9 @@ public class DetailsAppFrame {
      */
     private Recipe getMockedRecipe() {
         // Hardcoded value for now, recipe value for it should be changing
-        Recipe temp = new Recipe("Fried Chicken and Egg Fried Rice", "BREAKFAST");
-        temp.setAccountId("656a2e6d8a659b00c86888b8"); // Chris's account ID
+        RecipeBuilder builder = new RecipeBuilder("656a2e6d8a659b00c86888b8","Fried Chicken and Egg Fried Rice");
+            builder.setMealTag("BREAKFAST");
+        Recipe temp = builder.buildRecipe();    // Chris's account ID
         temp.addIngredient("2 chicken breasts, diced");
         temp.addIngredient("2 large eggs");
         temp.addIngredient("2 cups cooked rice");
@@ -173,6 +189,7 @@ public class DetailsAppFrame {
             refreshButton.setVisible(false);
         }
         updateDisplay();
+        isOldRecipe = old;
         return detailedUI;
     }
 
