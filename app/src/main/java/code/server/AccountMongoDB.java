@@ -64,7 +64,7 @@ public class AccountMongoDB implements IAccountDb {
     @Override
     public boolean add(Account account) {
         String username = account.getUsername();
-        if (findByUsername(username) != null) {
+        if (findByUsername(username) != null || username.isEmpty()) {
             return false;
         }
 
