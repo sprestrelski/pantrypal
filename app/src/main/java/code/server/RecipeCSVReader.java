@@ -14,7 +14,7 @@ public class RecipeCSVReader {
         buffReader = new BufferedReader(reader);
     }
 
-    private Recipe readRecipe(String recipeStr) throws IOException {
+    public Recipe readRecipe(String recipeStr) throws IOException {
         String[] recipeTokens = recipeStr.split("::");
         String id = recipeTokens[0];
         String accountId = recipeTokens[1];

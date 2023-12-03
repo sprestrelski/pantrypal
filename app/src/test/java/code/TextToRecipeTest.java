@@ -30,7 +30,7 @@ public class TextToRecipeTest {
         String mealType = "BREAKFAST";
         String responseText = """
                 Fried Chicken and Egg Fried Rice
-
+                BREAKFAST
                 Ingredients:
 
                 - 2 chicken breasts, diced
@@ -90,6 +90,7 @@ public class TextToRecipeTest {
         String mealType = "LUNCH";
         String responseText = """
                 Cheesy pasta bake
+                LUNCH
                 Ingredients:
                 - 1 lb pasta
                 - 1 lb ground beef
@@ -151,8 +152,8 @@ public class TextToRecipeTest {
         String mealType = "DINNER";
         String responseText = """
 
-
                 Savory Beef Pasta Bake
+                DINNER
                 Ingredients:
                 - ½ pound of ground beef
                 - 1 box of your favorite pasta noodles
@@ -226,6 +227,7 @@ public class TextToRecipeTest {
 
 
                 Savory Beef Pasta Bake
+                LUNCH
                 Ingredients:
                 - ½ pound of ground beef
                 - 1 box of your favorite pasta noodles

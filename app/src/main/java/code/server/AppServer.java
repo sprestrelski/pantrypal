@@ -21,13 +21,14 @@ public class AppServer extends BaseServer {
     private final static int NUM_THREADS = 10;
     private HttpServer httpServer;
 
-    public AppServer(IRecipeDb recipeDb, String hostName, int port) {
+    public AppServer(String hostName, int port) {
         super(hostName, port);
-        this.recipeDb = recipeDb;
         MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN);
         MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
         MongoCollection<Document> userCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
+        MongoCollection<Document> recipeCollection = mongoDb.getCollection(AppConfig.MONGO_RECIPE_COLLECTION);
         accountMongoDB = new AccountMongoDB(userCollection);
+        recipeDb = new RecipeMongoDb(recipeCollection);
     }
 
     @Override

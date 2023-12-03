@@ -3,6 +3,8 @@ package code.client.Model;
 import java.io.Writer;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
+
 import code.server.Recipe;
 import code.server.IRecipeDb;
 
@@ -55,6 +57,19 @@ public class RecipeCSVWriter {
         writer.write(strBuilder.toString());
 
         for (Recipe recipe : recipeDb.getList()) {
+            writeRecipe(recipe);
+        }
+    }
+
+    public void writeRecipeList(List<Recipe> recipes) throws IOException {
+        StringBuilder strBuilder = new StringBuilder();
+        // use "::" as a delimiter for the csv files
+        strBuilder.append("sep=::").append("\n");
+        // add labels for the columns of the csv file
+        strBuilder.append("ID::Account::Title::Tag::Ingredients::Instructions").append("\n");
+        writer.write(strBuilder.toString());
+
+        for (Recipe recipe : recipes) {
             writeRecipe(recipe);
         }
     }

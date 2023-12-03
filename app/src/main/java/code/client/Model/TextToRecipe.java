@@ -38,11 +38,11 @@ public abstract class TextToRecipe {
         }
 
         // Create a new recipe with a title
-        Recipe recipe = new Recipe(tokenList.get(0), mealType);
+        Recipe recipe = new Recipe(tokenList.get(0), tokenList.get(1));
 
         // Parse recipe's ingredients
         String ingredient;
-        for (i = 2; !tokenList.get(i).equals("Instructions:"); ++i) {
+        for (i = 3; !tokenList.get(i).equals("Instructions:"); ++i) {
             ingredient = removeDashFromIngredient(tokenList.get(i).trim());
             recipe.addIngredient(ingredient);
         }

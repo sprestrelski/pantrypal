@@ -88,7 +88,6 @@ public class AppFrameHome extends BorderPane {
         header = new Header();
         recipeList = new RecipeListUI();
         footer = new Footer();
-        recipeList.loadRecipes();
         ScrollPane scroller = new ScrollPane(recipeList);
         scroller.setFitToWidth(true);
         scroller.setFitToHeight(true);

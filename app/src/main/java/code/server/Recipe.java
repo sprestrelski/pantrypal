@@ -6,8 +6,8 @@ import java.util.List;
 import org.bson.types.ObjectId;
 
 public class Recipe {
-    private final String id;
-    private String accountId;
+    private String id;
+    private String userID;
     private String title;
     private String mealTag;
     private final List<String> ingredients = new ArrayList<>();
@@ -15,7 +15,7 @@ public class Recipe {
 
     public Recipe(String id, String accountId, String title, String mealTag) {
         this.id = id;
-        this.accountId = accountId;
+        this.userID = accountId;
         this.title = title;
         this.mealTag = mealTag;
     }
@@ -32,12 +32,16 @@ public class Recipe {
         return id;
     }
 
+    public void setID(String accountID) {
+        id = accountID;
+    }
+
     public void setAccountId(String accountId) {
-        this.accountId = accountId;
+        this.userID = accountId;
     }
 
     public String getAccountId() {
-        return accountId;
+        return userID;
     }
 
     public void setTitle(String title) {
@@ -96,6 +100,10 @@ public class Recipe {
         if (!(obj instanceof Recipe recipe)) {
             return false;
         }
-        return id.equals(recipe.id);
+        return title.equals(recipe.getTitle()) &&
+                mealTag.equals(recipe.mealTag) &&
+                ingredients.equals(recipe.ingredients) &&
+                instructions.equals(recipe.instructions);
     }
+
 }

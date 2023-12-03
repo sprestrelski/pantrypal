@@ -93,6 +93,7 @@ public class DetailsAppFrame {
     private Recipe getMockedRecipe() {
         // Hardcoded value for now, recipe value for it should be changing
         Recipe temp = new Recipe("Fried Chicken and Egg Fried Rice", "BREAKFAST");
+        temp.setAccountId("656a2e6d8a659b00c86888b8"); // Chris's account ID
         temp.addIngredient("2 chicken breasts, diced");
         temp.addIngredient("2 large eggs");
         temp.addIngredient("2 cups cooked rice");

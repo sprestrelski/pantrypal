@@ -9,6 +9,7 @@ public class MockGPTService extends TextToRecipe {
             throws IOException, InterruptedException, URISyntaxException {
         return """
                 Fried Chicken
+                breakfast
                 Ingredients:
                 - 2 chicken breasts, diced
                 - 2 eggs

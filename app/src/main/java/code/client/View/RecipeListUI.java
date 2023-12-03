@@ -11,7 +11,7 @@ import code.server.IRecipeDb;
 import code.client.Model.RecipeCSVReader;
 import code.client.Model.RecipeCSVWriter;
 
-// TODO: SERVER Controller that sends a GET(db) request for the recipeDB.
+
 public class RecipeListUI extends VBox {
     private IRecipeDb recipeDb;
 
@@ -26,6 +26,10 @@ public class RecipeListUI extends VBox {
         return this.recipeDb;
     }
 
+    public void setRecipeDB(IRecipeDb recipeDB) {
+        this.recipeDb = recipeDB;
+    }
+
 
     public void update() {
         getChildren().clear();
@@ -35,22 +39,6 @@ public class RecipeListUI extends VBox {
         for (Recipe recipe : recipeList) {
             recipeUI = new RecipeUI(recipe);
             this.getChildren().add(recipeUI);
-        }
-    }
-    
-    /*
-     * TODO : ERADICATE THIS from here
-     * Load recipes from a file called "recipes.csv" to RecipeDb
-     */
-    public void loadRecipes() {
-        try {
-            Reader reader = new FileReader(AppConfig.RECIPE_CSV_FILE);
-            RecipeCSVReader recipeReader = new RecipeCSVReader(reader);
-            recipeDb = new RecipeListDb();
-            recipeReader.readRecipeDb(recipeDb);
-            System.out.println("Recipes loaded");
-        } catch (IOException e) {
-            System.out.println("Recipes could not be loaded.");
         }
     }
 }

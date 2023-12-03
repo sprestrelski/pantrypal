@@ -2,6 +2,7 @@ package code.client.Controllers;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ import code.client.View.RecipeListUI;
 import code.client.View.RecipeUI;
 import code.client.View.View;
 import code.server.AccountRequestHandler;
+import code.server.IRecipeDb;
 
 import java.net.URL;
 import javafx.animation.KeyFrame;
@@ -35,7 +37,9 @@ public class Controller {
     private Account account;
     private Model model;
     private View view;
+    private IRecipeDb recipeDb;
     private RecipeCSVWriter recipeWriter;
+    private RecipeCSVReader recipeReader;
     private String title;
     private String defaultButtonStyle, onStyle, offStyle, blinkStyle;
 
@@ -67,8 +71,7 @@ public class Controller {
         loadCredentials();
         if (account != null) {
             this.view.getLoginUI().setLoginCreds(account);
-            this.view.goToRecipeList();
-            addListenersToList();
+            goToRecipeList();
         }
     }
 
@@ -78,7 +81,6 @@ public class Controller {
 
     private void handleRecipePostButton(ActionEvent event) throws IOException {
         Recipe postedRecipe = view.getDetailedView().getDisplayedRecipe();
-
         Button saveButtonFromDetailed = view.getDetailedView().getSaveButton();
         saveButtonFromDetailed.setStyle(blinkStyle);
         PauseTransition pause = new PauseTransition(Duration.seconds(1));
@@ -96,9 +98,31 @@ public class Controller {
         model.performRecipeRequest("POST", recipe, null);
     }
 
-    private void handleGetButton(ActionEvent event) {
-        String uuid = UUID.fromString(title).toString();
-        model.performRecipeRequest("GET", null, uuid);
+    private void goToRecipeList() {
+        getUserRecipeList();
+        displayUserRecipes();
+        view.goToRecipeList();
+        addListenersToList();
+    }
+
+    private void getUserRecipeList() {
+        String userID = account.getId();
+        String response = model.performRecipeRequest("GET", null, userID);
+        Reader reader = new StringReader(response);
+        recipeReader = new RecipeCSVReader(reader);
+
+        try {
+            recipeDb = new RecipeListDb();
+            recipeReader.readRecipeDb(recipeDb);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void displayUserRecipes() {
+        RecipeListUI recipeListUI = this.view.getAppFrameHome().getRecipeList();
+        recipeListUI.setRecipeDB(recipeDb);
+        recipeListUI.update();
     }
 
     private void handleNewButton(ActionEvent event) throws URISyntaxException, IOException {
@@ -116,8 +140,7 @@ public class Controller {
     }
 
     private void handleHomeButton(ActionEvent event) {
-        view.goToRecipeList();
-        addListenersToList();
+        goToRecipeList();
     }
 
     public void addListenersToList() {
@@ -151,6 +174,7 @@ public class Controller {
                 String audioOutput2 = ingredients;// audio.processAudio();
                 String responseText = caller.getResponse(audioOutput1, audioOutput2);
                 Recipe chatGPTrecipe = caller.mapResponseToRecipe(mealType, responseText);
+                chatGPTrecipe.setAccountId(account.getId());
 
                 // TODO Changes UI to Detailed Recipe Screen
                 view.goToDetailedView(chatGPTrecipe, false);
@@ -192,7 +216,7 @@ public class Controller {
         String uuid = UUID.fromString(title).toString();
         model.performRecipeRequest("DELETE", null, uuid);
     }
-    
+
     private void handleShareButton(ActionEvent event) {
         Recipe shownRecipe = this.view.getDetailedView().getDisplayedRecipe();
         String id = shownRecipe.getId().toString();
@@ -201,19 +225,20 @@ public class Controller {
         Hyperlink textArea = new Hyperlink(AppConfig.SHARE_LINK + account.getUsername() + "/" + id);
         textArea.setOnAction(action -> {
             try {
-                java.awt.Desktop.getDesktop().browse(new URL(AppConfig.SHARE_LINK + account.getUsername() + "/" + id).toURI());
+                java.awt.Desktop.getDesktop()
+                        .browse(new URL(AppConfig.SHARE_LINK + account.getUsername() + "/" + id).toURI());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
         });
-        textArea.setWrapText(true);  
+        textArea.setWrapText(true);
         GridPane gridPane = new GridPane();
         gridPane.setMaxWidth(Double.MAX_VALUE);
         gridPane.add(textArea, 0, 0);
         gridPane.setStyle(styleAlert);
-        gridPane.setPrefSize(220,220);
+        gridPane.setPrefSize(220, 220);
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Share this recipe!");
@@ -289,7 +314,7 @@ public class Controller {
         // Check if the username is already taken
         // temporary logic, no database yet
         String response = model.performAccountRequest("GET", username, "");
-        System.out.println("Response for usernameTaken : " + response);
+        // System.out.println("Response for usernameTaken : " + response);
         return (response.equals("Username is taken"));
     }
     ////////////////////////////////////////
@@ -308,8 +333,7 @@ public class Controller {
             if (loginSuccessful) {
                 showLoginSuccessPane(grid, true); // useless
 
-                view.goToRecipeList();
-                addListenersToList();
+                goToRecipeList();
 
                 if (!view.getLoginUI().getRememberLogin()) {
                     clearCredentials();
@@ -392,7 +416,7 @@ public class Controller {
         }
         // The response is the account id
         String accountId = response;
-        System.out.println("Account ID " + accountId + "\n" + response);
+        // System.out.println("Account ID " + accountId + "\n" + response);
         account = new Account(accountId, username, password);
         return true;
     }

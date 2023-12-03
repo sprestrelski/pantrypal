@@ -52,7 +52,7 @@ public class ShareRequestHandler implements HttpHandler {
         if(checkUser == null) {
             return nonExistentRecipe();
         }
-        System.out.println("Found user" + checkUser.getUsername());
+        //System.out.println("Found user" + checkUser.getUsername());
         String accountID = checkUser.getId();
         List<Recipe> accRecipes = recipeMongoDb.getList(accountID);
         Recipe foundRecipe = null;

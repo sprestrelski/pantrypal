@@ -39,12 +39,12 @@ public class Model {
         }
     }
 
-    public String performRecipeRequest(String method, String recipe, String id) {
+    public String performRecipeRequest(String method, String recipe, String userId) {
         // Implement your HTTP request logic here and return the response
         try {
             String urlString = AppConfig.SERVER_URL + AppConfig.RECIPE_PATH;
-            if (id != null) {
-                urlString += "?=" + id;
+            if (userId != null) {
+                urlString += "?=" + userId;
             }
             
             URL url = new URI(urlString).toURL();
@@ -60,7 +60,11 @@ public class Model {
             }
 
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String response = in.readLine();
+            String response = "";
+            String line;
+            while ((line = in.readLine()) != null) {
+                response += line + "\n";
+            }
             in.close();
             return response;
         } catch (Exception ex) {

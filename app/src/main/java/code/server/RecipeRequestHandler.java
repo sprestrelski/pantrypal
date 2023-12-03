@@ -2,6 +2,7 @@ package code.server;
 
 import com.sun.net.httpserver.*;
 
+import code.client.Model.RecipeCSVWriter;
 import code.server.Recipe;
 import code.server.RecipeCSVReader;
 import java.io.*;
@@ -80,16 +81,16 @@ public class RecipeRequestHandler implements HttpHandler {
         String response = "Invalid GET request";
         URI uri = httpExchange.getRequestURI();
         String query = uri.getRawQuery();
-
-        if (query == null) {
-            response = getAllRecipes();
-        } else {
-            int equalSignIndex = query.indexOf("=");
-            String key = query.substring(0, equalSignIndex);
-            String value = query.substring(equalSignIndex + 1);
-
-            if (key.equals("id")) {
-                response = getRecipeById(value);
+        if (query != null) {
+            String userID = query.substring(query.indexOf("=") + 1);
+            List<Recipe> recipeList = recipeDb.getList(userID);
+            if (recipeList.isEmpty()) {
+                response = "No recipes found";
+            } else {
+                Writer writer = new StringWriter();
+                RecipeCSVWriter recipeWriter = new RecipeCSVWriter(writer);
+                recipeWriter.writeRecipeList(recipeList);
+                response = writer.toString();
             }
         }
 

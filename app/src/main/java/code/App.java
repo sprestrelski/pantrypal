@@ -21,7 +21,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        initDb();
+        // initDb(); To use CSV file
         initServer();
         server.start();
         drawUI(primaryStage);
@@ -75,6 +75,6 @@ public class App extends Application {
     }
 
     private void initServer() throws IOException {
-        server = new AppServer(recipeDb, AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+        server = new AppServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
     }
 }
