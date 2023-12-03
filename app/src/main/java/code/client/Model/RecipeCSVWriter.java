@@ -22,6 +22,7 @@ public class RecipeCSVWriter {
         strBuilder.append(recipe.getTitle()).append("::");
         strBuilder.append(recipe.getMealTag()).append("::");
 
+        // ingredients
         while (ingredientIter.hasNext()) {
             ingredient = ingredientIter.next();
             strBuilder.append(ingredient);
@@ -29,9 +30,9 @@ public class RecipeCSVWriter {
                 strBuilder.append(";;");
             }
         }
-
         strBuilder.append("::");
 
+        // instructions
         while (instructionIter.hasNext()) {
             instruction = instructionIter.next();
             strBuilder.append(instruction);
@@ -39,6 +40,8 @@ public class RecipeCSVWriter {
                 strBuilder.append(";;");
             }
         }
+
+        strBuilder.append(recipe.getImage()).append("::");
 
         strBuilder.append("\n");
         writer.write(strBuilder.toString());
@@ -49,7 +52,7 @@ public class RecipeCSVWriter {
         // use "::" as a delimiter for the csv files
         strBuilder.append("sep=::").append("\n");
         // add labels for the columns of the csv file
-        strBuilder.append("ID::Account::Title::Tag::Ingredients::Instructions").append("\n");
+        strBuilder.append("ID::Account::Title::Tag::Ingredients::Instructions::Image").append("\n");
         writer.write(strBuilder.toString());
 
         for (Recipe recipe : recipeDb.getList()) {

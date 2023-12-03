@@ -60,7 +60,7 @@ public class Controller {
         this.view.getLoginUI().setGoToCreateAction(this::handleGoToCreateLogin);
         this.view.getLoginUI().setLoginButtonAction(this::handleLoginButton);
         loadCredentials();
-        if(account != null) {
+        if (account != null) {
             this.view.getLoginUI().setLoginCreds(account);
             this.view.goToRecipeList();
             addListenersToList();
@@ -146,11 +146,15 @@ public class Controller {
         String ingredients = inputs.get(1);
         if (mealType != null && ingredients != null) {
             TextToRecipe caller = new MockGPTService();// new ChatGPTService();
+            RecipeToImage imageCaller = new MockDallEService(); // new DallEService();
+
             try {
                 String audioOutput1 = mealType;
                 String audioOutput2 = ingredients;// audio.processAudio();
                 String responseText = caller.getResponse(audioOutput1, audioOutput2);
                 Recipe chatGPTrecipe = caller.mapResponseToRecipe(mealType, responseText);
+                System.out.println(chatGPTrecipe.getTitle());
+                chatGPTrecipe.setImage(imageCaller.getResponse(chatGPTrecipe.getTitle()));
 
                 // TODO Changes UI to Detailed Recipe Screen
                 view.goToDetailedView(chatGPTrecipe, false);
@@ -277,8 +281,7 @@ public class Controller {
 
                 if (!view.getLoginUI().getRememberLogin()) {
                     clearCredentials();
-                }
-                else {
+                } else {
                     saveCredentials(account);
                 }
             } else {
@@ -312,6 +315,7 @@ public class Controller {
             System.out.println("Account credentials could not be saved.");
         }
     }
+
     private void loadCredentials() {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(CSVFILE));
@@ -319,7 +323,7 @@ public class Controller {
             String[] credentials;
             while ((line = reader.readLine()) != null) {
                 credentials = line.split("\\|");
-                account = new Account(new ObjectId(credentials[2]),credentials[0], credentials[1]);
+                account = new Account(new ObjectId(credentials[2]), credentials[0], credentials[1]);
             }
             reader.close();
         } catch (IOException e) {
