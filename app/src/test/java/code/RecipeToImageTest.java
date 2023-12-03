@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 public class RecipeToImageTest {
     @Test
     /**
-     * Integration test for provide recipe
+     * Integration test for image download
      */
     public void testImageDownload() throws IOException, InterruptedException {
         // create a recipe
@@ -26,10 +26,9 @@ public class RecipeToImageTest {
 
         // DallE request
         RecipeToImage recipeToImage = new MockDallEService();
-        String json = recipeToImage.getResponse(recipe.getTitle());
-        String imageString = recipeToImage.parseResponseBody(json);
+        String imageString = recipeToImage.getResponse(recipe.getTitle());
         // parse base64 to image
-        byte[] imageBytes = recipeToImage.downloadImageJSON(imageString, recipe.getId());
+        byte[] imageBytes = recipeToImage.downloadImage(imageString, recipe.getId());
         String expectedResponse = "Fried Rice Image :)";
         assertEquals(expectedResponse, new String(imageBytes, StandardCharsets.UTF_8));
     }

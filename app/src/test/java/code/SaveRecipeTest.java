@@ -38,10 +38,10 @@ public class SaveRecipeTest {
         // Initialize a RecipeDb
         recipeDb = new RecipeListDb();
         // Initialize two simple recipes
-        r1 = new Recipe(new ObjectId(RECIPE_ID), new ObjectId(ACCOUNT_ID), "Plain Spaghetti", "Breakfast");
+        r1 = new Recipe(new ObjectId(RECIPE_ID), new ObjectId(ACCOUNT_ID), "Plain Spaghetti", "Breakfast", null);
         r1.addIngredient("Spaghetti noodles");
         r1.addInstruction("Boil the noodles");
-        r2 = new Recipe(new ObjectId(RECIPE_ID), new ObjectId(ACCOUNT_ID), "Steak", "Lunch");
+        r2 = new Recipe(new ObjectId(RECIPE_ID), new ObjectId(ACCOUNT_ID), "Steak", "Lunch", null);
         r2.addIngredient("Raw beef");
         r2.addInstruction("Cook the beef");
     }

@@ -18,7 +18,6 @@ import java.util.Base64;
 
 public class DallEService extends RecipeToImage {
     private static final String API_ENDPOINT = "https://api.openai.com/v1/images/generations";
-    private static final String API_KEY = "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";
     private static final String MODEL = "dall-e-2";
     private static final int NUM_IMAGES = 1;
     private static final String IMAGE_SIZE = "256x256";
@@ -42,7 +41,7 @@ public class DallEService extends RecipeToImage {
                 .newBuilder()
                 .uri(URI.create(API_ENDPOINT))
                 .header("Content-Type", "application/json")
-                .header("Authorization", String.format("Bearer %s", API_KEY))
+                .header("Authorization", String.format("Bearer %s", AppConfig.API_KEY))
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
                 .build();
 
@@ -53,11 +52,21 @@ public class DallEService extends RecipeToImage {
 
         // Process the response
         String responseBody = response.body();
-        return responseBody;
+        JSONObject responseJson = new JSONObject(responseBody);
+        String generatedImageData = "";
+        try {
+            generatedImageData = responseJson.getJSONArray("data")
+                    .getJSONObject(0).getString("b64_json");
+        } catch (Exception e) {
+            // badly formatted json
+            generatedImageData = "An error occurred.";
+            e.printStackTrace();
+        }
+        return generatedImageData;
     }
 
     @Override
-    public byte[] downloadImageJSON(String generatedImageData, ObjectId id) {
+    public byte[] downloadImage(String generatedImageData, ObjectId id) {
         // convert base64 string to binary data
         byte[] generatedImageBytes = Base64.getDecoder().decode(generatedImageData);
         try (InputStream in = new ByteArrayInputStream(generatedImageBytes)) {
