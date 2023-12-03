@@ -205,6 +205,7 @@ public class Controller {
         detailedView.setDeleteButtonAction(this::handleDeleteButton);
         detailedView.setHomeButtonAction(this::handleHomeButton);
         detailedView.setShareButtonAction(this::handleShareButton);
+        detailedView.setRefreshButtonAction(this::handleRefreshButton);
     }
 
     private void handleEditButton(ActionEvent event) {
@@ -258,6 +259,35 @@ public class Controller {
 
     private void handleGoToCreateLogin(ActionEvent event) {
         view.goToCreateAcc();
+    }
+
+    private void handleRefreshButton(ActionEvent event) {
+        // Get ChatGPT response from the Model
+        List<String> inputs = view.getAppFrameMic().getVoiceResponse();
+
+        String mealType = inputs.get(0);
+        String ingredients = inputs.get(1);
+
+        TextToRecipe caller = new MockGPTService();// new ChatGPTService();
+        RecipeToImage imageCaller = new MockDallEService(); // new DallEService();
+
+        try {
+            String audioOutput1 = mealType;
+            String audioOutput2 = ingredients;// audio.processAudio();
+            String responseText = caller.getResponse(audioOutput1, audioOutput2);
+            Recipe chatGPTrecipe = caller.mapResponseToRecipe(mealType, responseText);
+            chatGPTrecipe.setAccountId(account.getId());
+            chatGPTrecipe.setImage(imageCaller.getResponse(chatGPTrecipe.getTitle()));
+
+            // Changes UI to Detailed Recipe Screen
+            view.goToDetailedView(chatGPTrecipe, false);
+            view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+            handleDetailedViewListeners();
+
+        } catch (IOException | URISyntaxException | InterruptedException exception) {
+            AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+            exception.printStackTrace();
+        }
     }
 
     ////////////////////////////////////////
