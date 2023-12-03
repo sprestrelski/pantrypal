@@ -12,11 +12,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class RecipeToImageTest {
-    @Test
-    /**
-     * Integration test for image download
+    /*
+     * Image creation unit tests
      */
-    public void testImageDownload() throws IOException, InterruptedException {
+    @Test
+    public void testImageCreation() throws IOException, InterruptedException {
         // create a recipe
         Recipe recipe = new Recipe("Fried Rice", "Lunch");
         assertEquals("Fried Rice", recipe.getTitle());
@@ -31,6 +31,22 @@ public class RecipeToImageTest {
         byte[] imageBytes = recipeToImage.downloadImage(imageString, recipe.getId());
         String expectedResponse = "Fried Rice Image :)";
         assertEquals(expectedResponse, new String(imageBytes, StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void testImageCreationError() throws IOException, InterruptedException {
+        // create a recipe
+        Recipe recipe = new Recipe("Fried Rice", "Lunch");
+        assertEquals("Fried Rice", recipe.getTitle());
+        recipe.addIngredient("Rice");
+        recipe.addIngredient("Fried");
+        recipe.addInstruction("A shrimp fried this rice?");
+
+        // DallE request
+        RecipeToImage recipeToImage = new MockDallEService();
+        recipeToImage.setError(true);
+        String imageString = recipeToImage.getResponse(recipe.getTitle());
+        assertEquals("error", imageString);
     }
 
 }

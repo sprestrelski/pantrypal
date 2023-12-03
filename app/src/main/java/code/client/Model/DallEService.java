@@ -3,6 +3,7 @@ package code.client.Model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -52,15 +53,25 @@ public class DallEService extends RecipeToImage {
 
         // Process the response
         String responseBody = response.body();
+        return processResponse(responseBody);
+    }
+
+    private String processResponse(String responseBody) {
         JSONObject responseJson = new JSONObject(responseBody);
         String generatedImageData = "";
         try {
             generatedImageData = responseJson.getJSONArray("data")
                     .getJSONObject(0).getString("b64_json");
-        } catch (Exception e) {
+        } catch (Exception chatError) {
             // badly formatted json
-            generatedImageData = "error";
-            e.printStackTrace();
+            File file = new File(AppConfig.RECIPE_IMG_FILE);
+            try {
+                byte[] imageBytes = Files.readAllBytes(file.toPath());
+                generatedImageData = Base64.getEncoder().encodeToString(imageBytes);
+            } catch (Exception fileError) {
+                fileError.printStackTrace();
+            }
+            chatError.printStackTrace();
         }
         return generatedImageData;
     }
@@ -76,6 +87,10 @@ public class DallEService extends RecipeToImage {
             e.printStackTrace();
         }
         return generatedImageBytes;
+    }
+
+    @Override
+    public void setError(boolean error) {
     }
 
 }

@@ -22,6 +22,10 @@ public class RecipeCSVReader {
         String[] instructionTokens = recipeTokens[5].split(";;");
         String image = recipeTokens[6];
         Recipe recipe = new Recipe(new ObjectId(id), new ObjectId(accountId), title, mealTag, image);
+        // error occurred, images have a pretty long bytestring
+        if (image.length() < 256) {
+            recipe.setDefaultImage();
+        }
 
         for (String ingredient : ingredientTokens) {
             recipe.addIngredient(ingredient);

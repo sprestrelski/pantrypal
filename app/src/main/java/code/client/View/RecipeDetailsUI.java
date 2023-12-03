@@ -41,20 +41,8 @@ public class RecipeDetailsUI extends HBox {
 
         // image
         imageString = recipe.getImage();
-        if (imageString == "error") {
-            File file = new File(AppConfig.RECIPE_IMG_FILE);
-            recipeImg = new Image(file.toURI().toString());
-            try {
-                byte[] imageBytes = Files.readAllBytes(file.toPath());
-                imageString = Base64.getEncoder().encodeToString(imageBytes);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            byte[] imageBytes = Base64.getDecoder().decode(imageString);
-            recipeImg = new Image(new ByteArrayInputStream(imageBytes));
-        }
-        recipeImgView.setImage(recipeImg);
+        byte[] imageBytes = Base64.getDecoder().decode(imageString);
+        recipeImg = new Image(new ByteArrayInputStream(imageBytes));
 
         // ingredients
         StringBuilder ingredientBuilder = new StringBuilder();
@@ -79,6 +67,10 @@ public class RecipeDetailsUI extends HBox {
 
     public TextField getTitleField() {
         return titleTextField;
+    }
+
+    public Image getImage() {
+        return recipeImg;
     }
 
     public String getImageString() {

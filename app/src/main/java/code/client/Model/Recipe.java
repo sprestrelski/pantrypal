@@ -1,6 +1,9 @@
 package code.client.Model;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 import org.bson.types.ObjectId;
@@ -28,10 +31,12 @@ public class Recipe {
 
     public Recipe(ObjectId accountId, String title, String mealTag) {
         this(accountId, title, mealTag, null);
+        setDefaultImage();
     }
 
     public Recipe(String title, String mealTag) {
         this(null, title, mealTag, null);
+        setDefaultImage();
     }
 
     public ObjectId getId() {
@@ -60,6 +65,16 @@ public class Recipe {
 
     public String getMealTag() {
         return mealTag;
+    }
+
+    public void setDefaultImage() {
+        File file = new File(AppConfig.RECIPE_IMG_FILE);
+        try {
+            byte[] imageBytes = Files.readAllBytes(file.toPath());
+            this.image = Base64.getEncoder().encodeToString(imageBytes);
+        } catch (Exception fileError) {
+            fileError.printStackTrace();
+        }
     }
 
     public void setImage(String image) {

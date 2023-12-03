@@ -9,6 +9,7 @@ import org.bson.types.ObjectId;
 import org.json.JSONObject;
 
 public abstract class RecipeToImage {
+    public abstract void setError(boolean error);
 
     public abstract String getResponse(String recipeTitle)
             throws IOException, InterruptedException;
