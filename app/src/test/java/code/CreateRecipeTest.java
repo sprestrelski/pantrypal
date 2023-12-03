@@ -12,7 +12,9 @@ public class CreateRecipeTest {
      */
     @Test
     public void testCreateRecipe() {
-        Recipe recipe = new Recipe("Fried Rice", "Lunch");
+        RecipeBuilder builder = new RecipeBuilder("656a2e6d8a659b00c86888b8", "Fried Rice");
+        builder.setMealTag("Lunch");
+        Recipe recipe = builder.buildRecipe();
         assertEquals("Fried Rice", recipe.getTitle());
         recipe.addIngredient("Rice");
         recipe.addIngredient("Fried");

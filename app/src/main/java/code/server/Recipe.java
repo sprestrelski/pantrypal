@@ -4,48 +4,62 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
+
 import org.bson.types.ObjectId;
+
+import java.util.*;
 import code.client.Model.*;
 
-public class Recipe {
+public class Recipe implements Comparable<Recipe> {
     private String id;
     private String userID;
     private String title;
     private String mealTag;
+    private long date;
     private String image;
     private final List<String> ingredients = new ArrayList<>();
     private final List<String> instructions = new ArrayList<>();
 
-    public Recipe(String id, String accountId, String title, String mealTag, String image) {
+    public Recipe(String id, String accountId, String title, String mealTag, long date, String image) {
         this.id = id;
         this.userID = accountId;
         this.title = title;
         this.mealTag = mealTag;
+        this.date = date;
         this.image = image;
     }
 
-    public Recipe(String accountId, String title, String mealTag, String image) {
-        this(new ObjectId().toHexString(), accountId, title, mealTag, image);
-    }
+    // public Recipe(String accountId, String title, String mealTag, String image) {
+    //     this(new ObjectId().toHexString(), accountId, title, mealTag, image);
+    // }
 
-    public Recipe(String accountId, String title, String mealTag) {
-        this(accountId, title, mealTag, null);
-        setDefaultImage();
-    }
+    // public Recipe(String accountId, String title, String mealTag) {
+    //     this(accountId, title, mealTag, null);
+    //     setDefaultImage();
+    // }
 
+    // Keep this for one testing purposes please :)
     public Recipe(String title, String mealTag) {
-        this(null, title, mealTag, null);
+        this(new ObjectId().toHexString(), new ObjectId().toHexString(), title, mealTag, 1, "");
         setDefaultImage();
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setID(String accountID) {
-        id = accountID;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setAccountId(String accountId) {
@@ -134,6 +148,36 @@ public class Recipe {
                 mealTag.equals(recipe.mealTag) &&
                 ingredients.equals(recipe.ingredients) &&
                 instructions.equals(recipe.instructions);
+    }
+
+
+    @Override
+    public int compareTo(Recipe recipe) {
+        return Comparators.TITLE.compare(this, recipe);
+    }
+    
+    // Source: https://stackoverflow.com/questions/14154127/collections-sortlistt-comparator-super-t-method-example
+    public static class Comparators {
+        
+        public static final Comparator<Recipe> TITLE = 
+            (Recipe r1, Recipe r2) -> r1.getTitle().compareTo(r2.getTitle());
+
+        public static final Comparator<Recipe> DATE = 
+            (Recipe r1, Recipe r2) -> Long.compare(r1.getDate(), r2.getDate()); 
+        
+        // public static Comparator<Recipe> TITLE = new Comparator<>() {
+        //     @Override
+        //     public int compare(Recipe r1, Recipe r2) {
+        //         return r1.getTitle().compareTo(r2.getTitle());
+        //     }
+        // };
+
+        // public static Comparator<Recipe> DATE = new Comparator<>() {
+        //     @Override
+        //     public int compare(Recipe r1, Recipe r2) {
+        //         return r1.getDate() - r2.getDate();
+        //     }
+        // };
     }
 
 }

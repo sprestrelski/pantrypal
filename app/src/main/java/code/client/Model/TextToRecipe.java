@@ -86,4 +86,6 @@ public abstract class TextToRecipe {
 
         return strBuilder.toString();
     }
+
+    public abstract void setSampleRecipe(String recipe);
 }
