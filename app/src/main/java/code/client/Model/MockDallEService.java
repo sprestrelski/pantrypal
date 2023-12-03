@@ -1,6 +1,8 @@
 package code.client.Model;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Base64;
 
 import org.bson.types.ObjectId;
@@ -18,7 +20,15 @@ public class MockDallEService extends RecipeToImage {
     if (this.error) {
       return "error";
     } else {
-      return "RnJpZWQgUmljZSBJbWFnZSA6KQ==";
+      File file = new File(AppConfig.RECIPE_IMG_FILE);
+      // try to give default image
+      try {
+        byte[] imageBytes = Files.readAllBytes(file.toPath());
+        return Base64.getEncoder().encodeToString(imageBytes);
+      } catch (Exception fileError) {
+        fileError.printStackTrace();
+        return "RnJpZWQgUmljZSBJbWFnZSA6KQ==";
+      }
     }
   }
 

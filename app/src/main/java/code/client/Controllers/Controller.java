@@ -153,6 +153,7 @@ public class Controller {
                 String audioOutput2 = ingredients;// audio.processAudio();
                 String responseText = caller.getResponse(audioOutput1, audioOutput2);
                 Recipe chatGPTrecipe = caller.mapResponseToRecipe(mealType, responseText);
+                System.out.println(chatGPTrecipe.getTitle());
                 chatGPTrecipe.setImage(imageCaller.getResponse(chatGPTrecipe.getTitle()));
 
                 // TODO Changes UI to Detailed Recipe Screen
