@@ -34,7 +34,7 @@ public class DetailsAppFrame {
         backToHomeButton.setAlignment(Pos.TOP_LEFT);
 
         refreshButton = new Button("Remake Recipe");
-        refreshButton.setStyle(defaultButtonStyle);
+        refreshButton.setStyle(onStyle);
         refreshButton.setAlignment(Pos.TOP_RIGHT);
 
         saveButton = new Button("Save");
@@ -167,8 +167,10 @@ public class DetailsAppFrame {
         currentRecipe = recipe;
         if (!old) {
             deleteButton.setVisible(false);
+            refreshButton.setVisible(true);
         } else {
             deleteButton.setVisible(true);
+            refreshButton.setVisible(false);
         }
         updateDisplay();
         return detailedUI;
@@ -186,4 +188,12 @@ public class DetailsAppFrame {
         return editButton;
     }
 
+    public Button getRefreshButton() {
+        return refreshButton;
+    }
+
+    public void setRecipe(Recipe recipe) {
+        this.currentRecipe = recipe;
+        updateDisplay();
+    }
 }

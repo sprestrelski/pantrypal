@@ -280,10 +280,7 @@ public class Controller {
             chatGPTrecipe.setImage(imageCaller.getResponse(chatGPTrecipe.getTitle()));
 
             // Changes UI to Detailed Recipe Screen
-            view.goToDetailedView(chatGPTrecipe, false);
-            view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-            handleDetailedViewListeners();
-
+            view.getDetailedView().setRecipe(chatGPTrecipe);
         } catch (IOException | URISyntaxException | InterruptedException exception) {
             AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
             exception.printStackTrace();
@@ -452,5 +449,4 @@ public class Controller {
         return true;
     }
     ///////////////////////////////
-
 }
