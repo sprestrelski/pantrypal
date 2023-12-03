@@ -38,13 +38,19 @@ public abstract class TextToRecipe {
         }
 
         // Create a new recipe with a title
-        Recipe recipe = new Recipe(tokenList.get(0), tokenList.get(1));
+        Recipe recipe = new Recipe(tokenList.get(0), mealType);
 
         // Parse recipe's ingredients
         String ingredient;
-        for (i = 3; !tokenList.get(i).equals("Instructions:"); ++i) {
-            ingredient = removeDashFromIngredient(tokenList.get(i).trim());
-            recipe.addIngredient(ingredient);
+        boolean parse = false;
+        for (i = 0; !tokenList.get(i).contains("Instructions"); ++i) {
+            ingredient = tokenList.get(i).trim();
+            if (ingredient.contains("Ingredients")) {
+                parse = true;
+            } else if (parse) {
+                ingredient = removeDashFromIngredient(tokenList.get(i).trim());
+                recipe.addIngredient(ingredient);
+            }
         }
 
         // Parse recipe's instructions
@@ -58,6 +64,9 @@ public abstract class TextToRecipe {
     }
 
     private String removeDashFromIngredient(String ingredient) {
+        if (ingredient.charAt(0) == ('-')) {
+            return ingredient.substring(1).trim();
+        }
         return ingredient.substring(2);
     }
 
@@ -77,4 +86,6 @@ public abstract class TextToRecipe {
 
         return strBuilder.toString();
     }
+
+    public abstract void setSampleRecipe(String recipe);
 }
