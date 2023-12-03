@@ -21,11 +21,11 @@ public class VoiceToTextTest {
 
         VoiceToText voiceToText = new MockWhisperService(connection);
         String response = voiceToText.processAudio("mealtype");
-        assertEquals("Breakfast.", response);
+        assertEquals("Breakfast", response);
 
         voiceToText = new MockWhisperService(connection);
         response = voiceToText.processAudio("ingredients");
-        assertEquals("Chicken, cheese.", response);
+        assertEquals("Chicken, eggs.", response);
 
     }
 
