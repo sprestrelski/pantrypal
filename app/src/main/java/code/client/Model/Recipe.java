@@ -3,10 +3,12 @@ package code.client.Model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Comparator;
 import org.bson.types.ObjectId;
 
-public class Recipe {
+public class Recipe implements Comparable<Recipe> {
     private final ObjectId id;
+    private final int date;
     private String title;
     private final List<String> ingredients = new ArrayList<>();
     private final List<String> instructions = new ArrayList<>();
@@ -14,6 +16,7 @@ public class Recipe {
     public Recipe(ObjectId id, String title) {
         this.id = id;
         this.title = title;
+        this.date = 0;
     }
 
     public Recipe(String title) {
@@ -30,6 +33,10 @@ public class Recipe {
 
     public String getTitle() {
         return title;
+    }
+
+    public int getDate() {
+        return date;
     }
 
     public void addIngredient(String ingredient) {
@@ -73,5 +80,33 @@ public class Recipe {
         }
         return id.equals(recipe.id);
     }
+
+    @Override
+    public int compareTo(Recipe recipe) {
+        return Comparators.TITLE.compare(this, recipe);
+    }
     
+    // Source: https://stackoverflow.com/questions/14154127/collections-sortlistt-comparator-super-t-method-example
+    public static class Comparators {
+        
+        public static final Comparator<Recipe> TITLE = 
+            (Recipe r1, Recipe r2) -> r1.getTitle().compareTo(r2.getTitle());
+
+        public static final Comparator<Recipe> DATE = 
+            (Recipe r1, Recipe r2) -> Integer.compare(r1.getDate(), r2.getDate());
+        
+        // public static Comparator<Recipe> TITLE = new Comparator<>() {
+        //     @Override
+        //     public int compare(Recipe r1, Recipe r2) {
+        //         return r1.getTitle().compareTo(r2.getTitle());
+        //     }
+        // };
+
+        // public static Comparator<Recipe> DATE = new Comparator<>() {
+        //     @Override
+        //     public int compare(Recipe r1, Recipe r2) {
+        //         return r1.getDate() - r2.getDate();
+        //     }
+        // };
+    }
 }

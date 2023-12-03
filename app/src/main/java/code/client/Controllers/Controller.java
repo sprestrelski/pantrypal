@@ -133,11 +133,13 @@ public class Controller {
         
         // Setting action for newest to oldest sorting criteria
         sortMenuItems.get(NEWEST_TO_OLDEST_INDEX).setOnAction(e -> {
-            
+            recipeSorter.sortNewestToOldest();
+            list.update();
         });
         // Setting action for oldest to newest sorting criteria
         sortMenuItems.get(OLDEST_TO_NEWEST_INDEX).setOnAction(e -> {
-            
+            recipeSorter.sortOldestToNewest();
+            list.update();
         });
         // Setting action for A to Z sorting criteria
         sortMenuItems.get(A_TO_Z_INDEX).setOnAction(e -> {
@@ -149,6 +151,7 @@ public class Controller {
             recipeSorter.sortZToA();
             list.update();
         });
+        list.update();
 
 
         //; Setting action for oldest to newest sorting criteria
