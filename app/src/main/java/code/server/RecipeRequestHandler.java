@@ -80,7 +80,7 @@ public class RecipeRequestHandler implements HttpHandler {
     private String handleGet(HttpExchange httpExchange) throws IOException {
         String response = "Invalid GET request";
         URI uri = httpExchange.getRequestURI();
-        String query = uri.getRawQuery();
+        String query = uri.getRawQuery(); // ?=
         if (query != null) {
             String userID = query.substring(query.indexOf("=") + 1);
             List<Recipe> recipeList = recipeDb.getList(userID);
@@ -92,6 +92,8 @@ public class RecipeRequestHandler implements HttpHandler {
                 recipeWriter.writeRecipeList(recipeList);
                 response = writer.toString();
             }
+        } else {
+
         }
 
         return response;

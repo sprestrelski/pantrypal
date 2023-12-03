@@ -76,6 +76,7 @@ public class DetailsAppFrame {
 
         Recipe edit = new Recipe(title, currentRecipe.getMealTag());
         edit.setAccountId(currentRecipe.getAccountId());
+        edit.setID(currentRecipe.getId());
         for (String ingredient : ingr) {
             edit.addIngredient(ingredient);
         }

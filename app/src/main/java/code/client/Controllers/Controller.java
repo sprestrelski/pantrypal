@@ -220,13 +220,13 @@ public class Controller {
 
     private void handleShareButton(ActionEvent event) {
         Recipe shownRecipe = this.view.getDetailedView().getDisplayedRecipe();
-        String id = shownRecipe.getId().toString();
+        String id = shownRecipe.getId();
 
         String styleAlert = "-fx-background-color: #F1FFCB; -fx-font-weight: bold;";
         Hyperlink textArea = new Hyperlink(AppConfig.SHARE_LINK + account.getUsername() + "/" + id);
         textArea.setOnAction(action -> {
             try {
-                java.awt.Desktop.getDesktop()
+                java.awt.Desktop.getDesktop() // Format: localhost:8100/recipes/username/recipeID
                         .browse(new URL(AppConfig.SHARE_LINK + account.getUsername() + "/" + id).toURI());
             } catch (IOException e) {
                 e.printStackTrace();
