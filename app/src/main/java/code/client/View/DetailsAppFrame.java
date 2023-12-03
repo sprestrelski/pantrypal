@@ -1,7 +1,6 @@
 package code.client.View;
 
 import java.util.Date;
-
 import code.client.Model.*;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -56,8 +55,6 @@ public class DetailsAppFrame {
         shareButton.setStyle(defaultButtonStyle);
         shareButton.setAlignment(Pos.BOTTOM_RIGHT);
 
-        
-
         // Default recipe
         currentRecipe = getMockedRecipe();
     }
@@ -79,18 +76,17 @@ public class DetailsAppFrame {
         String[] ingr = ingredients.split("\n");
         String[] instr = instructions.split("\n");
 
-        RecipeBuilder builder = new RecipeBuilder(currentRecipe.getAccountId(),title);
-            builder.setMealTag(currentRecipe.getMealTag());
-            builder.setId(currentRecipe.getId());
+        RecipeBuilder builder = new RecipeBuilder(currentRecipe.getAccountId(), title);
+        builder.setMealTag(currentRecipe.getMealTag());
+        builder.setId(currentRecipe.getId());
 
-        if(isOldRecipe) {
+        if (isOldRecipe) {
             builder.setDate(currentRecipe.getDate());
-        }
-        else {
+        } else {
             Date currDate = new Date();
             builder.setDate(currDate.getTime());
         }
-        
+
         Recipe edit = builder.buildRecipe();
         for (String ingredient : ingr) {
             edit.addIngredient(ingredient);
@@ -110,9 +106,9 @@ public class DetailsAppFrame {
      */
     private Recipe getMockedRecipe() {
         // Hardcoded value for now, recipe value for it should be changing
-        RecipeBuilder builder = new RecipeBuilder("656a2e6d8a659b00c86888b8","Fried Chicken and Egg Fried Rice");
-            builder.setMealTag("BREAKFAST");
-        Recipe temp = builder.buildRecipe();    // Chris's account ID
+        RecipeBuilder builder = new RecipeBuilder("656a2e6d8a659b00c86888b8", "Fried Chicken and Egg Fried Rice");
+        builder.setMealTag("BREAKFAST");
+        Recipe temp = builder.buildRecipe(); // Chris's account ID
         temp.addIngredient("2 chicken breasts, diced");
         temp.addIngredient("2 large eggs");
         temp.addIngredient("2 cups cooked rice");

@@ -1,7 +1,6 @@
 
 package code.client.View;
 
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 
 import javafx.scene.layout.*;
@@ -9,7 +8,6 @@ import javafx.scene.text.*;
 import java.io.*;
 import javafx.geometry.Pos;
 import javafx.event.*;
-
 
 class Footer extends HBox {
     // Button for creating a new recipe
@@ -77,15 +75,14 @@ class Header extends HBox {
         sortMenuButton.getItems().addAll(sortNewToOld, sortOldToNew, sortAToZ, sortZToA);
 
         EventHandler<ActionEvent> event1 = new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e)
-            {
-                System.out.println(((MenuItem)e.getSource()).getText() + " selected");
+            public void handle(ActionEvent e) {
+                System.out.println(((MenuItem) e.getSource()).getText() + " selected");
             }
         };
 
         sortMenuButton.getItems().get(2).setOnAction(event1);
         sortMenuButton.getItems().get(3).setOnAction(event1);
-        
+
         this.setPrefSize(620, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
 
@@ -143,7 +140,7 @@ public class AppFrameHome extends BorderPane {
     public void updateDisplay() {
         recipeList.update();
         // for (int i = 0; i < recipeList.getChildren().size(); i++) {
-        //     RecipeUI currRecipe = (RecipeUI) recipeList.getChildren().get(i);
+        // RecipeUI currRecipe = (RecipeUI) recipeList.getChildren().get(i);
         // }
         this.setCenter(recipeList);
     }

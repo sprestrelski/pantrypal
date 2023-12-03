@@ -3,15 +3,10 @@ package code.client.View;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import java.util.Iterator;
 import java.util.Base64;
-import java.io.File;
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.file.Files;
 
 import code.server.Recipe;
 
@@ -21,7 +16,6 @@ public class RecipeDetailsUI extends HBox {
     private TextArea instructionTextArea;
     private String imageString;
     private Image recipeImg;
-    private ImageView recipeImgView;
     private Recipe recipe;
     private boolean editableStatus = false;
 
