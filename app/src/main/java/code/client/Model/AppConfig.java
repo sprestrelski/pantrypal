@@ -22,5 +22,5 @@ public class AppConfig {
     public static final String RECIPE_PATH = "/recipe";
     public static final String ACCOUNT_PATH = "/accounts";
     public static final String SHARE_PATH = "/recipes/";
-    public static final String SHARE_LINK = "https://localhost:8100/recipes/";
+    public static final String SHARE_LINK = "http://localhost:8100/recipes/";
 }

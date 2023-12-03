@@ -36,7 +36,7 @@ class Footer extends HBox {
         logOutButton = new Button("Log out");
         logOutButton.setStyle(defaultButtonStyle);
         grid.add(logOutButton, 3, 0);
-        grid.add(newButton,11,0);
+        grid.add(newButton, 11, 0);
         grid.setHgap(20);
         this.getChildren().add(grid);
         this.setAlignment(Pos.CENTER_LEFT);
@@ -45,6 +45,7 @@ class Footer extends HBox {
     public Button getNewButton() {
         return this.newButton;
     }
+
     public Button getLogOutButton() {
         return this.logOutButton;
     }
@@ -122,6 +123,7 @@ public class AppFrameHome extends BorderPane {
     public void setNewRecipeButtonAction(EventHandler<ActionEvent> eventHandler) {
         newButton.setOnAction(eventHandler);
     }
+
     public void setLogOutButtonAction(EventHandler<ActionEvent> eventHandler) {
         logOutButton.setOnAction(eventHandler);
     }

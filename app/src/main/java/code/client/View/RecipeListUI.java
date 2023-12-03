@@ -11,7 +11,6 @@ import code.server.IRecipeDb;
 import code.client.Model.RecipeCSVReader;
 import code.client.Model.RecipeCSVWriter;
 
-
 public class RecipeListUI extends VBox {
     private IRecipeDb recipeDb;
 
@@ -29,7 +28,6 @@ public class RecipeListUI extends VBox {
     public void setRecipeDB(IRecipeDb recipeDB) {
         this.recipeDb = recipeDB;
     }
-
 
     public void update() {
         getChildren().clear();
