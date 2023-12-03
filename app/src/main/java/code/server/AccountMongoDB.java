@@ -23,17 +23,15 @@ public class AccountMongoDB implements IAccountDb {
 
     private Account jsonToAccount(Document accountDocument) {
         Gson gson = new Gson();
-        System.out.println(accountDocument.toJson().toString());
         Account account = gson.fromJson(accountDocument.toJson(), Account.class);
-
         JsonObject jsonObj = JsonParser.parseString(accountDocument.toJson().toString()).getAsJsonObject();
-        ObjectId id = new ObjectId(jsonObj.getAsJsonObject("_id").get("$oid").getAsString());
-        account.setId(id);
+        String accountId = jsonObj.getAsJsonObject("_id").get("$oid").getAsString();
+        account.setId(accountId);
         return account;
     }
 
     @Override
-    public Account find(String username) {
+    public Account findByUsername(String username) {
         Bson filter = eq("username", username);
         var accountDocumentIter = accountDocumentCollection.find(filter);
         Document accountDocument = accountDocumentIter.first();
@@ -45,34 +43,35 @@ public class AccountMongoDB implements IAccountDb {
     }
 
     @Override
-    public boolean validate(String username, String password) {
-        Account account = find(username);
-        if (account == null) {
-            return false;
+    public Account findById(String id) {
+        Bson filter = eq("_id", new ObjectId(id));
+        var accountDocumentIter = accountDocumentCollection.find(filter);
+        Document accountDocument = accountDocumentIter.first();
+        if (accountDocument == null) {
+            // Account does not exist
+            return null;
         }
+        return jsonToAccount(accountDocument);
+    }
+
+    // This method assumes that the username exists
+    @Override
+    public boolean checkPassword(String username, String password) {
+        Account account = findByUsername(username);
         return account.getPassword().equals(password);
     }
 
     @Override
     public boolean add(Account account) {
-        if (find(account.getUsername()) != null) {
+        String username = account.getUsername();
+        if (findByUsername(username) != null || username.isEmpty()) {
             return false;
         }
 
-        Document accountDocument = new Document("_id", account.getId());
-        accountDocument.append("username", account.getUsername()).append("password", account.getPassword());
+        Document accountDocument = new Document("_id", new ObjectId(account.getId()));
+        accountDocument.append("username", username)
+                .append("password", account.getPassword());
         accountDocumentCollection.insertOne(accountDocument);
-        return true;
-    }
-
-    public boolean remove(Account account) {
-        if (find(account.getUsername()) == null) {
-            return false;
-        }
-
-        Document accountDocument = new Document("_id", account.getId());
-        accountDocument.append("username", account.getUsername()).append("password", account.getPassword());
-        accountDocumentCollection.deleteOne(accountDocument);
         return true;
     }
 
@@ -93,20 +92,8 @@ public class AccountMongoDB implements IAccountDb {
     }
 
     @Override
-    public Account find(ObjectId id) {
-        Bson filter = eq("_id", id);
-        var accountDocumentIter = accountDocumentCollection.find(filter);
-        Document accountDocument = accountDocumentIter.first();
-        if (accountDocument == null) {
-            // Account does not exist
-            return null;
-        }
-        return jsonToAccount(accountDocument);
-    }
-
-    @Override
     public boolean update(Account updatedAccount) {
-        Account oldAccount = remove(updatedAccount.getId());
+        Account oldAccount = removeById(updatedAccount.getId());
         if (oldAccount == null) {
             // Account does not exist
             return false;
@@ -116,8 +103,19 @@ public class AccountMongoDB implements IAccountDb {
     }
 
     @Override
-    public Account remove(ObjectId id) {
-        Bson filter = eq("_id", id);
+    public Account removeById(String id) {
+        Bson filter = eq("_id", new ObjectId(id));
+        Document accountDocument = accountDocumentCollection.findOneAndDelete(filter);
+        if (accountDocument == null) {
+            // Account does not exist
+            return null;
+        }
+        return jsonToAccount(accountDocument);
+    }
+
+    @Override
+    public Account removeByUsername(String username) {
+        Bson filter = eq("username", username);
         Document accountDocument = accountDocumentCollection.findOneAndDelete(filter);
         if (accountDocument == null) {
             // Account does not exist

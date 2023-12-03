@@ -3,7 +3,7 @@ package code.client.View;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.geometry.Pos;
-import code.client.Model.Recipe;
+import code.server.Recipe;
 
 public class RecipeUI extends HBox {
     private Button mealType;

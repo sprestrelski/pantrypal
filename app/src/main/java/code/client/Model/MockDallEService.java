@@ -33,7 +33,7 @@ public class MockDallEService extends RecipeToImage {
   }
 
   @Override
-  public byte[] downloadImage(String generatedImageData, ObjectId id) {
+  public byte[] downloadImage(String generatedImageData, String id) {
     byte[] generatedImageBytes = Base64.getDecoder().decode(generatedImageData);
     return generatedImageBytes;
   }

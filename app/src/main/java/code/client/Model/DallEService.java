@@ -5,16 +5,13 @@ import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.bson.types.ObjectId;
 import java.util.Base64;
 
 public class DallEService extends RecipeToImage {
@@ -77,11 +74,11 @@ public class DallEService extends RecipeToImage {
     }
 
     @Override
-    public byte[] downloadImage(String generatedImageData, ObjectId id) {
+    public byte[] downloadImage(String generatedImageData, String id) {
         // convert base64 string to binary data
         byte[] generatedImageBytes = Base64.getDecoder().decode(generatedImageData);
         try (InputStream in = new ByteArrayInputStream(generatedImageBytes)) {
-            String path = id.toString() + ".jpg";
+            String path = id + ".jpg";
             Files.copy(in, Paths.get(path));
         } catch (IOException e) {
             e.printStackTrace();

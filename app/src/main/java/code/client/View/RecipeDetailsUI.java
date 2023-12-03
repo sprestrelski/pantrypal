@@ -13,8 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
 
-import code.client.Model.AppConfig;
-import code.client.Model.Recipe;
+import code.server.Recipe;
 
 public class RecipeDetailsUI extends HBox {
     private TextField titleTextField;

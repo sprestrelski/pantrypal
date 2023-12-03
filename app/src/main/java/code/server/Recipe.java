@@ -1,4 +1,4 @@
-package code.client.Model;
+package code.server;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -7,29 +7,30 @@ import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 import org.bson.types.ObjectId;
+import code.client.Model.*;
 
 public class Recipe {
-    private final ObjectId id;
-    private ObjectId accountId;
+    private String id;
+    private String userID;
     private String title;
     private String mealTag;
     private String image;
     private final List<String> ingredients = new ArrayList<>();
     private final List<String> instructions = new ArrayList<>();
 
-    public Recipe(ObjectId id, ObjectId accountId, String title, String mealTag, String image) {
+    public Recipe(String id, String accountId, String title, String mealTag, String image) {
         this.id = id;
-        this.accountId = accountId;
+        this.userID = accountId;
         this.title = title;
         this.mealTag = mealTag;
         this.image = image;
     }
 
-    public Recipe(ObjectId accountId, String title, String mealTag, String image) {
-        this(new ObjectId(), accountId, title, mealTag, image);
+    public Recipe(String accountId, String title, String mealTag, String image) {
+        this(new ObjectId().toHexString(), accountId, title, mealTag, image);
     }
 
-    public Recipe(ObjectId accountId, String title, String mealTag) {
+    public Recipe(String accountId, String title, String mealTag) {
         this(accountId, title, mealTag, null);
         setDefaultImage();
     }
@@ -39,16 +40,20 @@ public class Recipe {
         setDefaultImage();
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setAccountId(ObjectId accountId) {
-        this.accountId = accountId;
+    public void setID(String accountID) {
+        id = accountID;
     }
 
-    public ObjectId getAccountId() {
-        return accountId;
+    public void setAccountId(String accountId) {
+        this.userID = accountId;
+    }
+
+    public String getAccountId() {
+        return userID;
     }
 
     public void setTitle(String title) {
@@ -125,6 +130,10 @@ public class Recipe {
         if (!(obj instanceof Recipe recipe)) {
             return false;
         }
-        return id.equals(recipe.id);
+        return title.equals(recipe.getTitle()) &&
+                mealTag.equals(recipe.mealTag) &&
+                ingredients.equals(recipe.ingredients) &&
+                instructions.equals(recipe.instructions);
     }
+
 }

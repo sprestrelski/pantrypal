@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 
 import code.client.Model.*;
+import code.server.IRecipeDb;
+import code.server.Recipe;
 
 /**
  * Test the delete recipe feature for four distinct test cases:

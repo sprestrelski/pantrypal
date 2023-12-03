@@ -29,9 +29,9 @@ public class AddUserTest {
             AccountMongoDB accountDb = new AccountMongoDB(userCollection);
             Account account = new Account("Bob", "Ross");
             accountDb.add(account);
-            Account test1 = accountDb.find("Bob");
+            Account test1 = accountDb.findByUsername("Bob");
             assertNotEquals(test1, null);
-            accountDb.remove(account);
+            accountDb.removeById(account.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -47,18 +47,18 @@ public class AddUserTest {
             // make an account
             Account account = new Account("Bob", "Ross");
             accountDb.add(account);
-            Account test1 = accountDb.find("Bob");
+            Account test1 = accountDb.findByUsername("Bob");
             assertNotEquals(test1, null);
 
             // try to make an account with the same username
             Account temp1 = new Account("", "Robert");
             Account temp2 = new Account("Bob", "Robert");
-            assertTrue(accountDb.validate("Bob", "Ross"));
+            assertTrue(accountDb.checkPassword("Bob", "Ross"));
             assertFalse(accountDb.add(temp1));
             assertFalse(accountDb.add(temp2));
-            accountDb.remove(test1);
-            accountDb.remove(temp1);
-            accountDb.remove(temp2);
+            accountDb.removeByUsername(test1.getUsername());
+            accountDb.removeByUsername(temp1.getUsername());
+            accountDb.removeByUsername(temp2.getUsername());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,7 +70,7 @@ public class AddUserTest {
             MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
             MongoCollection<Document> userCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
             IAccountDb accountDb = new AccountMongoDB(userCollection);
-            Account test = accountDb.find("Greg Miranda");
+            Account test = accountDb.findByUsername("Greg Miranda");
             assertNull(test);
         } catch (Exception e) {
             e.printStackTrace();

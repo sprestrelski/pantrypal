@@ -5,16 +5,19 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
-import org.bson.types.ObjectId;
-
 import code.client.View.RecipeListUI;
 import code.client.View.RecipeUI;
 import code.client.View.View;
+import code.server.AccountRequestHandler;
+import code.server.IRecipeDb;
+
+import java.net.URL;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.GridPane;
@@ -25,15 +28,18 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import code.client.Model.*;
 import code.client.View.AppAlert;
+import code.client.View.DetailsAppFrame;
+import code.server.Recipe;
 
 public class Controller {
     private Account account;
     private Model model;
     private View view;
+    private IRecipeDb recipeDb;
     private RecipeCSVWriter recipeWriter;
+    private RecipeCSVReader recipeReader;
     private String title;
     private String defaultButtonStyle, onStyle, offStyle, blinkStyle;
-    public static final String CSVFILE = "usercredentials.csv";
 
     public Controller(View view, Model model) {
 
@@ -52,6 +58,7 @@ public class Controller {
                 e.printStackTrace();
             }
         });
+
         this.view.getAppFrameHome().setLogOutButtonAction(event -> {
             handleLogOutOutButton(event);
         });
@@ -62,8 +69,7 @@ public class Controller {
         loadCredentials();
         if (account != null) {
             this.view.getLoginUI().setLoginCreds(account);
-            this.view.goToRecipeList();
-            addListenersToList();
+            goToRecipeList();
         }
     }
 
@@ -73,7 +79,6 @@ public class Controller {
 
     private void handleRecipePostButton(ActionEvent event) throws IOException {
         Recipe postedRecipe = view.getDetailedView().getDisplayedRecipe();
-
         Button saveButtonFromDetailed = view.getDetailedView().getSaveButton();
         saveButtonFromDetailed.setStyle(blinkStyle);
         PauseTransition pause = new PauseTransition(Duration.seconds(1));
@@ -86,19 +91,36 @@ public class Controller {
 
         String recipe = writer.toString();
         // Debugging
-        System.out.println("Posting: " + recipe);
+        // System.out.println("Posting: " + recipe);
 
         model.performRecipeRequest("POST", recipe, null);
     }
 
-    private void handleGetButton(ActionEvent event) {
-        String uuid = UUID.fromString(title).toString();
-        model.performRecipeRequest("GET", null, uuid);
+    private void goToRecipeList() {
+        getUserRecipeList();
+        displayUserRecipes();
+        view.goToRecipeList();
+        addListenersToList();
     }
 
-    private void handleDeleteButton(ActionEvent event) {
-        String uuid = UUID.fromString(title).toString();
-        model.performRecipeRequest("DELETE", null, uuid);
+    private void getUserRecipeList() {
+        String userID = account.getId();
+        String response = model.performRecipeRequest("GET", null, userID);
+        Reader reader = new StringReader(response);
+        recipeReader = new RecipeCSVReader(reader);
+
+        try {
+            recipeDb = new RecipeListDb();
+            recipeReader.readRecipeDb(recipeDb);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void displayUserRecipes() {
+        RecipeListUI recipeListUI = this.view.getAppFrameHome().getRecipeList();
+        recipeListUI.setRecipeDB(recipeDb);
+        recipeListUI.update();
     }
 
     private void handleNewButton(ActionEvent event) throws URISyntaxException, IOException {
@@ -116,8 +138,7 @@ public class Controller {
     }
 
     private void handleHomeButton(ActionEvent event) {
-        view.goToRecipeList();
-        addListenersToList();
+        goToRecipeList();
     }
 
     public void addListenersToList() {
@@ -153,10 +174,10 @@ public class Controller {
                 String audioOutput2 = ingredients;// audio.processAudio();
                 String responseText = caller.getResponse(audioOutput1, audioOutput2);
                 Recipe chatGPTrecipe = caller.mapResponseToRecipe(mealType, responseText);
-                System.out.println(chatGPTrecipe.getTitle());
+                chatGPTrecipe.setAccountId(account.getId());
                 chatGPTrecipe.setImage(imageCaller.getResponse(chatGPTrecipe.getTitle()));
 
-                // TODO Changes UI to Detailed Recipe Screen
+                // Changes UI to Detailed Recipe Screen
                 view.goToDetailedView(chatGPTrecipe, false);
                 view.getDetailedView().getRecipeDetailsUI().setEditable(false);
                 handleDetailedViewListeners();
@@ -172,22 +193,59 @@ public class Controller {
 
     private void handleDetailedViewListeners() {
         // Saving recipe or editing recipe from Detailed View
-        this.view.getDetailedView().setPostButtonAction(event -> {
+        DetailsAppFrame detailedView = this.view.getDetailedView();
+        detailedView.setPostButtonAction(event -> {
             try {
                 handleRecipePostButton(event);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-        this.view.getDetailedView().setEditButtonAction(this::handleEditButton);
-        this.view.getDetailedView().setDeleteButtonAction(this::handleDeleteButton);
-        this.view.getDetailedView().setHomeButtonAction(this::handleHomeButton);
+        detailedView.setEditButtonAction(this::handleEditButton);
+        detailedView.setDeleteButtonAction(this::handleDeleteButton);
+        detailedView.setHomeButtonAction(this::handleHomeButton);
+        detailedView.setShareButtonAction(this::handleShareButton);
     }
 
     private void handleEditButton(ActionEvent event) {
         Button edit = view.getDetailedView().getEditButton();
         view.getDetailedView().getRecipeDetailsUI().setEditable();
         changeEditButtonColor(edit);
+    }
+
+    private void handleDeleteButton(ActionEvent event) {
+        String uuid = UUID.fromString(title).toString();
+        model.performRecipeRequest("DELETE", null, uuid);
+    }
+
+    private void handleShareButton(ActionEvent event) {
+        Recipe shownRecipe = this.view.getDetailedView().getDisplayedRecipe();
+        String id = shownRecipe.getId().toString();
+
+        String styleAlert = "-fx-background-color: #F1FFCB; -fx-font-weight: bold;";
+        Hyperlink textArea = new Hyperlink(AppConfig.SHARE_LINK + account.getUsername() + "/" + id);
+        textArea.setOnAction(action -> {
+            try {
+                java.awt.Desktop.getDesktop()
+                        .browse(new URL(AppConfig.SHARE_LINK + account.getUsername() + "/" + id).toURI());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        });
+        textArea.setWrapText(true);
+        GridPane gridPane = new GridPane();
+        gridPane.setMaxWidth(Double.MAX_VALUE);
+        gridPane.add(textArea, 0, 0);
+        gridPane.setStyle(styleAlert);
+        gridPane.setPrefSize(220, 220);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Share this recipe!");
+        alert.setHeaderText("Share this recipe with a friend!");
+        alert.getDialogPane().setContent(gridPane);
+        alert.showAndWait();
     }
 
     private void changeEditButtonColor(Button edit) {
@@ -218,7 +276,7 @@ public class Controller {
         } else {
             // Continue with account creation logic
             System.out.println("Account Created!\nUsername: " + username + "\nPassword: " + password);
-            model.performUserRequest("PUT", username, password);
+            model.performAccountRequest("PUT", username, password);
             // Show success message
             showSuccessPane(grid);
             view.goToLoginUI();
@@ -256,8 +314,8 @@ public class Controller {
     private boolean isUsernameTaken(String username) {
         // Check if the username is already taken
         // temporary logic, no database yet
-        String response = model.performUserRequest("GET", username, "");
-        System.out.println("Response for usernameTaken : " + response);
+        String response = model.performAccountRequest("GET", username, "");
+        // System.out.println("Response for usernameTaken : " + response);
         return (response.equals("Username is taken"));
     }
     ////////////////////////////////////////
@@ -276,8 +334,7 @@ public class Controller {
             if (loginSuccessful) {
                 showLoginSuccessPane(grid, true); // useless
 
-                view.goToRecipeList();
-                addListenersToList();
+                goToRecipeList();
 
                 if (!view.getLoginUI().getRememberLogin()) {
                     clearCredentials();
@@ -291,7 +348,7 @@ public class Controller {
     }
 
     private void clearCredentials() {
-        try (FileWriter writer = new FileWriter("userCredentials.csv", false)) {
+        try (FileWriter writer = new FileWriter(AppConfig.CREDENTIALS_CSV_FILE, false)) {
             writer.write("");
             writer.flush();
             writer.close();
@@ -302,7 +359,7 @@ public class Controller {
     }
 
     private void saveCredentials(Account acc) {
-        try (FileWriter writer = new FileWriter("userCredentials.csv", true)) {
+        try (FileWriter writer = new FileWriter(AppConfig.CREDENTIALS_CSV_FILE, true)) {
             writer.append(acc.getUsername())
                     .append("|")
                     .append(acc.getPassword())
@@ -318,12 +375,12 @@ public class Controller {
 
     private void loadCredentials() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(CSVFILE));
+            BufferedReader reader = new BufferedReader(new FileReader(AppConfig.CREDENTIALS_CSV_FILE));
             String line;
             String[] credentials;
             while ((line = reader.readLine()) != null) {
                 credentials = line.split("\\|");
-                account = new Account(new ObjectId(credentials[2]), credentials[0], credentials[1]);
+                account = new Account(credentials[2], credentials[0], credentials[1]);
             }
             reader.close();
         } catch (IOException e) {
@@ -352,16 +409,17 @@ public class Controller {
 
     private boolean performLogin(String username, String password) {
         // Will add logic for failed login later
-        String response = model.performUserRequest("GET", username, password);
-        String canLogin = "Username and Password are correct.";
-        if (response.contains(canLogin)) {
-            String userID = response.substring(response.indexOf(canLogin) + canLogin.length());
-
-            System.out.println("UserID " + userID + "\n" + response);
-            account = new Account(new ObjectId(userID), username, password);
-            return true;
-        } else
+        String response = model.performAccountRequest("GET", username, password);
+        if (response.equals(AccountRequestHandler.USERNAME_NOT_FOUND) ||
+                response.equals(AccountRequestHandler.INCORRECT_PASSWORD) ||
+                response.equals(AccountRequestHandler.TAKEN_USERNAME)) {
             return false;
+        }
+        // The response is the account id
+        String accountId = response;
+        // System.out.println("Account ID " + accountId + "\n" + response);
+        account = new Account(accountId, username, password);
+        return true;
     }
     ///////////////////////////////
 

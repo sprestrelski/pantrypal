@@ -2,7 +2,7 @@ package code;
 
 import org.junit.jupiter.api.Test;
 
-import code.client.Model.Recipe;
+import code.server.Recipe;
 import code.client.Model.RecipeToImage;
 import code.client.Model.AppConfig;
 import code.client.Model.MockDallEService;

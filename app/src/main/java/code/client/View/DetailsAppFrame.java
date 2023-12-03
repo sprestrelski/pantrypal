@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import code.server.Recipe;
 
 import javafx.event.*;
 
@@ -74,6 +75,7 @@ public class DetailsAppFrame {
         String[] instr = instructions.split("\n");
 
         Recipe edit = new Recipe(title, currentRecipe.getMealTag());
+        edit.setAccountId(currentRecipe.getAccountId());
         for (String ingredient : ingr) {
             edit.addIngredient(ingredient);
         }
@@ -93,6 +95,7 @@ public class DetailsAppFrame {
     private Recipe getMockedRecipe() {
         // Hardcoded value for now, recipe value for it should be changing
         Recipe temp = new Recipe("Fried Chicken and Egg Fried Rice", "BREAKFAST");
+        temp.setAccountId("656a2e6d8a659b00c86888b8"); // Chris's account ID
         temp.addIngredient("2 chicken breasts, diced");
         temp.addIngredient("2 large eggs");
         temp.addIngredient("2 cups cooked rice");
