@@ -29,10 +29,14 @@ import code.client.View.AppAlert;
 import code.client.View.AppFrameHome;
 
 public class Controller {
-    private final int NEWEST_TO_OLDEST_INDEX = 0; // Index of newest to oldest in sorting drop down menu 
-    private final int OLDEST_TO_NEWEST_INDEX = 1; // Index of oldest to newest in sorting drop down menu
-    private final int A_TO_Z_INDEX = 2; // Index of A to Z in sorting drop down menu
-    private final int Z_TO_A_INDEX = 3; // Index of Z to A in sorting drop down menu
+    // Index of newest to oldest in sorting drop down menu, index of breakfast in filtering drop down menu
+    private final int NEWEST_TO_OLDEST_INDEX = 0, BREAKFAST_INDEX = 0;
+    // Index of oldest to newest in sorting drop down menu, index of lunch in filtering drop down menu
+    private final int OLDEST_TO_NEWEST_INDEX = 1, LUNCH_INDEX = 1;
+    // Index of A to Z in sorting drop down menu, index of dinner in filtering drop down menu
+    private final int A_TO_Z_INDEX = 2, DINNER_INDEX = 2;
+    // Index of Z to A in sorting drop down menu, index of none in filtering drop down menu
+    private final int Z_TO_A_INDEX = 3, NONE_INDEX = 3;
     
     private Model model;
     private View view;
@@ -124,6 +128,29 @@ public class Controller {
     //         sortChoiceBox.show();
     //     });
     // }
+
+    private void handleFilterMenuButton(ActionEvent event) {
+        RecipeListUI list = view.getAppFrameHome().getRecipeList();
+        MenuButton filterMenuButton = view.getAppFrameHome().getFilterMenuButton();
+        ObservableList<MenuItem> filterMenuItems = filterMenuButton.getItems();
+
+        // Filter to show only breakfast recipes when criteria is selected
+        filterMenuItems.get(BREAKFAST_INDEX).setOnAction(e -> {
+
+        });
+        // Filter to show only lunch recipes when criteria is selected
+        filterMenuItems.get(LUNCH_INDEX).setOnAction(e -> {
+
+        });
+        // Filter to show only dinner recipes when criteria is selected
+        filterMenuItems.get(DINNER_INDEX).setOnAction(e -> {
+
+        });
+        // Remove selected filter to show breakfast, lunch, and dinner recipes
+        filterMenuItems.get(NONE_INDEX).setOnAction(e -> {
+
+        });
+    }
 
     private void handleSortMenuButton(ActionEvent event) {
         RecipeListUI list = view.getAppFrameHome().getRecipeList();

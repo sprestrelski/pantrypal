@@ -46,34 +46,42 @@ class Footer extends HBox {
 
 class Header extends HBox {
 
-    private Button filterButton;
-    // Drop down menu for choosing sorting criteria
-    private MenuButton sortMenuButton;
+    // Drop down menu for choosing filtering and sorting criteria
+    private MenuButton filterMenuButton, sortMenuButton;
+    // Filtering criteria contained in the dropdown menu
+    private MenuItem filterBreakfast, filterLunch, filterDinner, filterNone;
     // Sorting crteria contained in the dropdown menu
-    private MenuItem sortNtoO, sortOtoN, sortAtoZ, sortZtoA;
+    private MenuItem sortNewToOld, sortOldToNew, sortAToZ, sortZToA;
 
     Header() {
         String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF; -fx-font-weight: bold; -fx-font: 13 arial;";
 
-        filterButton = new Button("Filter");
-        filterButton.setStyle(defaultButtonStyle);
+        filterMenuButton = new MenuButton("Filter");
+        filterMenuButton.setStyle(defaultButtonStyle);
+
+        filterBreakfast = new MenuItem("Breakfast");
+        filterLunch = new MenuItem("Lunch");
+        filterDinner = new MenuItem("Dinner");
+        filterNone = new MenuItem("None");
+
+        filterMenuButton.getItems().addAll(filterBreakfast, filterLunch, filterDinner, filterNone);
 
         sortMenuButton = new MenuButton("Sort");
         sortMenuButton.setStyle(defaultButtonStyle);
 
-        sortNtoO = new MenuItem("Sort by date (Newest to Oldest)");
-        sortOtoN = new MenuItem("Sort by date (Oldest to Newest)");
-        sortAtoZ = new MenuItem("Sort alphabetically (A-Z)");
-        sortZtoA = new MenuItem("Sort alphabetically (Z-A)");
+        sortNewToOld = new MenuItem("Sort by date (Newest to Oldest)");
+        sortOldToNew = new MenuItem("Sort by date (Oldest to Newest)");
+        sortAToZ = new MenuItem("Sort alphabetically (A-Z)");
+        sortZToA = new MenuItem("Sort alphabetically (Z-A)");
 
-        sortMenuButton.getItems().addAll(sortNtoO, sortOtoN, sortAtoZ, sortZtoA);
+        sortMenuButton.getItems().addAll(sortNewToOld, sortOldToNew, sortAToZ, sortZToA);
 
         this.setPrefSize(700, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
 
         Text titleText = new Text("Recipe List");
         titleText.setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
-        this.getChildren().addAll(filterButton, titleText, sortMenuButton); //thjere was sortButton before
+        this.getChildren().addAll(filterMenuButton, titleText, sortMenuButton);
         this.setAlignment(Pos.CENTER);
         this.setSpacing(200);
     }
@@ -82,8 +90,8 @@ class Header extends HBox {
         return this.sortMenuButton;
     }
 
-    public Button getFilterButton() {
-        return this.filterButton;
+    public MenuButton getFilterMenuButton() {
+        return this.filterMenuButton;
     }
 }
 
@@ -91,8 +99,8 @@ public class AppFrameHome extends BorderPane {
     private Header header;
     private Footer footer;
     private RecipeListUI recipeList;
-    private Button newButton, filterButton;
-    private MenuButton sortMenuButton;
+    private Button newButton;
+    private MenuButton filterMenuButton, sortMenuButton;
     private Scene mainScene;
     private StackPane stack;
 
@@ -112,7 +120,7 @@ public class AppFrameHome extends BorderPane {
         this.setBottom(footer);
 
         newButton = footer.getNewButton();
-        filterButton = header.getFilterButton();
+        filterMenuButton = header.getFilterMenuButton();
         sortMenuButton = header.getSortMenuButton();
     }
 
@@ -139,8 +147,8 @@ public class AppFrameHome extends BorderPane {
         newButton.setOnAction(eventHandler);
     }
 
-    public void setFilterButtonAction(EventHandler<ActionEvent> eventHandler) {
-        filterButton.setOnAction(eventHandler);
+    public void setFilterMenuButtonAction(EventHandler<ActionEvent> eventHandler) {
+        filterMenuButton.setOnAction(eventHandler);
     }
 
     public void setSortMenuButtonAction(EventHandler<ActionEvent> eventHandler) {
@@ -159,8 +167,8 @@ public class AppFrameHome extends BorderPane {
         return header.getSortMenuButton();
     }
 
-    public Button getFilterButton() {
-        return header.getFilterButton();
+    public MenuButton getFilterMenuButton() {
+        return header.getFilterMenuButton();
     }
 
     public Button getNewButton() {
