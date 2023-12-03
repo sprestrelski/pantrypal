@@ -4,12 +4,8 @@ import javafx.scene.layout.*;
 import java.io.*;
 import java.util.List;
 
-import code.client.Model.AppConfig;
 import code.server.Recipe;
-import code.client.Model.RecipeListDb;
 import code.server.IRecipeDb;
-import code.client.Model.RecipeCSVReader;
-import code.client.Model.RecipeCSVWriter;
 
 public class RecipeListUI extends VBox {
     private IRecipeDb recipeDb;

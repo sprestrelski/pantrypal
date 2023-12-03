@@ -3,11 +3,8 @@ package code.client.View;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import javax.swing.plaf.basic.BasicOptionPaneUI.ButtonAreaLayout;
-import code.client.Model.Account;
 import code.server.Recipe;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 
 public class View {
     private AppFrameHome home;

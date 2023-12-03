@@ -1,6 +1,5 @@
 package code.client.View;
 
-import code.client.Model.*;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;

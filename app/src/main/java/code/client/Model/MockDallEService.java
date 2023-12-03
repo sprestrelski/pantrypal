@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Base64;
 
-import org.bson.types.ObjectId;
-
 public class MockDallEService extends RecipeToImage {
   private boolean error = false;
 

@@ -1,21 +1,13 @@
 
 package code.client.View;
 
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import java.io.*;
-import java.lang.StackWalker.StackFrame;
 
 import javafx.geometry.Pos;
-import java.util.ArrayList;
-import java.util.UUID;
-
-import code.client.Model.*;
-import code.client.View.*;
-import code.client.Controllers.*;
 import javafx.event.*;
 
 class Footer extends HBox {
@@ -80,7 +72,6 @@ public class AppFrameHome extends BorderPane {
     private Footer footer;
     private RecipeListUI recipeList;
     private Button newButton, logOutButton;
-    private Scene mainScene;
     private StackPane stack;
 
     AppFrameHome() throws IOException {
@@ -114,10 +105,6 @@ public class AppFrameHome extends BorderPane {
             RecipeUI currRecipe = (RecipeUI) recipeList.getChildren().get(i);
         }
         this.setCenter(recipeList);
-    }
-
-    public void setMain(Scene main) {
-        mainScene = main;
     }
 
     public void setNewRecipeButtonAction(EventHandler<ActionEvent> eventHandler) {
