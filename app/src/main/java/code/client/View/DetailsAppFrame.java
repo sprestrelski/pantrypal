@@ -180,9 +180,11 @@ public class DetailsAppFrame {
         if (!old) {
             deleteButton.setVisible(false);
             refreshButton.setVisible(true);
+            shareButton.setVisible(false);
         } else {
             deleteButton.setVisible(true);
             refreshButton.setVisible(false);
+            shareButton.setVisible(true);
         }
         updateDisplay();
         isOldRecipe = old;
@@ -203,6 +205,14 @@ public class DetailsAppFrame {
 
     public Button getRefreshButton() {
         return refreshButton;
+    }
+
+    public Button getShareButton() {
+        return shareButton;
+    }
+
+    public Button getDeleteButton() {
+        return deleteButton;
     }
 
     public void setRecipe(Recipe recipe) {
