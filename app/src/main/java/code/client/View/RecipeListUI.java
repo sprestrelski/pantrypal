@@ -26,14 +26,15 @@ public class RecipeListUI extends VBox {
         this.recipeDb = recipeDB;
     }
 
-    public void update() {
+    public void update(String filter) {
         getChildren().clear();
         List<Recipe> recipeList = recipeDb.getList();
         RecipeUI recipeUI;
-
         for (Recipe recipe : recipeList) {
-            recipeUI = new RecipeUI(recipe);
-            this.getChildren().add(recipeUI);
+            if (filter.equals("none") || recipe.getMealTag().toLowerCase().equals(filter.toLowerCase())) {
+                recipeUI = new RecipeUI(recipe);
+                this.getChildren().add(recipeUI);
+            }
         }
     }
 }
