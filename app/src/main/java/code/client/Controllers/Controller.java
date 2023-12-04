@@ -2,10 +2,7 @@ package code.client.Controllers;
 
 import java.io.*;
 import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
+import java.util.*;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 
 import code.client.View.RecipeListUI;
@@ -15,28 +12,21 @@ import code.server.AccountRequestHandler;
 import code.server.IRecipeDb;
 
 import java.net.URL;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.PauseTransition;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import javafx.scene.text.*;
 import javafx.util.Duration;
 import code.client.Model.*;
 import code.client.View.AppAlert;
 import code.client.View.AppFrameHome;
+import code.client.View.AppFrameMic;
 import code.client.View.DetailsAppFrame;
 import code.server.Recipe;
 
@@ -63,6 +53,13 @@ public class Controller {
     private String title;
     private String defaultButtonStyle, onStyle, offStyle, blinkStyle;
     private String filter;
+
+    // Audio Stuff
+    private boolean recording; // keeps track if the app is currently recording
+    private final AppAudioRecorder recorder = new AppAudioRecorder();
+    private VoiceToText voiceToText;
+    private String mealType; // stores the meal type specified by the user
+    private String ingredients; // stores the ingredients listed out by the user
 
     public Controller(View view, Model model) {
 
@@ -132,6 +129,11 @@ public class Controller {
         MenuButton sortMenuButton = this.view.getAppFrameHome().getSortMenuButton();
         setActiveState(filterMenuButton, 9);
         setActiveState(sortMenuButton, 9);
+
+        RecipeListUI recipeListUI = this.view.getAppFrameHome().getRecipeList();
+        RecipeSorter recipeSorter = new RecipeSorter(recipeListUI.getRecipeDB().getList());
+        recipeSorter.sortNewestToOldest();
+        sortList(sortMenuButton, NEWEST_TO_OLDEST_INDEX);
         // 9 is beyond the scope of menuItem indexes
     }
 
@@ -157,17 +159,19 @@ public class Controller {
 
     private void handleNewButton(ActionEvent event) throws URISyntaxException, IOException {
         view.goToAudioCapture();
-        this.view.getAppFrameMic().setGoToDetailedButtonAction(this::handleDetailedViewFromNewRecipeButton);
-        this.view.getAppFrameMic().setGoToHomeButtonAction(this::handleHomeButton);
-    }
+        AppFrameMic mic = this.view.getAppFrameMic();
+        mic.setGoToDetailedButtonAction(this::handleDetailedViewFromNewRecipeButton);
+        mic.setGoToHomeButtonAction(this::handleHomeButton);
+        mic.setRecordIngredientsButtonAction(this::handleRecordIngredients);
+        mic.setRecordMealTypeButtonAction(event1 -> {
+            try {
+                handleRecordMealType(event1);
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
+            }
+        });
 
-    // private void handleSortButton(ActionEvent event) {
-    // ChoiceBox<String> sortChoiceBox = view.getAppFrameHome().getSortChoiceBox();
-    // RecipeListUI list = view.getAppFrameHome().getRecipeList();
-    // view.getAppFrameHome().getSortButton().setOnAction(e -> {
-    // sortChoiceBox.show();
-    // });
-    // }
+    }
 
     private void addFilterListeners() {
         MenuButton filterMenuButton = this.view.getAppFrameHome().getFilterMenuButton();
@@ -287,28 +291,19 @@ public class Controller {
 
     private void handleDetailedViewFromNewRecipeButton(ActionEvent event) {
         // Get ChatGPT response from the Model
-        List<String> inputs = view.getAppFrameMic().getVoiceResponse();
-
-        String mealType = inputs.get(0);
-        String ingredients = inputs.get(1);
         if (mealType != null && ingredients != null) {
-            TextToRecipe caller = new MockGPTService();// new ChatGPTService();
-            RecipeToImage imageCaller = new MockDallEService(); // new DallEService();
-
             try {
-                String audioOutput1 = mealType;
-                String audioOutput2 = ingredients;// audio.processAudio();
-                String responseText = caller.getResponse(audioOutput1, audioOutput2);
-                Recipe chatGPTrecipe = caller.mapResponseToRecipe(mealType, responseText);
+                String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
+                Recipe chatGPTrecipe = mapResponseToRecipe(mealType, responseText);
                 chatGPTrecipe.setAccountId(account.getId());
-                chatGPTrecipe.setImage(imageCaller.getResponse(chatGPTrecipe.getTitle()));
+                chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
 
                 // Changes UI to Detailed Recipe Screen
                 view.goToDetailedView(chatGPTrecipe, false);
                 view.getDetailedView().getRecipeDetailsUI().setEditable(false);
                 handleDetailedViewListeners();
 
-            } catch (IOException | URISyntaxException | InterruptedException exception) {
+            } catch (Exception exception) {
                 AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
                 exception.printStackTrace();
             }
@@ -387,14 +382,15 @@ public class Controller {
     }
 
     private void showShareRecipe(Hyperlink textArea) {
-        String styleAlert = "-fx-background-color: #F1FFCB; -fx-font-weight: bold;";
+        String styleAlert = "-fx-background-color: #F1FFCB; -fx-font-weight: bold; -fx-font: 14 arial";
 
         GridPane gridPane = new GridPane();
         gridPane.setMaxWidth(Double.MAX_VALUE);
         gridPane.add(textArea, 0, 0);
         gridPane.setStyle(styleAlert);
         gridPane.setPrefSize(220, 220);
-
+        gridPane.setAlignment(Pos.TOP_CENTER);
+        textArea.setTextAlignment(TextAlignment.CENTER);
         Button copyButton = new Button("Copy to Clipboard");
         copyButton.setOnAction(event -> {
             Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -402,7 +398,7 @@ public class Controller {
             content.putString(textArea.getText());
             clipboard.setContent(content);
         });
-        gridPane.add(copyButton, 0, 2);
+        gridPane.add(copyButton, 0, 3);
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Share this recipe!");
@@ -429,27 +425,22 @@ public class Controller {
 
     private void handleRefreshButton(ActionEvent event) {
         // Get ChatGPT response from the Model
-        List<String> inputs = view.getAppFrameMic().getVoiceResponse();
+        if (mealType != null && ingredients != null) {
+            try {
+                String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
+                Recipe chatGPTrecipe = mapResponseToRecipe(mealType, responseText);
+                chatGPTrecipe.setAccountId(account.getId());
+                chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
 
-        String mealType = inputs.get(0);
-        String ingredients = inputs.get(1);
+                // Changes UI to Detailed Recipe Screen
+                view.getDetailedView().setRecipe(chatGPTrecipe);
 
-        TextToRecipe caller = new MockGPTService();// new ChatGPTService();
-        RecipeToImage imageCaller = new MockDallEService(); // new DallEService();
-
-        try {
-            String audioOutput1 = mealType;
-            String audioOutput2 = ingredients;// audio.processAudio();
-            String responseText = caller.getResponse(audioOutput1, audioOutput2);
-            Recipe chatGPTrecipe = caller.mapResponseToRecipe(mealType, responseText);
-            chatGPTrecipe.setAccountId(account.getId());
-            chatGPTrecipe.setImage(imageCaller.getResponse(chatGPTrecipe.getTitle()));
-
-            // Changes UI to Detailed Recipe Screen
-            view.getDetailedView().setRecipe(chatGPTrecipe);
-        } catch (IOException | URISyntaxException | InterruptedException exception) {
-            AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
-            exception.printStackTrace();
+            } catch (Exception exception) {
+                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+                exception.printStackTrace();
+            }
+        } else {
+            AppAlert.show("Input Error", "Invalid meal type or ingredients, please try again!");
         }
     }
 
@@ -613,5 +604,145 @@ public class Controller {
         account = new Account(accountId, username, password);
         return true;
     }
-    ///////////////////////////////
+
+    /////////////////////////////// AUDIOMANAGEMENT///////////////////////////////////
+    public void handleRecordMealType(ActionEvent event) throws IOException, URISyntaxException {
+        recordMealType();
+    }
+
+    public void handleRecordIngredients(ActionEvent event) {
+        recordIngredients();
+    };
+
+    private void recordMealType() {
+        AppFrameMic mic = this.view.getAppFrameMic();
+        if (!recording) {
+            recorder.startRecording();
+            recording = true;
+            mic.getRecordMealTypeButton().setStyle("-fx-background-color: #FF0000;");
+            mic.getRecordingMealTypeLabel().setVisible(true);
+            // recordingLabel1.setStyle("-fx-font-color: #FF0000;");
+        } else {
+            recorder.stopRecording();
+            recording = false;
+            mic.getRecordMealTypeButton().setStyle("");
+            mic.getRecordingMealTypeLabel().setVisible(false);
+            // recordingLabel1.setStyle("");
+
+            try {
+                mealType = model.performWhisperRequest("GET", "mealType");
+                if (mealType == null) {
+                    AppAlert.show("Input Error", "Please say a valid meal type!");
+                }
+                mic.getMealBox().getMealType().setText(mealType);
+            } catch (IOException exception) {
+                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+                exception.printStackTrace();
+            }
+        }
+    }
+
+    private void recordIngredients() {
+        AppFrameMic mic = this.view.getAppFrameMic();
+        if (!recording) {
+            recorder.startRecording();
+            recording = true;
+            mic.getRecordIngredientsButton().setStyle("-fx-background-color: #FF0000;");
+            mic.getRecordingIngredientsLabel().setVisible(true);
+            // recordingLabel2.setStyle("-fx-background-color: #FF0000;");
+        } else {
+            recorder.stopRecording();
+            recording = false;
+            mic.getRecordIngredientsButton().setStyle("");
+            mic.getRecordingIngredientsLabel().setVisible(false);
+            // recordingLabel2.setStyle("");
+
+            try {
+                mealType = model.performWhisperRequest("GET", "ingredients");
+                String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
+
+                if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*") ||
+                        ingredients.trim().isEmpty() ||
+                        ingredients.contains("you")) {
+                    AppAlert.show("Input Error", "Please provide valid ingredients!");
+                    ingredients = null;
+                } else {
+                    mic.getIngredBox().getIngredients().setText(ingredients);
+                }
+            } catch (IOException exception) {
+                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+                exception.printStackTrace();
+            }
+        }
+    }
+
+    /////////////////////////////// AUDIOMANAGEMENT//////////////////////////////////
+
+    /*
+     * TODO: move this to a separate class
+     */
+    public Recipe mapResponseToRecipe(String mealType, String responseText) {
+        // Split the tokens into lines
+        String[] tokenArr = responseText.split("\n");
+        List<String> tokenList = new ArrayList<>(Arrays.asList(tokenArr));
+        int i;
+
+        // Remove empty tokens
+        for (i = 0; i < tokenList.size();) {
+            if (tokenList.get(i).isBlank()) {
+                tokenList.remove(i);
+            } else {
+                ++i;
+            }
+        }
+
+        // Create a new recipe with a title
+        Recipe recipe = new Recipe(tokenList.get(0), mealType);
+
+        // Parse recipe's ingredients
+        String ingredient;
+        boolean parse = false;
+        for (i = 0; !tokenList.get(i).contains("Instructions"); ++i) {
+            ingredient = tokenList.get(i).trim();
+            if (ingredient.contains("Ingredients")) {
+                parse = true;
+            } else if (parse) {
+                ingredient = removeDashFromIngredient(tokenList.get(i).trim());
+                recipe.addIngredient(ingredient);
+            }
+        }
+
+        // Parse recipe's instructions
+        String instruction;
+        for (i += 1; i < tokenList.size(); ++i) {
+            instruction = removeNumberFromInstruction(tokenList.get(i).trim());
+            recipe.addInstruction(instruction);
+        }
+
+        return recipe;
+    }
+
+    private String removeDashFromIngredient(String ingredient) {
+        if (ingredient.charAt(0) == ('-')) {
+            return ingredient.substring(1).trim();
+        }
+        return ingredient.substring(2);
+    }
+
+    private String removeNumberFromInstruction(String instruction) {
+        StringBuilder strBuilder = new StringBuilder();
+        int i;
+
+        // Ignore characters until '.'
+        for (i = 0; i < instruction.length() && (instruction.charAt(i) != '.'); ++i)
+            ;
+
+        // Ignore '.' and ' ' after
+        // Get all characters until end of string
+        for (i += 2; i < instruction.length(); ++i) {
+            strBuilder.append(instruction.charAt(i));
+        }
+
+        return strBuilder.toString();
+    }
 }

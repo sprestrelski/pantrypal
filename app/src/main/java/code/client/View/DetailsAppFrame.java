@@ -136,7 +136,9 @@ public class DetailsAppFrame {
         HBox topButtons = new HBox();
         topButtons.setSpacing(100);
         topButtons.setAlignment(Pos.CENTER);
-        topButtons.getChildren().addAll(backToHomeButton, refreshButton);
+        Button mealTag = new Button();
+        MealTagStyler.styleTags(currentRecipe, mealTag);
+        topButtons.getChildren().addAll(backToHomeButton, mealTag, refreshButton);
         HBox.setHgrow(topButtons, Priority.ALWAYS);
 
         detailedUI.getChildren().addAll(topButtons, title, recipeImgView);

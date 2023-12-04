@@ -10,6 +10,7 @@ import code.client.Model.AppConfig;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.URISyntaxException;
 import java.util.concurrent.*;
 
 import org.bson.Document;
@@ -44,6 +45,13 @@ public class AppServer extends BaseServer {
         httpServer.createContext(AppConfig.RECIPE_PATH, new RecipeRequestHandler(recipeDb));
         httpServer.createContext(AppConfig.ACCOUNT_PATH, new AccountRequestHandler(accountMongoDB));
         httpServer.createContext(AppConfig.SHARE_PATH, new ShareRequestHandler(accountMongoDB, recipeDb));
+        httpServer.createContext(AppConfig.CHATGPT_PATH, new ChatGPTRequestHandler());
+        httpServer.createContext(AppConfig.DALLE_PATH, new DallERequestHandler());
+        try {
+            httpServer.createContext(AppConfig.WHISPER_PATH, new WhisperRequestHandler());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
         // set the executor
         httpServer.setExecutor(threadPoolExecutor);
         // start the server

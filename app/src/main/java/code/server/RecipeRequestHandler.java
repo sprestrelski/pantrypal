@@ -43,38 +43,6 @@ public class RecipeRequestHandler implements HttpHandler {
         outStream.close();
     }
 
-    private String buildResponseFromRecipe(Recipe recipe) {
-        return recipe.toString();
-    }
-
-    private String getRecipeById(String id) {
-        String response;
-        Recipe recipe = recipeDb.find(id);
-
-        if (recipe != null) {
-            response = buildResponseFromRecipe(recipe);
-            System.out.println("Queried for " + id + " and found " + recipe.getTitle());
-        } else {
-            response = "Recipe not found.";
-        }
-
-        return response;
-    }
-
-    private String getAllRecipes() {
-        List<Recipe> recipeList = recipeDb.getList();
-        StringBuilder responseBuilder = new StringBuilder();
-        String recipeResponse;
-
-        for (Recipe recipe : recipeList) {
-            recipeResponse = buildResponseFromRecipe(recipe);
-            responseBuilder.append(recipeResponse).append("\n");
-        }
-
-        String response = responseBuilder.toString();
-        return response;
-    }
-
     private String handleGet(HttpExchange httpExchange) throws IOException {
         String response = "Invalid GET request";
         URI uri = httpExchange.getRequestURI();

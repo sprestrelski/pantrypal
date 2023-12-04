@@ -1,14 +1,17 @@
-package code.client.Model;
+package code.server;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public class MockWhisperService extends VoiceToText {
-    public MockWhisperService() {
+import code.client.Model.IHttpConnection;
+import code.client.Model.MockHttpConnection;
+
+public class MockWhisperRequestHandler extends VoiceToText {
+    public MockWhisperRequestHandler() {
         super(new MockHttpConnection(200));
     }
 
-    public MockWhisperService(IHttpConnection connection) {
+    public MockWhisperRequestHandler(IHttpConnection connection) {
         super(connection);
     }
 
