@@ -51,7 +51,7 @@ public class AccountRequestHandler implements HttpHandler {
 
         if (query != null) {
             String value = query.substring(query.indexOf("=") + 1);
-
+            System.out.println("Value is: " + value);
             if (value != null) {
                 String[] userNamePassword = value.split(":");
                 String username = userNamePassword[0];

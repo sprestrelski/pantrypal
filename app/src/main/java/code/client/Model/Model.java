@@ -20,7 +20,7 @@ public class Model {
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
             System.out.println("Method is " + method);
-            
+
             // make a new user
             if (method.equals("PUT")) {
                 OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
@@ -28,7 +28,7 @@ public class Model {
                 out.flush();
                 out.close();
             }
-            
+
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String response = in.readLine();
             in.close();
@@ -46,7 +46,7 @@ public class Model {
             if (userId != null) {
                 urlString += "?=" + userId;
             }
-            
+
             URL url = new URI(urlString).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);

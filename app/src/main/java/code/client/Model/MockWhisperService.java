@@ -14,7 +14,7 @@ public class MockWhisperService extends VoiceToText {
 
     public String processAudio(String type) throws IOException, URISyntaxException {
         if (type.equals("mealtype")) {
-            return "Breakfast";
+            return "Breakfast.";
         } else if (type.equals("ingredients")) {
             return "Chicken, eggs.";
         } else {

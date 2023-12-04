@@ -242,18 +242,19 @@ public class AppFrameMic extends BorderPane {
 
             try {
                 voiceToText = new MockWhisperService();
-                mealType = voiceToText.processAudio("mealtype").toLowerCase();
+                mealType = voiceToText.processAudio("mealtype").toUpperCase();
                 // type check
-                if (mealType.contains("breakfast")) {
-                    mealTypeSelection.getMealType().setText("Breakfast");
-                } else if (mealType.contains("lunch")) {
-                    mealTypeSelection.getMealType().setText("Lunch");
-                } else if (mealType.contains("dinner")) {
-                    mealTypeSelection.getMealType().setText("Dinner");
+                if (mealType.contains("BREAKFAST")) {
+                    mealType = "Breakfast";
+                } else if (mealType.contains("LUNCH")) {
+                    mealType = "Lunch";
+                } else if (mealType.contains("DINNER")) {
+                    mealType = "Dinner";
                 } else {
                     AppAlert.show("Input Error", "Please say a valid meal type!");
                     mealType = null;
                 }
+                mealTypeSelection.getMealType().setText(mealType);
             } catch (IOException | URISyntaxException exception) {
                 AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
                 exception.printStackTrace();
