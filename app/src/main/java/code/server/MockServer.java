@@ -47,6 +47,7 @@ public class MockServer extends BaseServer {
         System.out.println("Server started on port " + port);
     }
 
+    @Override
     public void stop() {
         if (httpServer != null) {
             httpServer.stop(0); // Stop the server gracefully

@@ -38,6 +38,7 @@ public class RecipeToImageTest {
         String expectedResponse = "Fried Rice Image";
 
         assertEquals(expectedResponse, imageString);
+        server.stop();
     }
 
 }
