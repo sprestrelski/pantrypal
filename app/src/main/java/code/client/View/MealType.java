@@ -58,7 +58,7 @@ public class MealType extends GridPane {
         mealTypeArea.setStyle("-fx-font-size: 16"); // CHANGE 1 (FONT)
         mealTypeArea.setPrefWidth(300);
         mealTypeArea.setPrefHeight(50);
-        mealTypeArea.setEditable(true);
+        mealTypeArea.setEditable(false);
 
         // Add all of the elements to the MealTypeSelection
         this.add(recordButton, 0, 0);

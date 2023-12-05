@@ -13,7 +13,7 @@ public class Format {
                 .append(". ")
                 .append(ingredients)
                 .append(" Make a recipe using only these ingredients plus condiments. ")
-                .append("Remember to first include a title, then a list of ingredients, and then a list of instructions.");
+                .append("Please give me a recipe in the following format with no comments after the instructions. Title: Ingredients: Instructions:");
         return prompt.toString();
     }
 
@@ -33,8 +33,11 @@ public class Format {
         }
 
         // Create a new recipe with a title
-        Recipe recipe = new Recipe(tokenList.get(0), mealType);
-
+        String title = tokenList.get(0);
+        if (title.contains("Title:")) {
+            title = title.replaceAll("Title:", ""); 
+        } 
+        Recipe recipe = new Recipe(title.trim(), mealType);
         // Parse recipe's ingredients
         String ingredient;
         boolean parse = false;

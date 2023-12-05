@@ -60,8 +60,8 @@ public class AppFrameMic extends BorderPane {
 
         recipeCreationGrid = new GridPane();
         recipeCreationGrid.setAlignment(Pos.CENTER);
-        recipeCreationGrid.setVgap(10);
-        recipeCreationGrid.setHgap(10);
+        recipeCreationGrid.setVgap(5);
+        recipeCreationGrid.setHgap(5);
         recipeCreationGrid.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
 
         recipeCreationGrid.add(mealTypeSelection, 0, 1);
@@ -74,9 +74,6 @@ public class AppFrameMic extends BorderPane {
         recordingMealTypeLabel = mealTypeSelection.getRecordingLabel();
         recordIngredientsButton = ingredientsList.getRecordButton();
         recordingIngredientsLabel = ingredientsList.getRecordingLabel();
-
-        // createButton = new Button("Create Recipe");
-        // recipeCreationGrid.add(createButton, 0, 3);
 
         goToDetailedButton = new Button("See Detailed Recipe");
         recipeCreationGrid.add(goToDetailedButton, 0, 5);

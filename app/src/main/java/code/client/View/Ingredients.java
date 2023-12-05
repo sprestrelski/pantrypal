@@ -59,7 +59,7 @@ public class Ingredients extends GridPane {
         ingredientsArea.setStyle("-fx-font-size: 16"); // change
         ingredientsArea.setPrefWidth(300); // CHANGE 3 (WIDTH OF PROMPT)
         ingredientsArea.setPrefHeight(50); // CHANGE
-        ingredientsArea.setEditable(true);
+        ingredientsArea.setEditable(false);
 
         // Add all of the elements to the MealTypeSelection
         this.add(recordButton, 0, 0);

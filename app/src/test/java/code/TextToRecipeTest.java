@@ -27,11 +27,15 @@ public class TextToRecipeTest {
                         URISyntaxException, InterruptedException {
                 // record and process audio
                 server.start();
-                String mealType = "Breakfast"; // model.performWhisperRequest("GET", "mealtype");
-                String ingredients = "Chicken, eggs."; // model.performWhisperRequest("GET2", "ingredients");
+                VoiceToText voiceToText = new MockWhisperRequestHandler();
+                String mealType = voiceToText.processAudio("mealType");
+                assertEquals("Breakfast", mealType);
+
+                String ingredients = voiceToText.processAudio("ingredients");
+                assertEquals("Chicken, eggs.", ingredients);
 
                 // build prompt for chatGPT
-                String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Breakfast. Chicken, eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
+                String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Breakfast. Chicken, eggs. Make a recipe using only these ingredients plus condiments. Please give me a recipe in the following format with no comments after the instructions. Title: Ingredients: Instructions:";
                 String response = format.buildPrompt(mealType, ingredients);
                 assertEquals(prompt, response);
 
@@ -53,9 +57,8 @@ public class TextToRecipeTest {
          */
         @Test
         public void testPromptBuild() {
-                TextToRecipe textToRecipe = new MockChatGPTRequestHandler();
-                String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Lunch. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
-                String response = textToRecipe.buildPrompt("Lunch", "I have rice, shrimp, chicken, and eggs.");
+                String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Lunch. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Please give me a recipe in the following format with no comments after the instructions. Title: Ingredients: Instructions:";
+                String response = format.buildPrompt("Lunch", "I have rice, shrimp, chicken, and eggs.");
                 assertEquals(prompt, response);
         }
 

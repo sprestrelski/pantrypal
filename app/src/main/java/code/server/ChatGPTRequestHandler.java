@@ -1,6 +1,7 @@
 package code.server;
 
 import code.client.Model.AppConfig;
+import code.client.Controllers.Format;
 import com.sun.net.httpserver.*;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,7 +49,8 @@ public class ChatGPTRequestHandler extends TextToRecipe implements HttpHandler {
     private String getResponse(String mealType, String ingredients)
             throws IOException, InterruptedException, URISyntaxException {
         // Set request parameters
-        String prompt = buildPrompt(mealType, ingredients);
+        Format format = new Format();
+        String prompt = format.buildPrompt(mealType, ingredients);
 
         // Create a request body which you will pass into request object
         JSONObject requestBody = new JSONObject();

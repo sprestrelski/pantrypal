@@ -9,6 +9,7 @@ import com.mongodb.client.MongoDatabase;
 
 import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.FileWriter;
@@ -33,10 +34,10 @@ import code.server.*;
  * 5. Saves the refreshed recipe
  */
 public class EndToEndScenario2_1 {
-    private Account account; // Account used in the following tests
+    private static Account account; // Account used in the following tests
 
-    @BeforeEach
-    public void setUp() {
+    @BeforeAll
+    public static void setUp() {
         account = new Account("Chef", "Caitlyn");
     }
 
@@ -83,6 +84,8 @@ public class EndToEndScenario2_1 {
      */
     @Test
     public void createRecipeTest() {
+
+        // RecipeBuilder builder = new RecipeBuilder();
 
     }
 

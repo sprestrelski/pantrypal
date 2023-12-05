@@ -14,6 +14,8 @@ import java.net.URLConnection;
 import java.net.URI;
 import java.nio.file.*;
 import java.net.URLEncoder;
+import com.mongodb.MongoException;
+import com.mongodb.MongoWriteException;
 
 public class Model {
     public String performAccountRequest(String method, String user, String password) {
@@ -41,6 +43,12 @@ public class Model {
             String response = in.readLine();
             in.close();
             return response;
+        } catch (MongoWriteException ex) {
+            ex.printStackTrace();
+            return "Duplicate Key Error";
+        } catch (MongoException ex) {
+            ex.printStackTrace();
+            return "Server Offline";
         } catch (Exception ex) {
             ex.printStackTrace();
             return "Error: " + ex.getMessage();
@@ -75,6 +83,12 @@ public class Model {
             }
             in.close();
             return response;
+        } catch (MongoWriteException ex) {
+            ex.printStackTrace();
+            return "Duplicate Key Error";
+        } catch (MongoException ex) {
+            ex.printStackTrace();
+            return "Server Offline";
         } catch (Exception ex) {
             ex.printStackTrace();
             return "Error: " + ex.getMessage();
@@ -157,13 +171,13 @@ public class Model {
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line;
             response = "";
-            
+
             while ((line = in.readLine()) != null) {
                 response += line + "\n";
             }
-            
+
             in.close();
-            
+
             if (type.equals("mealType") && responseCode == 200) {
                 response = response.toUpperCase();
                 if (response.contains("BREAKFAST")) {
@@ -173,11 +187,11 @@ public class Model {
                 } else if (response.contains("DINNER")) {
                     response = "Dinner";
                 } else {
-                    response = "NONE OF THE ABOVE";
+                    response = null;
                 }
             }
         }
-        
+
         System.out.println("Whisper response: " + response);
         return response;
     }
