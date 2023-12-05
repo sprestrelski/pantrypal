@@ -30,7 +30,7 @@ public class Ingredients extends GridPane {
         this.setHgap(20);
 
         // Get a picture of a microphone for the voice recording button
-        File file = new File("app/src/main/java/code/client/View/microphone.png");
+        File file = new File(AppConfig.MICROPHONE_IMG_FILE);
         microphone = new ImageView(new Image(file.toURI().toString()));
 
         // Set the size of the microphone image
