@@ -10,7 +10,7 @@ import java.io.File;
 
 import code.client.Model.AppConfig;
 
-public class LoadingUI extends HBox {
+public class LoadingUI extends VBox {
     private final Label loadingLabel;
     private final ImageView loadingImg;
 
@@ -32,5 +32,6 @@ public class LoadingUI extends HBox {
         gridPane.add(loadingImg, 1, 2);
         GridPane.setFillWidth(gridPane, true);
         getChildren().addAll(gridPane);
+        this.setFillWidth(true);
     }
 }

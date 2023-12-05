@@ -74,14 +74,14 @@ class Header extends HBox {
 
         sortMenuButton.getItems().addAll(sortNewToOld, sortOldToNew, sortAToZ, sortZToA);
 
-        EventHandler<ActionEvent> event1 = new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-                System.out.println(((MenuItem) e.getSource()).getText() + " selected");
-            }
-        };
+        // EventHandler<ActionEvent> event1 = new EventHandler<ActionEvent>() {
+        // public void handle(ActionEvent e) {
+        // System.out.println(((MenuItem) e.getSource()).getText() + " selected");
+        // }
+        // };
 
-        sortMenuButton.getItems().get(2).setOnAction(event1);
-        sortMenuButton.getItems().get(3).setOnAction(event1);
+        // sortMenuButton.getItems().get(2).setOnAction(event1);
+        // sortMenuButton.getItems().get(3).setOnAction(event1);
 
         this.setPrefSize(620, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -125,6 +125,7 @@ public class AppFrameHome extends BorderPane {
         scroller.setFitToWidth(true);
         newButton = footer.getNewButton();
         logOutButton = footer.getLogOutButton();
+        BorderPane.setAlignment(this, Pos.CENTER);
     }
 
     public StackPane getRoot() {
