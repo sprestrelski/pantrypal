@@ -9,8 +9,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
+import java.util.Arrays;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -66,15 +72,24 @@ public class RecipeMongoDb implements IRecipeDb {
 
     @Override
     public boolean add(Recipe recipe) {
-        Document recipeDocument = new Document("_id", new ObjectId(recipe.getId()));
-        recipeDocument.append("userID", recipe.getAccountId())
-                .append("title", recipe.getTitle())
-                .append("mealTag", recipe.getMealTag())
-                .append("ingredients", Lists.newArrayList(recipe.getIngredientIterator()))
-                .append("instructions", Lists.newArrayList(recipe.getInstructionIterator()))
-                .append("date",recipe.getDate())
-                .append("image", recipe.getImage());
-        recipeDocumentCollection.insertOne(recipeDocument);
+        Bson filter = eq("_id", new ObjectId(recipe.getId()));
+        List<Bson> updates = new ArrayList<>();
+        Bson updateUserId = set("userID", recipe.getAccountId());
+        Bson updateTitle = set("title", recipe.getTitle());
+        Bson updateMealTag = set("mealTag", recipe.getMealTag());
+        Bson updateIngr = set("ingredients", Lists.newArrayList(recipe.getIngredientIterator()));
+        Bson updateInstr = set("instructions", Lists.newArrayList(recipe.getInstructionIterator()));
+        Bson updateDate = set("date", recipe.getDate());
+        Bson updateImage = set("image", recipe.getImage());
+        updates.addAll(Arrays.asList(updateUserId, 
+                                    updateTitle,
+                                    updateMealTag,
+                                    updateIngr,
+                                    updateInstr,
+                                    updateDate,
+                                    updateImage));
+        UpdateOptions options = new UpdateOptions().upsert(true);
+        recipeDocumentCollection.updateOne(filter, updates, options);
         return true;
     }
 
@@ -92,12 +107,7 @@ public class RecipeMongoDb implements IRecipeDb {
 
     @Override
     public boolean update(Recipe updatedRecipe) {
-        Recipe oldRecipe = remove(updatedRecipe.getId());
-        if (oldRecipe == null) {
-            // Recipe does not exist
-            return false;
-        }
-        add(updatedRecipe);
+        Bson filter = eq("_id", updatedRecipe.getId());
         return true;
     }
 

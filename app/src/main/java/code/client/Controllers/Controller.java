@@ -105,7 +105,7 @@ public class Controller {
 
         Button saveButtonFromDetailed = view.getDetailedView().getSaveButton();
         saveButtonFromDetailed.setStyle(blinkStyle);
-        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        PauseTransition pause = new PauseTransition(Duration.seconds(2.5));
         pause.setOnFinished(f -> saveButtonFromDetailed.setStyle(defaultButtonStyle));
         pause.play();
 
@@ -360,7 +360,8 @@ public class Controller {
 
         System.out.println("Deleting id: " + recipe.getId());
         model.performRecipeRequest("DELETE", recipeStr, null);
-        this.view.getAppFrameHome().updateDisplay(filter);
+        this.view.getAppFrameHome().updateDisplay(filter); 
+        goToRecipeList();
     }
 
     private void handleShareButton(ActionEvent event) {
@@ -664,7 +665,7 @@ public class Controller {
             // recordingLabel2.setStyle("");
 
             try {
-                mealType = model.performWhisperRequest("GET", "ingredients");
+                ingredients = model.performWhisperRequest("GET", "ingredients");
                 String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
 
                 if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*") ||

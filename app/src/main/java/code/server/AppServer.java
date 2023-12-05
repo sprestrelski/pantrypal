@@ -47,11 +47,7 @@ public class AppServer extends BaseServer {
         httpServer.createContext(AppConfig.SHARE_PATH, new ShareRequestHandler(accountMongoDB, recipeDb));
         httpServer.createContext(AppConfig.CHATGPT_PATH, new ChatGPTRequestHandler());
         httpServer.createContext(AppConfig.DALLE_PATH, new DallERequestHandler());
-        try {
-            httpServer.createContext(AppConfig.WHISPER_PATH, new WhisperRequestHandler());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        httpServer.createContext(AppConfig.WHISPER_PATH, new WhisperRequestHandler());
         // set the executor
         httpServer.setExecutor(threadPoolExecutor);
         // start the server
