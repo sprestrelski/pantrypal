@@ -183,34 +183,17 @@ public class Controller {
         MenuButton filterMenuButton = this.view.getAppFrameHome().getFilterMenuButton();
         ObservableList<MenuItem> filterMenuItems = filterMenuButton.getItems();
 
-        // Filter to show only breakfast recipes when criteria is selected
-        filterMenuItems.get(BREAKFAST_INDEX).setOnAction(e -> {
-            filter = "breakfast";
-            setActiveState(filterMenuButton, BREAKFAST_INDEX);
-            this.view.getAppFrameHome().updateDisplay("breakfast");
-            addListenersToList();
-        });
-        // Filter to show only lunch recipes when criteria is selected
-        filterMenuItems.get(LUNCH_INDEX).setOnAction(e -> {
-            filter = "lunch";
-            setActiveState(filterMenuButton, LUNCH_INDEX);
-            this.view.getAppFrameHome().updateDisplay("lunch");
-            addListenersToList();
-        });
-        // Filter to show only dinner recipes when criteria is selected
-        filterMenuItems.get(DINNER_INDEX).setOnAction(e -> {
-            filter = "dinner";
-            setActiveState(filterMenuButton, DINNER_INDEX);
-            this.view.getAppFrameHome().updateDisplay("dinner");
-            addListenersToList();
-        });
-        // Remove selected filter to show all recipes
-        filterMenuItems.get(NONE_INDEX).setOnAction(e -> {
-            filter = "none";
-            setActiveState(filterMenuButton, NONE_INDEX);
-            this.view.getAppFrameHome().updateDisplay("none");
-            addListenersToList();
-        });
+        String[] filterTypes = { "breakfast", "lunch", "dinner", "none" };
+
+        for (int i = 0; i < filterTypes.length; i++) {
+            int index = i;
+            filterMenuItems.get(index).setOnAction(e -> {
+                filter = filterTypes[index];
+                setActiveState(filterMenuButton, index);
+                this.view.getAppFrameHome().updateDisplay(filterTypes[index]);
+                addListenersToList();
+            });
+        }
     }
 
     private void addSortingListener() {
@@ -222,25 +205,16 @@ public class Controller {
         }
         RecipeSorter recipeSorter = new RecipeSorter(list.getRecipeDB().getList());
 
-        // Setting action for newest to oldest sorting criteria
-        sortMenuItems.get(NEWEST_TO_OLDEST_INDEX).setOnAction(e -> {
-            recipeSorter.sortNewestToOldest();
-            sortList(sortMenuButton, NEWEST_TO_OLDEST_INDEX);
-        });
-        // Setting action for oldest to newest sorting criteria
-        sortMenuItems.get(OLDEST_TO_NEWEST_INDEX).setOnAction(e -> {
-            recipeSorter.sortOldestToNewest();
-            sortList(sortMenuButton, OLDEST_TO_NEWEST_INDEX);
-        });
-        // Setting action for A to Z sorting criteria
-        sortMenuItems.get(A_TO_Z_INDEX).setOnAction(e -> {
-            recipeSorter.sortAToZ();
-            sortList(sortMenuButton, A_TO_Z_INDEX);
-        });
-        // Setting action for Z to A sorting criteria
-        sortMenuItems.get(Z_TO_A_INDEX).setOnAction(e -> {
-            recipeSorter.sortZToA();
-            sortList(sortMenuButton, Z_TO_A_INDEX);
+        setSortAction(sortMenuItems, NEWEST_TO_OLDEST_INDEX, recipeSorter::sortNewestToOldest);
+        setSortAction(sortMenuItems, OLDEST_TO_NEWEST_INDEX, recipeSorter::sortOldestToNewest);
+        setSortAction(sortMenuItems, A_TO_Z_INDEX, recipeSorter::sortAToZ);
+        setSortAction(sortMenuItems, Z_TO_A_INDEX, recipeSorter::sortZToA);
+    }
+
+    private void setSortAction(ObservableList<MenuItem> sortMenuItems, int index, Runnable sortAction) {
+        sortMenuItems.get(index).setOnAction(e -> {
+            sortAction.run();
+            sortList(view.getAppFrameHome().getSortMenuButton(), index);
         });
     }
 
@@ -300,21 +274,17 @@ public class Controller {
         if (mealType != null && ingredients != null) {
             view.goToLoading();
             try {
-                Thread thread = new Thread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
-                                Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
-                                chatGPTrecipe.setAccountId(account.getId());
-                                chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
+                Thread thread = new Thread(() -> {
+                    String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
+                    Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
+                    chatGPTrecipe.setAccountId(account.getId());
+                    chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
 
-                                // Changes UI to Detailed Recipe Screen
-                                view.goToDetailedView(chatGPTrecipe, false);
-                                view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-                                handleDetailedViewListeners();
-                            }
-                        });
+                    // Changes UI to Detailed Recipe Screen
+                    view.goToDetailedView(chatGPTrecipe, false);
+                    view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+                    handleDetailedViewListeners();
+                });
                 thread.start();
                 AppFrameMic mic = view.getAppFrameMic();
                 mic.getRecordingIngredientsLabel()
@@ -326,7 +296,9 @@ public class Controller {
                 AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
                 exception.printStackTrace();
             }
-        } else {
+        } else
+
+        {
             AppAlert.show("Input Error", "Invalid meal type or ingredients, please try again!");
         }
     }
@@ -454,25 +426,20 @@ public class Controller {
         if (mealType != null && ingredients != null) {
             view.goToLoading();
             try {
-                Thread thread = new Thread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                String responseText = model.performChatGPTRequest("GET", mealType,
-                                        ingredients);
-                                Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
-                                chatGPTrecipe.setAccountId(account.getId());
-                                chatGPTrecipe.setImage(model.performDallERequest("GET",
-                                        chatGPTrecipe.getTitle()));
+                Thread thread = new Thread(() -> {
+                    String responseText = model.performChatGPTRequest("GET", mealType,
+                            ingredients);
+                    Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
+                    chatGPTrecipe.setAccountId(account.getId());
+                    chatGPTrecipe.setImage(model.performDallERequest("GET",
+                            chatGPTrecipe.getTitle()));
 
-                                // Changes UI to Detailed Recipe Screen
-                                view.goToDetailedView(chatGPTrecipe, false);
-                                view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-                                handleDetailedViewListeners();
-                            }
-                        });
+                    // Changes UI to Detailed Recipe Screen
+                    view.goToDetailedView(chatGPTrecipe, false);
+                    view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+                    handleDetailedViewListeners();
+                });
                 thread.start();
-
             } catch (Exception exception) {
                 AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
                 exception.printStackTrace();
@@ -484,50 +451,35 @@ public class Controller {
 
     ////////////////////////////////////////
     private void handleCreateAcc(ActionEvent event) {
-        // Simulating existing usernames
         GridPane grid = view.getAccountCreationUI().getRoot();
         String username = view.getAccountCreationUI().getUsernameTextField().getText();
         String password = view.getAccountCreationUI().getPasswordField().getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-            // Display an error message if username or password is empty
             showErrorPane(grid, "Error. Please provide a username and password.");
-        } else {
-            view.goToLoading();
-            Thread thread = new Thread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!isUsernameTaken(username, password)
-                                    && !view.getMainScene().equals(view.getOfflineUI())) {
-                                // Continue with account creation logic
-                                System.out.println(
-                                        "Username not taken!\nUsername: " + username + "\nPassword: " + password);
-                                String response = model.performAccountRequest("PUT", username, password);
-                                // Show success message
-                                if (response.contains("Offline")) {
-                                    view.goToOfflineUI();
-                                } else {
-                                    showSuccessPane(grid);
-                                    view.goToLoginUI();
-                                }
-
-                            } else {
-                                // Display an error message if the username is already taken
-                                view.goToCreateAcc();
-                                Platform.runLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        showErrorPane(grid,
-                                                "Error. This username is already taken. Please choose another one.");
-                                    }
-                                });
-                            }
-                        }
-                    });
-            thread.start();
+            return;
         }
 
+        view.goToLoading();
+
+        Thread thread = new Thread(() -> {
+            boolean isUsernameTaken = isUsernameTaken(username, password);
+            if (view.getMainScene().equals(view.getOfflineUI())) {
+            } else if (!isUsernameTaken) {
+                String response = model.performAccountRequest("PUT", username, password);
+                if (response.contains("Offline")) {
+                    view.goToOfflineUI();
+                } else {
+                    showSuccessPane(grid);
+                    view.goToLoginUI();
+                }
+            } else {
+                view.goToCreateAcc();
+                Platform.runLater(
+                        () -> showErrorPane(grid, "Error. This username is already taken. Please choose another one."));
+            }
+        });
+        thread.start();
     }
 
     private void showErrorPane(GridPane grid, String errorMessage) {
@@ -563,12 +515,12 @@ public class Controller {
         String response = model.performAccountRequest("GET", username, password);
         if (response.contains("Offline")) {
             view.goToOfflineUI();
-            return true;
+            return false;
         }
         return (!response.equals("Username is not found"));
     }
-    ////////////////////////////////////////
 
+    ////////////////////////////////////////
     private void handleLoginButton(ActionEvent event) {
         String username = view.getLoginUI().getUsernameTextField().getText();
         String password = view.getLoginUI().getPasswordField().getText();
@@ -577,41 +529,28 @@ public class Controller {
         if (username.isEmpty() || password.isEmpty()) {
             // Display an error message if username or password is empty
             showErrorPane(grid, "Error. Please provide a username and password.");
-        } else {
-            view.goToLoading();
-            Thread thread = new Thread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            boolean loginSuccessful = performLogin(username, password);
-                            if (loginSuccessful) {
-                                Platform.runLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        goToRecipeList();
-                                        if (!view.getLoginUI().getRememberLogin()) {
-                                            clearCredentials();
-                                        } else {
-                                            saveCredentials(account);
-                                        }
-                                    }
-                                });
-
-                            } else {
-                                Platform.runLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (!view.getMainScene().equals(view.getOfflineUI())) {
-                                            view.goToLoginUI();
-                                            showLoginSuccessPane(grid, false);
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    });
-            thread.start();
+            return;
         }
+
+        view.goToLoading();
+        Thread thread = new Thread(() -> {
+            boolean loginSuccessful = performLogin(username, password);
+            if (view.getMainScene().equals(view.getOfflineUI())) {
+            } else if (loginSuccessful) {
+                Platform.runLater(
+                        () -> goToRecipeList());
+                if (!view.getLoginUI().getRememberLogin()) {
+                    clearCredentials();
+                } else {
+                    saveCredentials(account);
+                }
+            } else {
+                view.goToLoginUI();
+                Platform.runLater(
+                        () -> showLoginSuccessPane(grid, false));
+            }
+        });
+        thread.start();
     }
 
     private void clearCredentials() {
@@ -710,13 +649,11 @@ public class Controller {
             recording = true;
             mic.getRecordMealTypeButton().setStyle("-fx-background-color: #FF0000;");
             mic.getRecordingMealTypeLabel().setVisible(true);
-            // recordingLabel1.setStyle("-fx-font-color: #FF0000;");
         } else {
             recorder.stopRecording();
             recording = false;
             mic.getRecordMealTypeButton().setStyle("");
             mic.getRecordingMealTypeLabel().setVisible(false);
-            // recordingLabel1.setStyle("");
 
             try {
                 mealType = model.performWhisperRequest("GET", "mealType");
@@ -738,13 +675,11 @@ public class Controller {
             recording = true;
             mic.getRecordIngredientsButton().setStyle("-fx-background-color: #FF0000;");
             mic.getRecordingIngredientsLabel().setVisible(true);
-            // recordingLabel2.setStyle("-fx-background-color: #FF0000;");
         } else {
             recorder.stopRecording();
             recording = false;
             mic.getRecordIngredientsButton().setStyle("");
             mic.getRecordingIngredientsLabel().setVisible(false);
-            // recordingLabel2.setStyle("");
 
             try {
                 ingredients = model.performWhisperRequest("GET", "ingredients");
@@ -764,7 +699,6 @@ public class Controller {
             }
         }
     }
-
     /////////////////////////////// AUDIOMANAGEMENT//////////////////////////////////
 
 }
