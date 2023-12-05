@@ -19,8 +19,7 @@ import code.client.Model.Account;
 
 public class LoginUI {
 
-    private boolean rememberLogin, accountSaved = false;
-    private Account savedAccount;
+    private boolean rememberLogin;
     private Hyperlink goToCreate;
     private Button loginButton;
     private TextField usernameField;
@@ -75,7 +74,6 @@ public class LoginUI {
     public void setLoginCreds(Account account) {
         usernameField.setText(account.getUsername());
         passwordField.setText(account.getPassword());
-        savedAccount = account;
     }
 
     public GridPane getRoot() {

@@ -42,16 +42,18 @@ public class ShareRecipe {
         return htmlBuilder.toString();
     }
 
-    private static String getMockedRecipe() {
-        String title = "Fried Chicken and Egg Fried Rice";
-        String mealType = "Breakfast";
-        String ingredients = "2 chicken breasts, diced;;2 large eggs;;2 cups cooked rice;;2 tablespoons vegetable oil";
-        String[] ingr = ingredients.split(";;");
-        String instructions = "1. Heat the vegetable oil in a large pan over medium-high heat.";
-        String[] instr = instructions.split(";;");
-        // return formatRecipe(title, ingr, instr);
-        return title;
-    }
+    // private static String getMockedRecipe() {
+    // String title = "Fried Chicken and Egg Fried Rice";
+    // String mealType = "Breakfast";
+    // String ingredients = "2 chicken breasts, diced;;2 large eggs;;2 cups cooked
+    // rice;;2 tablespoons vegetable oil";
+    // String[] ingr = ingredients.split(";;");
+    // String instructions = "1. Heat the vegetable oil in a large pan over
+    // medium-high heat.";
+    // String[] instr = instructions.split(";;");
+    // // return formatRecipe(title, ingr, instr);
+    // return title;
+    // }
 
     private static String formatRecipe(Recipe recipe) {
         String title = recipe.getTitle() != null ? recipe.getTitle() : "Untitled Recipe";

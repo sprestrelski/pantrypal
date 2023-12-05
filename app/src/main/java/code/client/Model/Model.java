@@ -14,9 +14,6 @@ import java.net.URLConnection;
 import java.net.URI;
 import java.nio.file.*;
 import java.net.URLEncoder;
-import com.mongodb.MongoException;
-import com.mongodb.MongoSocketReadException;
-import com.mongodb.MongoWriteException;
 
 public class Model {
     public String performAccountRequest(String method, String user, String password) {

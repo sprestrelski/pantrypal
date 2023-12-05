@@ -1,6 +1,5 @@
 package code.client.View;
 
-import code.client.Model.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -122,7 +121,7 @@ public class AppFrameMic extends BorderPane {
         return mealTypeSelection;
     }
 
-    public Ingredients getIngredBox() {
+    public Ingredients getIngrBox() {
         return ingredientsList;
     }
 

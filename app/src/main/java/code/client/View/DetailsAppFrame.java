@@ -1,7 +1,6 @@
 package code.client.View;
 
 import java.util.Date;
-import code.client.Model.*;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -72,7 +71,7 @@ public class DetailsAppFrame {
         String instructions = recipeInfo.getInstructionsField().getText();
         String image = recipeInfo.getImageString();
 
-        /// Use Trung's deformatting here.
+        // remove format
         String[] ingr = ingredients.split("\n");
         String[] instr = instructions.split("\n");
 
@@ -118,7 +117,7 @@ public class DetailsAppFrame {
     }
 
     public void updateDisplay() {
-        // Resets the UI everytime
+        // Resets the UI every time
         detailedUI.getChildren().clear();
 
         VBox setupContainer = new VBox();

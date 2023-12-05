@@ -50,9 +50,6 @@ public class AccountRequestHandler implements HttpHandler {
         outStream.close();
     }
 
-    /*
-     * TODO: Expects username and password
-     */
     private String handleGet(HttpExchange httpExchange) throws IOException {
         String response = "Invalid GET request";
         URI uri = httpExchange.getRequestURI();
@@ -80,9 +77,6 @@ public class AccountRequestHandler implements HttpHandler {
         return response;
     }
 
-    /*
-     * TODO for accounts
-     */
     private String handlePut(HttpExchange httpExchange) throws IOException {
         InputStream inStream = httpExchange.getRequestBody();
         Scanner scanner = new Scanner(inStream);

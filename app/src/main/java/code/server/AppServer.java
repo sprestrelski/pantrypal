@@ -10,7 +10,6 @@ import code.client.Model.AppConfig;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.URISyntaxException;
 import java.util.concurrent.*;
 
 import org.bson.Document;

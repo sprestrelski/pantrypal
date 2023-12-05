@@ -48,7 +48,7 @@ class Header extends HBox {
     private MenuButton filterMenuButton, sortMenuButton;
     // Filtering criteria contained in the dropdown menu
     private MenuItem filterBreakfast, filterLunch, filterDinner, filterNone;
-    // Sorting crteria contained in the dropdown menu
+    // Sorting criteria contained in the dropdown menu
     private MenuItem sortNewToOld, sortOldToNew, sortAToZ, sortZToA;
 
     Header() {
@@ -106,7 +106,6 @@ public class AppFrameHome extends BorderPane {
     private Header header;
     private Footer footer;
     private RecipeListUI recipeList;
-    private MenuButton filterMenuButton, sortMenuButton;
     private Button newButton, logOutButton;
     private StackPane stack;
 
@@ -125,8 +124,6 @@ public class AppFrameHome extends BorderPane {
         this.setBottom(footer);
 
         newButton = footer.getNewButton();
-        filterMenuButton = header.getFilterMenuButton();
-        sortMenuButton = header.getSortMenuButton();
         logOutButton = footer.getLogOutButton();
     }
 

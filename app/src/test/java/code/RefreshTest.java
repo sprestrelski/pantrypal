@@ -1,18 +1,8 @@
 package code;
 
-import code.client.Controllers.Controller;
 import code.client.Model.Model;
-import code.client.View.DetailsAppFrame;
-import code.client.View.View;
-import javafx.scene.control.Button;
-import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
-import code.client.Model.Account;
-import code.client.Model.AccountCSVReader;
-import code.client.Model.AccountCSVWriter;
 import code.client.Model.AppConfig;
-import code.client.View.*;
-import code.client.Controllers.*;
 import code.server.*;
 import code.server.mocking.MockServer;
 
@@ -21,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.*;
 
 public class RefreshTest {
     BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);

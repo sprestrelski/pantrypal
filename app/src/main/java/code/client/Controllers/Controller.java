@@ -3,7 +3,6 @@ package code.client.Controllers;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
-import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 
 import code.client.View.RecipeListUI;
 import code.client.View.RecipeUI;
@@ -26,23 +25,15 @@ import javafx.scene.text.*;
 import javafx.util.Duration;
 import code.client.Model.*;
 import code.client.View.AppAlert;
-import code.client.View.AppFrameHome;
 import code.client.View.AppFrameMic;
 import code.client.View.DetailsAppFrame;
 import code.server.Recipe;
 
 public class Controller {
-    // Index of newest to oldest in sorting drop down menu, index of breakfast in
-    // filtering drop down menu
-    private final int NEWEST_TO_OLDEST_INDEX = 0, BREAKFAST_INDEX = 0;
-    // Index of oldest to newest in sorting drop down menu, index of lunch in
-    // filtering drop down menu
-    private final int OLDEST_TO_NEWEST_INDEX = 1, LUNCH_INDEX = 1;
-    // Index of A to Z in sorting drop down menu, index of dinner in filtering drop
-    // down menu
-    private final int A_TO_Z_INDEX = 2, DINNER_INDEX = 2;
-    // Index of Z to A in sorting drop down menu, index of none in filtering drop
-    // down menu
+    // indices in sorting drop-down menu
+    private final int NEWEST_TO_OLDEST_INDEX = 0;
+    private final int OLDEST_TO_NEWEST_INDEX = 1;
+    private final int A_TO_Z_INDEX = 2;
     private final int Z_TO_A_INDEX = 3, NONE_INDEX = 3;
 
     private Account account;
@@ -52,7 +43,6 @@ public class Controller {
     private IRecipeDb recipeDb;
     private RecipeCSVWriter recipeWriter;
     private RecipeCSVReader recipeReader;
-    private String title;
     private String defaultButtonStyle, onStyle, offStyle, blinkStyle;
     private String filter;
 
@@ -61,7 +51,6 @@ public class Controller {
     private final AppAudioRecorder recorder = new AppAudioRecorder();
     private String mealType; // stores the meal type specified by the user
     private String ingredients; // stores the ingredients listed out by the user
-    private ProgressBar progressBar;
 
     public Controller(View view, Model model) {
 
@@ -94,10 +83,6 @@ public class Controller {
             this.view.getLoginUI().setLoginCreds(account);
             goToRecipeList();
         }
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     private void handleRecipePostButton(ActionEvent event) throws IOException {
@@ -691,7 +676,7 @@ public class Controller {
                     AppAlert.show("Input Error", "Please provide valid ingredients!");
                     ingredients = null;
                 } else {
-                    mic.getIngredBox().getIngredients().setText(ingredients);
+                    mic.getIngrBox().getIngredients().setText(ingredients);
                 }
             } catch (IOException exception) {
                 AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");

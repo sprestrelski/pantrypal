@@ -3,14 +3,7 @@ package code.server;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-
-import org.bson.types.ObjectId;
-
-import java.util.Iterator;
-import java.util.List;
-
 import code.client.Model.*;
-
 import com.sun.net.httpserver.*;
 
 public class ShareRequestHandler implements HttpHandler {
@@ -26,7 +19,6 @@ public class ShareRequestHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         String response = "Request Received";
-        String method = httpExchange.getRequestMethod();
         URI uri = httpExchange.getRequestURI();
         String query = uri.toString();
         int usernameStart = query.indexOf(AppConfig.SHARE_PATH);
