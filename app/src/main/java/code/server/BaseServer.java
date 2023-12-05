@@ -20,4 +20,6 @@ public abstract class BaseServer {
     }
 
     public abstract void start() throws IOException;
+
+    public abstract void stop();
 }

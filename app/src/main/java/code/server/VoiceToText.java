@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import code.client.Model.IHttpConnection;
 
 public abstract class VoiceToText {
     protected final IHttpConnection connection;

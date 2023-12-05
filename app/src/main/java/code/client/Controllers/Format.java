@@ -1,16 +1,11 @@
-package code.client.Model;
+package code.client.Controllers;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import code.server.Recipe;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import code.server.Recipe;
 
-public abstract class TextToRecipe {
-    public abstract String getResponse(String mealType, String ingredients)
-            throws IOException, InterruptedException, URISyntaxException;
-
+public class Format {
     public String buildPrompt(String mealType, String ingredients) {
         StringBuilder prompt = new StringBuilder();
         prompt.append("I am a student on a budget with a busy schedule and I need to quickly cook a ")
@@ -86,6 +81,4 @@ public abstract class TextToRecipe {
 
         return strBuilder.toString();
     }
-
-    public abstract void setSampleRecipe(String recipe);
 }

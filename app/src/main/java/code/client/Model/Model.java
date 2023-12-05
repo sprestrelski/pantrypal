@@ -13,6 +13,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URI;
 import java.nio.file.*;
+import java.net.URLEncoder;
 
 public class Model {
     public String performAccountRequest(String method, String user, String password) {
@@ -83,18 +84,25 @@ public class Model {
     public String performChatGPTRequest(String method, String mealType, String ingredients) {
         try {
             String urlString = AppConfig.SERVER_URL + AppConfig.CHATGPT_PATH;
+            mealType = URLEncoder.encode(mealType, "UTF-8");
+            ingredients = URLEncoder.encode(ingredients, "UTF-8");
             urlString += "?=" + mealType + "::" + ingredients;
             URL url = new URI(urlString).toURL();
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
-            // System.out.println("Method is " + method);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String response = in.readLine();
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+                response.append("\n");
+            }
             in.close();
-            return response;
+
+            return response.toString();
         } catch (Exception ex) {
             ex.printStackTrace();
             return "Error: " + ex.getMessage();
@@ -104,13 +112,12 @@ public class Model {
     public String performDallERequest(String method, String recipeTitle) {
         try {
             String urlString = AppConfig.SERVER_URL + AppConfig.DALLE_PATH;
-            urlString += "?=" + recipeTitle;
+            urlString += "?=" + URLEncoder.encode(recipeTitle, "UTF-8");
             URL url = new URI(urlString).toURL();
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
-            // System.out.println("Method is " + method);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String response = in.readLine();

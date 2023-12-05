@@ -58,4 +58,12 @@ public class AppServer extends BaseServer {
         httpServer.start();
         System.out.println("Server started on port " + port);
     }
+
+    @Override
+    public void stop() {
+        if (httpServer != null) {
+            httpServer.stop(0); // Stop the server gracefully
+            System.out.println("Server stopped");
+        }
+    }
 }

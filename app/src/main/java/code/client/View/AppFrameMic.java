@@ -4,20 +4,13 @@ import code.client.Model.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
-import code.client.View.Ingredients;
-import code.client.View.MealType;
-// import javax.sound.sampled.*;
 
 class GPTRecipe extends GridPane {
     private Label recipeLabel;

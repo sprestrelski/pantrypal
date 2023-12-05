@@ -47,6 +47,7 @@ public class Controller {
     private Account account;
     private Model model;
     private View view;
+    private Format format = new Format();
     private IRecipeDb recipeDb;
     private RecipeCSVWriter recipeWriter;
     private RecipeCSVReader recipeReader;
@@ -57,7 +58,6 @@ public class Controller {
     // Audio Stuff
     private boolean recording; // keeps track if the app is currently recording
     private final AppAudioRecorder recorder = new AppAudioRecorder();
-    private VoiceToText voiceToText;
     private String mealType; // stores the meal type specified by the user
     private String ingredients; // stores the ingredients listed out by the user
 
@@ -294,7 +294,7 @@ public class Controller {
         if (mealType != null && ingredients != null) {
             try {
                 String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
-                Recipe chatGPTrecipe = mapResponseToRecipe(mealType, responseText);
+                Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
                 chatGPTrecipe.setAccountId(account.getId());
                 chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
 
@@ -428,7 +428,7 @@ public class Controller {
         if (mealType != null && ingredients != null) {
             try {
                 String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
-                Recipe chatGPTrecipe = mapResponseToRecipe(mealType, responseText);
+                Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
                 chatGPTrecipe.setAccountId(account.getId());
                 chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
 
@@ -678,71 +678,4 @@ public class Controller {
 
     /////////////////////////////// AUDIOMANAGEMENT//////////////////////////////////
 
-    /*
-     * TODO: move this to a separate class
-     */
-    public Recipe mapResponseToRecipe(String mealType, String responseText) {
-        // Split the tokens into lines
-        String[] tokenArr = responseText.split("\n");
-        List<String> tokenList = new ArrayList<>(Arrays.asList(tokenArr));
-        int i;
-
-        // Remove empty tokens
-        for (i = 0; i < tokenList.size();) {
-            if (tokenList.get(i).isBlank()) {
-                tokenList.remove(i);
-            } else {
-                ++i;
-            }
-        }
-
-        // Create a new recipe with a title
-        Recipe recipe = new Recipe(tokenList.get(0), mealType);
-
-        // Parse recipe's ingredients
-        String ingredient;
-        boolean parse = false;
-        for (i = 0; !tokenList.get(i).contains("Instructions"); ++i) {
-            ingredient = tokenList.get(i).trim();
-            if (ingredient.contains("Ingredients")) {
-                parse = true;
-            } else if (parse) {
-                ingredient = removeDashFromIngredient(tokenList.get(i).trim());
-                recipe.addIngredient(ingredient);
-            }
-        }
-
-        // Parse recipe's instructions
-        String instruction;
-        for (i += 1; i < tokenList.size(); ++i) {
-            instruction = removeNumberFromInstruction(tokenList.get(i).trim());
-            recipe.addInstruction(instruction);
-        }
-
-        return recipe;
-    }
-
-    private String removeDashFromIngredient(String ingredient) {
-        if (ingredient.charAt(0) == ('-')) {
-            return ingredient.substring(1).trim();
-        }
-        return ingredient.substring(2);
-    }
-
-    private String removeNumberFromInstruction(String instruction) {
-        StringBuilder strBuilder = new StringBuilder();
-        int i;
-
-        // Ignore characters until '.'
-        for (i = 0; i < instruction.length() && (instruction.charAt(i) != '.'); ++i)
-            ;
-
-        // Ignore '.' and ' ' after
-        // Get all characters until end of string
-        for (i += 2; i < instruction.length(); ++i) {
-            strBuilder.append(instruction.charAt(i));
-        }
-
-        return strBuilder.toString();
-    }
 }
