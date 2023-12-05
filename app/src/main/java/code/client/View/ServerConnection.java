@@ -7,9 +7,18 @@ import code.server.BaseServer;
 
 public class ServerConnection {
     private BaseServer server;
+    private String ipAddress;
+    private int port;
 
     public ServerConnection(BaseServer server) {
         this.server = server;
+        ipAddress = server.getHostName();
+        port = server.getPort();
+    }
+
+    public ServerConnection(String ipAddress, int port) {
+        this.ipAddress = ipAddress;
+        this.port = port;
     }
 
     public BaseServer getServer() {
@@ -22,7 +31,7 @@ public class ServerConnection {
 
     public boolean isOnline() {
         try {
-            InetSocketAddress socketAddr = new InetSocketAddress(server.getHostName(), server.getPort());
+            InetSocketAddress socketAddr = new InetSocketAddress(ipAddress, port);
             Socket socket = new Socket();
             socket.connect(socketAddr, 500);
             socket.close();

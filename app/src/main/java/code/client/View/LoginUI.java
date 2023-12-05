@@ -34,6 +34,7 @@ public class LoginUI {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
         grid.setStyle("-fx-background-color: #F0F8FF;");
+        GridPane.setFillWidth(grid, true);
 
         Text titleText = new Text("Pantry Pal - Login");
         titleText.setFont(Font.font("Arial", FontWeight.BOLD, 20));

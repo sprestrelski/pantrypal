@@ -30,6 +30,7 @@ public class LoadingUI extends HBox {
         loadingImg = new ImageView(new Image(file.toURI().toString()));
         loadingImg.setFitWidth(Region.USE_COMPUTED_SIZE);
         gridPane.add(loadingImg, 1, 2);
+        GridPane.setFillWidth(gridPane, true);
         getChildren().addAll(gridPane);
     }
 }

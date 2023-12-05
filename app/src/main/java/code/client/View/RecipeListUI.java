@@ -15,6 +15,7 @@ public class RecipeListUI extends VBox {
         this.setPrefSize(700, 600);
         this.setStyle("-fx-background-color: #F0F8FF;");
         VBox.setVgrow(this, Priority.ALWAYS);
+        this.setFillWidth(true);
     }
 
     public IRecipeDb getRecipeDB() {

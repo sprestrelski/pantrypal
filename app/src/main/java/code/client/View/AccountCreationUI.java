@@ -55,6 +55,7 @@ public class AccountCreationUI {
         flow.getChildren().addAll(
                 new Text("Already have an account? "), goToLogin);
         grid.add(flow, 1, 5);
+        GridPane.setFillWidth(grid, true);
     }
 
     public GridPane getRoot() {

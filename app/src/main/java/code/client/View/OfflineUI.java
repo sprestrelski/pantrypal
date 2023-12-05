@@ -9,7 +9,7 @@ import java.io.File;
 
 import code.client.Model.AppConfig;
 
-public class OfflineUI extends HBox {
+public class OfflineUI extends VBox {
     private final Label offlineLabel;
     private final ImageView offlineImg;
 
@@ -25,7 +25,12 @@ public class OfflineUI extends HBox {
         // Show an image when the server is offline
         File file = new File(AppConfig.OFFLINE_IMG_FILE);
         offlineImg = new ImageView(new Image(file.toURI().toString()));
+        offlineImg.prefWidth(500);
         gridPane.add(offlineImg, 1, 2);
         getChildren().addAll(gridPane);
+        GridPane.setFillHeight(gridPane, true);
+        GridPane.setFillWidth(gridPane, true);
+        GridPane.setMargin(gridPane, new Insets(10, 10, 10, 10));
+        this.setFillWidth(true);
     }
 }

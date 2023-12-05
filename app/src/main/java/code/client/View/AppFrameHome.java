@@ -122,7 +122,7 @@ public class AppFrameHome extends BorderPane {
         this.setTop(header);
         this.setCenter(scroller);
         this.setBottom(footer);
-
+        scroller.setFitToWidth(true);
         newButton = footer.getNewButton();
         logOutButton = footer.getLogOutButton();
     }
