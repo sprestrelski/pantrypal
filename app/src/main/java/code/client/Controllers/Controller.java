@@ -499,6 +499,9 @@ public class Controller {
         // Check if the username is already taken
         // temporary logic, no database yet
         String response = model.performAccountRequest("GET", username, password);
+        if (response.contains("Offline")) {
+            view.goToOfflineUI();
+        }
         // System.out.println("Response for usernameTaken : " + response);
         return (response.equals("Username is taken"));
     }
@@ -593,7 +596,10 @@ public class Controller {
     private boolean performLogin(String username, String password) {
         // Will add logic for failed login later
         String response = model.performAccountRequest("GET", username, password);
-        if (response.equals(AccountRequestHandler.USERNAME_NOT_FOUND) ||
+        if (response.contains("Offline")) {
+            view.goToOfflineUI();
+            return false;
+        } else if (response.equals(AccountRequestHandler.USERNAME_NOT_FOUND) ||
                 response.equals(AccountRequestHandler.INCORRECT_PASSWORD) ||
                 response.equals(AccountRequestHandler.TAKEN_USERNAME)) {
             return false;

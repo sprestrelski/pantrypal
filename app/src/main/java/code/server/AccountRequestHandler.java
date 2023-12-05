@@ -1,5 +1,6 @@
 package code.server;
 
+import com.mongodb.MongoTimeoutException;
 import com.sun.net.httpserver.*;
 
 import java.io.*;
@@ -29,6 +30,8 @@ public class AccountRequestHandler implements HttpHandler {
             } else {
                 throw new Exception("Not valid request method.");
             }
+        } catch (MongoTimeoutException e) {
+            response = "Server Offline";
         } catch (Exception e) {
             System.out.println("An erroneous request");
             e.printStackTrace();
