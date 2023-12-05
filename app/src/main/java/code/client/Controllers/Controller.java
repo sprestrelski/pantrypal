@@ -654,6 +654,8 @@ public class Controller {
         if (response.contains("Offline")) {
             view.goToOfflineUI();
             return false;
+        } else if (response.contains("Error")) {
+            return false;
         } else if (response.equals(AccountRequestHandler.USERNAME_NOT_FOUND) ||
                 response.equals(AccountRequestHandler.INCORRECT_PASSWORD) ||
                 response.equals(AccountRequestHandler.TAKEN_USERNAME)) {
@@ -692,7 +694,7 @@ public class Controller {
 
             try {
                 mealType = model.performWhisperRequest("GET", "mealType");
-                if (mealType == null) {
+                if (mealType.contains("Error")) {
                     AppAlert.show("Input Error", "Please say a valid meal type!");
                 }
                 mic.getMealBox().getMealType().setText(mealType);

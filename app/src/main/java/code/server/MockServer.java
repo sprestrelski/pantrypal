@@ -13,6 +13,8 @@ import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
 import java.util.concurrent.*;
 
+import org.bson.Document;
+
 public class MockServer extends BaseServer {
     private IRecipeDb recipeDb;
     private AccountMongoDB accountMongoDB;
@@ -22,6 +24,12 @@ public class MockServer extends BaseServer {
 
     public MockServer(String hostName, int port) {
         super(hostName, port);
+        MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN);
+        MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
+        MongoCollection<Document> userCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
+        MongoCollection<Document> recipeCollection = mongoDb.getCollection(AppConfig.MONGO_RECIPE_COLLECTION);
+        accountMongoDB = new AccountMongoDB(userCollection);
+        recipeDb = new RecipeMongoDb(recipeCollection);
     }
 
     @Override

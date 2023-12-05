@@ -27,11 +27,10 @@ public class TextToRecipeTest {
                         URISyntaxException, InterruptedException {
                 // record and process audio
                 server.start();
-                VoiceToText voiceToText = new MockWhisperRequestHandler();
-                String mealType = voiceToText.processAudio("mealType");
+                String mealType = model.performWhisperRequest("GET", "mealType");
                 assertEquals("Breakfast", mealType);
 
-                String ingredients = voiceToText.processAudio("ingredients");
+                String ingredients = model.performWhisperRequest("GET", "ingredients");
                 assertEquals("Chicken, eggs.", ingredients);
 
                 // build prompt for chatGPT

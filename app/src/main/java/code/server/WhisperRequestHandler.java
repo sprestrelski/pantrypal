@@ -5,14 +5,17 @@ import com.sun.net.httpserver.*;
 import code.client.Model.AppConfig;
 
 import java.io.*;
+import java.net.URI;
 
 public class WhisperRequestHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         String response = "Request received";
-        String method = httpExchange.getRequestMethod();
-        System.out.println("Method is " + method);
+        URI uri = httpExchange.getRequestURI();
+        String query = uri.getRawQuery();
+        String type = query.substring(query.indexOf("=") + 1);
+
         int audioFileSize = 0;
 
         try {
@@ -49,10 +52,23 @@ public class WhisperRequestHandler implements HttpHandler {
             VoiceToText whisperService = new WhisperService();
             response = whisperService.processAudio("");
         } catch (Exception e) {
+            response = "Error";
             System.out.println("An erroneous request");
             e.printStackTrace();
         }
 
+        if (type.equals("mealType")) {
+            response = response.toUpperCase();
+            if (response.contains("BREAKFAST")) {
+                response = "Breakfast";
+            } else if (response.contains("LUNCH")) {
+                response = "Lunch";
+            } else if (response.contains("DINNER")) {
+                response = "Dinner";
+            } else {
+                response = "Error";
+            }
+        }
         // Sending back response to the client
         httpExchange.sendResponseHeaders(200, response.length());
         OutputStream outStream = httpExchange.getResponseBody();

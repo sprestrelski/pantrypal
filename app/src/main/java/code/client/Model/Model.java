@@ -144,16 +144,18 @@ public class Model {
     }
 
     public String performWhisperRequest(String method, String type) throws MalformedURLException, IOException {
-        String response = "Unable to perform Whisper request";
-        final String postUrl = AppConfig.SERVER_URL + AppConfig.WHISPER_PATH;
-        final File audioFile = new File(AppConfig.AUDIO_FILE);
+        String response = "Error";
+        String urlString = AppConfig.SERVER_URL + AppConfig.WHISPER_PATH;
+        urlString += "?=" + type;
         String boundary = Long.toHexString(System.currentTimeMillis());
         String CRLF = "\r\n";
         String charset = "UTF-8";
-        URLConnection connection = new URL(postUrl).openConnection();
+        URLConnection connection = new URL(urlString).openConnection();
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
+        // send Whisper Request
+        File audioFile = new File(AppConfig.AUDIO_FILE);
         try (OutputStream output = connection.getOutputStream();
                 PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);) {
             writer.append("--" + boundary).append(CRLF);
@@ -177,22 +179,9 @@ public class Model {
             }
 
             in.close();
-
-            if (type.equals("mealType") && responseCode == 200) {
-                response = response.toUpperCase();
-                if (response.contains("BREAKFAST")) {
-                    response = "Breakfast";
-                } else if (response.contains("LUNCH")) {
-                    response = "Lunch";
-                } else if (response.contains("DINNER")) {
-                    response = "Dinner";
-                } else {
-                    response = null;
-                }
-            }
         }
 
         System.out.println("Whisper response: " + response);
-        return response;
+        return response.trim();
     }
 }

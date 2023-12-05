@@ -33,6 +33,7 @@ public class AccountRequestHandler implements HttpHandler {
         } catch (MongoTimeoutException e) {
             response = "Server Offline";
         } catch (Exception e) {
+            response = "Error";
             System.out.println("An erroneous request");
             e.printStackTrace();
         }

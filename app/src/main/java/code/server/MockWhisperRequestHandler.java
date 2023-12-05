@@ -3,7 +3,7 @@ package code.server;
 import com.sun.net.httpserver.*;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
+import java.net.URI;
 
 public class MockWhisperRequestHandler extends VoiceToText implements HttpHandler {
     public MockWhisperRequestHandler() {
@@ -14,24 +14,16 @@ public class MockWhisperRequestHandler extends VoiceToText implements HttpHandle
         super(connection);
     }
 
-    public String processAudio(String type) throws IOException, URISyntaxException {
-        if (type.equals("mealType")) {
-            // processed correctly
-            return "Breakfast";
-        } else if (type.equals("ingredients")) {
-            return "Chicken, eggs.";
-        } else {
-            return "Error text";
-        }
-    }
-
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        String method = httpExchange.getRequestMethod();
-        String response = "Request received";
-        if (method.equals("GET")) {
+        URI uri = httpExchange.getRequestURI();
+        String query = uri.getRawQuery();
+        String type = query.substring(query.indexOf("=") + 1);
+
+        String response = "";
+        if (type.equals("mealType")) {
             response = "Breakfast";
-        } else if (method.equals("GET2")) {
+        } else if (type.equals("ingredients")) {
             response = "Chicken, eggs.";
         }
 
