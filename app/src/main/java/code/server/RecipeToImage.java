@@ -6,6 +6,4 @@ import com.sun.net.httpserver.HttpExchange;
 
 public abstract class RecipeToImage {
     public abstract void handle(HttpExchange httpExchange) throws IOException;
-
-    public abstract void setError(boolean error);
 }

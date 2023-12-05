@@ -5,8 +5,6 @@ import com.sun.net.httpserver.*;
 
 import java.io.*;
 import java.net.*;
-
-import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -29,6 +27,7 @@ public class DallERequestHandler extends RecipeToImage implements HttpHandler {
         String query = uri.getRawQuery();
         try {
             String recipeTitle = query.substring(query.indexOf("=") + 1);
+            recipeTitle = URLEncoder.encode(recipeTitle, "UTF-8");
             response = getResponse(recipeTitle);
         } catch (InterruptedException e) {
             response = "An error occurred.";
@@ -93,7 +92,4 @@ public class DallERequestHandler extends RecipeToImage implements HttpHandler {
         return generatedImageData;
     }
 
-    @Override
-    public void setError(boolean error) {
-    }
 }

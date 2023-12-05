@@ -103,7 +103,7 @@ public class Model {
 
     public String performDallERequest(String method, String recipeTitle) {
         try {
-            String urlString = AppConfig.SERVER_URL + AppConfig.CHATGPT_PATH;
+            String urlString = AppConfig.SERVER_URL + AppConfig.DALLE_PATH;
             urlString += "?=" + recipeTitle;
             URL url = new URI(urlString).toURL();
 
