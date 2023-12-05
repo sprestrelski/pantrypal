@@ -60,6 +60,7 @@ public class Controller {
     private final AppAudioRecorder recorder = new AppAudioRecorder();
     private String mealType; // stores the meal type specified by the user
     private String ingredients; // stores the ingredients listed out by the user
+    private ProgressBar progressBar;
 
     public Controller(View view, Model model) {
 
@@ -99,6 +100,7 @@ public class Controller {
     }
 
     private void handleRecipePostButton(ActionEvent event) throws IOException {
+        view.getDetailedView().getRefreshButton().setVisible(false);
         Recipe postedRecipe = view.getDetailedView().getDisplayedRecipe();
         Date currTime = new Date();
         postedRecipe.setDate(currTime.getTime());
@@ -117,7 +119,12 @@ public class Controller {
         // Debugging
         // System.out.println("Posting: " + recipe);
 
-        model.performRecipeRequest("POST", recipe, null);
+        String response = model.performRecipeRequest("POST", recipe, null);
+        if (response.contains("Offline")) {
+
+        } else if (response.contains("Error")) {
+
+        }
     }
 
     private void goToRecipeList() {
@@ -292,17 +299,30 @@ public class Controller {
     private void handleDetailedViewFromNewRecipeButton(ActionEvent event) {
         // Get ChatGPT response from the Model
         if (mealType != null && ingredients != null) {
+            view.goToLoading();
             try {
-                String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
-                Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
-                chatGPTrecipe.setAccountId(account.getId());
-                chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
+                Thread thread = new Thread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
+                                Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
+                                chatGPTrecipe.setAccountId(account.getId());
+                                chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
 
-                // Changes UI to Detailed Recipe Screen
-                view.goToDetailedView(chatGPTrecipe, false);
-                view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-                handleDetailedViewListeners();
-
+                                // Changes UI to Detailed Recipe Screen
+                                view.goToDetailedView(chatGPTrecipe, false);
+                                view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+                                handleDetailedViewListeners();
+                            }
+                        });
+                thread.start();
+                AppFrameMic mic = view.getAppFrameMic();
+                mic.getRecordingIngredientsLabel()
+                        .setText("Processing mealType and ingredients. Please wait.");
+                mic.getRecordingIngredientsLabel()
+                        .setStyle("-fx-font-weight: bold; -fx-font: 20 arial;");
+                mic.getRecordingIngredientsLabel().setVisible(true);
             } catch (Exception exception) {
                 AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
                 exception.printStackTrace();
@@ -335,7 +355,14 @@ public class Controller {
         });
         detailedView.setHomeButtonAction(this::handleHomeButton);
         detailedView.setShareButtonAction(this::handleShareButton);
-        detailedView.setRefreshButtonAction(this::handleRefreshButton);
+        detailedView.setRefreshButtonAction(event -> {
+            try {
+                handleRefreshButton(event);
+            } catch (URISyntaxException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        });
     }
 
     private void handleEditButton(ActionEvent event) {
@@ -360,7 +387,7 @@ public class Controller {
 
         System.out.println("Deleting id: " + recipe.getId());
         model.performRecipeRequest("DELETE", recipeStr, null);
-        this.view.getAppFrameHome().updateDisplay(filter); 
+        this.view.getAppFrameHome().updateDisplay(filter);
         goToRecipeList();
     }
 
@@ -424,17 +451,44 @@ public class Controller {
         view.goToLoginUI();
     }
 
-    private void handleRefreshButton(ActionEvent event) {
+    private void handleRefreshButton(ActionEvent event) throws URISyntaxException, IOException {
         // Get ChatGPT response from the Model
         if (mealType != null && ingredients != null) {
+            view.goToLoading();
             try {
-                String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
-                Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
-                chatGPTrecipe.setAccountId(account.getId());
-                chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
+                Thread thread = new Thread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
 
-                // Changes UI to Detailed Recipe Screen
-                view.getDetailedView().setRecipe(chatGPTrecipe);
+                                String responseText = model.performChatGPTRequest("GET", mealType,
+                                        ingredients);
+                                Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
+                                chatGPTrecipe.setAccountId(account.getId());
+                                chatGPTrecipe.setImage(model.performDallERequest("GET",
+                                        chatGPTrecipe.getTitle()));
+
+                                // Changes UI to Detailed Recipe Screen
+                                view.goToDetailedView(chatGPTrecipe, false);
+                                view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+                                handleDetailedViewListeners();
+                            }
+                        });
+                thread.start();
+
+                // AppAlert.show("Loading", "Please wait for the recipe to regenerate.");
+                // Thread.sleep(2000);
+                // String responseText = model.performChatGPTRequest("GET", mealType,
+                // ingredients);
+                // Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
+                // chatGPTrecipe.setAccountId(account.getId());
+                // chatGPTrecipe.setImage(model.performDallERequest("GET",
+                // chatGPTrecipe.getTitle()));
+
+                // // Changes UI to Detailed Recipe Screen
+                // view.goToDetailedView(chatGPTrecipe, false);
+                // view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+                // handleDetailedViewListeners();
 
             } catch (Exception exception) {
                 AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");

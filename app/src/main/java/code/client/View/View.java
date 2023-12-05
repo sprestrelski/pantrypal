@@ -14,6 +14,7 @@ public class View {
     private AccountCreationUI createAcc;
     private Scene mainScene;
     private OfflineUI offlineScreen;
+    private LoadingUI loadingUI;
 
     public View() throws IOException, URISyntaxException {
         offlineScreen = new OfflineUI();
@@ -22,6 +23,7 @@ public class View {
         audioCapture = new AppFrameMic();
         detailedRecipe = new DetailsAppFrame();
         createAcc = new AccountCreationUI();
+        loadingUI = new LoadingUI();
     }
 
     public void setScene(Scene scene) {
@@ -30,6 +32,10 @@ public class View {
 
     public void goToRecipeList() {
         mainScene.setRoot(home.getRoot());
+    }
+
+    public void goToLoading() {
+        mainScene.setRoot(loadingUI);
     }
 
     public void goToAudioCapture() throws URISyntaxException, IOException {
