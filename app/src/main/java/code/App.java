@@ -6,7 +6,9 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import code.client.Model.*;
 import code.client.View.*;
+import code.server.BaseServer;
 import code.server.AppServer;
+import code.server.MockServer;
 import code.client.Controllers.*;
 import javafx.scene.Scene;
 import code.server.IRecipeDb;
@@ -17,7 +19,7 @@ import java.net.URISyntaxException;
 
 public class App extends Application {
     private IRecipeDb recipeDb;
-    private AppServer server;
+    private BaseServer server;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -75,6 +77,10 @@ public class App extends Application {
     }
 
     private void initServer() throws IOException {
-        server = new AppServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+        if (AppConfig.MOCKING_ON) {
+            server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+        } else {
+            server = new AppServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+        }
     }
 }
