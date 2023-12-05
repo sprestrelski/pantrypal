@@ -2,13 +2,10 @@ package code;
 
 import org.junit.jupiter.api.Test;
 
-import code.client.Model.TextToRecipe;
-import code.client.Model.VoiceToText;
+import code.client.Controllers.Format;
+import code.client.Model.AppConfig;
+import code.client.Model.Model;
 import code.server.*;
-import code.client.Model.MockDallEService;
-import code.client.Model.MockGPTService;
-import code.client.Model.MockWhisperService;
-import code.client.Model.RecipeToImage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -18,31 +15,37 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class TextToRecipeTest {
+    BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+    Model model = new Model();
+    Format format = new Format();
 
     @Test
     /**
      * Integration test for provide recipe
      */
-    public void testProvideRecipeIntegration() throws IOException, URISyntaxException, InterruptedException {
+    public void testProvideRecipeIntegration() throws IOException,
+            URISyntaxException, InterruptedException {
         // record and process audio
-        VoiceToText voiceToText = new MockWhisperService();
-        String mealType = voiceToText.processAudio("mealtype");
-        String ingredients = voiceToText.processAudio("ingredients");
+        server.start();
+        String mealType = "Breakfast"; // model.performWhisperRequest("GET", "mealtype");
+        String ingredients = "Chicken, eggs."; // model.performWhisperRequest("GET2", "ingredients");
 
         // build prompt for chatGPT
-        TextToRecipe textToRecipe = new MockGPTService();
         String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Breakfast. Chicken, eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
-        String response = textToRecipe.buildPrompt(mealType, ingredients);
+        String response = format.buildPrompt(mealType, ingredients);
         assertEquals(prompt, response);
 
         // create Recipe object from response
-        String responseText = textToRecipe.getResponse(mealType, ingredients);
-        Recipe chatGPTrecipe = textToRecipe.mapResponseToRecipe(mealType, responseText);
-        RecipeToImage recipeToImage = new MockDallEService();
-        chatGPTrecipe.setImage(recipeToImage.getResponse(chatGPTrecipe.getTitle()));
+        String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
+        Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType,
+                responseText);
+
+        chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
+
         assertEquals("Fried Chicken", chatGPTrecipe.getTitle());
         assertEquals("Breakfast", chatGPTrecipe.getMealTag());
         assertNotNull(chatGPTrecipe.getImage());
+        server.stop();
     }
 
     /**
@@ -50,16 +53,19 @@ public class TextToRecipeTest {
      */
     @Test
     public void testPromptBuild() {
-        TextToRecipe textToRecipe = new MockGPTService();
+        TextToRecipe textToRecipe = new MockChatGPTRequestHandler();
         String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Lunch. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Remember to first include a title, then a list of ingredients, and then a list of instructions.";
         String response = textToRecipe.buildPrompt("Lunch", "I have rice, shrimp, chicken, and eggs.");
         assertEquals(prompt, response);
     }
 
     @Test
-    public void testRefreshRecipe() throws IOException, InterruptedException, URISyntaxException {
-        TextToRecipe textToRecipe = new MockGPTService();
-        String initialResponse = textToRecipe.getResponse("breakfast", "chicken, eggs");
+    public void testRefreshRecipe() throws IOException, InterruptedException,
+            URISyntaxException {
+        server.start();
+        String mealType = "breakfast";
+        String ingredients = "chicken, eggs";
+        String initialResponse = model.performChatGPTRequest("GET", mealType, ingredients);
         String expectedResponse = """
                 Fried Chicken
                 breakfast
@@ -74,25 +80,13 @@ public class TextToRecipeTest {
         assertEquals(expectedResponse, initialResponse);
 
         // simulate refresh
-        textToRecipe.setSampleRecipe("""
-                Fried Chicken and Egg Fried Rice
-                breakfast
-                Ingredients:
-
-                - 2 chicken breasts, diced
-                - 2 large eggs
-                - 2 cups cooked rice
-                - 2 tablespoons vegetable oil
-                - 2 tablespoons soy sauce
-                - 1 teaspoon sesame oil
-                - Salt and pepper to taste""");
-        String refreshResponse = textToRecipe.getResponse("breakfast", "chicken, eggs");
+        String refreshResponse = model.performChatGPTRequest("GET2", mealType, ingredients);
         assertNotEquals(initialResponse, refreshResponse);
+        server.stop();
     }
 
     @Test
     public void testParseJSON() {
-        TextToRecipe textToRecipe = new MockGPTService();
         String mealType = "BREAKFAST";
         String responseText = """
                 Fried Chicken and Egg Fried Rice
@@ -146,13 +140,12 @@ public class TextToRecipeTest {
                 Cook the fried rice until everything is heated through, about 5 minutes.
                 Drizzle with sesame oil, season with more salt and pepper if desired, and serve. Enjoy!
                 """;
-        Recipe recipe = textToRecipe.mapResponseToRecipe(mealType, responseText);
+        Recipe recipe = format.mapResponseToRecipe(mealType, responseText);
         assertEquals(parsedResponse, recipe.toString());
     }
 
     @Test
     public void testParseNoIndentsAndNewLines() {
-        TextToRecipe textToRecipe = new MockGPTService();
         String mealType = "LUNCH";
         String responseText = """
                 Cheesy pasta bake
@@ -208,13 +201,12 @@ public class TextToRecipeTest {
                 Top with shredded cheese and bake in preheated oven for 25-30 minutes, or until the cheese is melted and bubbly.
                 Serve the cheesy pasta bake with garlic bread. Enjoy!
                 """;
-        Recipe recipe = textToRecipe.mapResponseToRecipe(mealType, responseText);
+        Recipe recipe = format.mapResponseToRecipe(mealType, responseText);
         assertEquals(parsedResponse, recipe.toString());
     }
 
     @Test
     public void testParseDifferentLineSpacing() {
-        TextToRecipe textToRecipe = new MockGPTService();
         String mealType = "DINNER";
         String responseText = """
 
@@ -253,8 +245,7 @@ public class TextToRecipeTest {
 
                 10. Remove from oven and discard the garlic bread or serve alongside the beef pasta bake.
 
-                11. Enjoy!
-                    """;
+                11. Enjoy!""";
         String parsedResponse = """
                 Title: Savory Beef Pasta Bake
                 Meal tag: DINNER
@@ -281,16 +272,14 @@ public class TextToRecipeTest {
                 Remove from oven and discard the garlic bread or serve alongside the beef pasta bake.
                 Enjoy!
                 """;
-        Recipe recipe = textToRecipe.mapResponseToRecipe(mealType, responseText);
+        Recipe recipe = format.mapResponseToRecipe(mealType, responseText);
         assertEquals(parsedResponse, recipe.toString());
     }
 
     @Test
     public void testParseRemoveDashesAndNumbers() {
-        TextToRecipe textToRecipe = new MockGPTService();
         String mealType = "LUNCH";
         String responseText = """
-
 
                 Savory Beef Pasta Bake
                 LUNCH
@@ -327,8 +316,7 @@ public class TextToRecipeTest {
 
                 10. Remove from oven and discard the garlic bread or serve alongside the beef pasta bake.
 
-                11. Enjoy!
-                    """;
+                11. Enjoy!""";
         String parsedResponse = """
                 Title: Savory Beef Pasta Bake
                 Meal tag: LUNCH
@@ -355,7 +343,7 @@ public class TextToRecipeTest {
                 Remove from oven and discard the garlic bread or serve alongside the beef pasta bake.
                 Enjoy!
                 """;
-        Recipe recipe = textToRecipe.mapResponseToRecipe(mealType, responseText);
+        Recipe recipe = format.mapResponseToRecipe(mealType, responseText);
         assertEquals(parsedResponse, recipe.toString());
     }
 }

@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.util.Base64;
-import java.net.URLEncoder;
 
 public class RecipeToImageTest {
     BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
@@ -32,7 +31,7 @@ public class RecipeToImageTest {
 
         // DallE request
         server.start();
-        String imageString = model.performDallERequest("GET", URLEncoder.encode(recipe.getTitle(), "UTF-8"));
+        String imageString = model.performDallERequest("GET", recipe.getTitle());
         imageString = new String(Base64.getDecoder().decode(imageString));
 
         // default image

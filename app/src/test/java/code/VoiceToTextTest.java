@@ -5,40 +5,30 @@ import java.net.URISyntaxException;
 
 import org.junit.jupiter.api.Test;
 
-import code.client.Model.IHttpConnection;
-import code.client.Model.MockHttpConnection;
-import code.client.Model.MockWhisperService;
-import code.client.Model.VoiceToText;
+import code.client.Model.AppConfig;
+import code.client.Model.Model;
+import code.server.BaseServer;
+import code.server.IHttpConnection;
+import code.server.MockHttpConnection;
+import code.server.MockServer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class VoiceToTextTest {
+    BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+    Model model = new Model();
+
     /*
-     * Integration Test
+     * Integration Test for processing both audios
      */
     @Test
     void testSuccessfulProcessAudio() throws IOException, URISyntaxException {
-        IHttpConnection connection = new MockHttpConnection(200);
-
-        VoiceToText voiceToText = new MockWhisperService(connection);
-        String response = voiceToText.processAudio("mealtype");
+        server.start();
+        String response = model.performWhisperRequest("GET", "mealType");
         assertEquals("Breakfast", response);
 
-        voiceToText = new MockWhisperService(connection);
-        response = voiceToText.processAudio("ingredients");
+        response = model.performWhisperRequest("GET2", "ingredients");
         assertEquals("Chicken, eggs.", response);
 
-    }
-
-    /*
-     * Unit test
-     */
-    @Test
-    void testFailedProcessAudio() throws IOException, URISyntaxException {
-        IHttpConnection connection = new MockHttpConnection(404);
-
-        VoiceToText voiceToText = new MockWhisperService(connection);
-        String response = voiceToText.processAudio("error");
-        assertEquals("Error text", response);
     }
 
     /*

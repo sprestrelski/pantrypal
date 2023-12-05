@@ -1,12 +1,11 @@
 package code.server;
 
+import com.sun.net.httpserver.*;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 
-import code.client.Model.IHttpConnection;
-import code.client.Model.MockHttpConnection;
-
-public class MockWhisperRequestHandler extends VoiceToText {
+public class MockWhisperRequestHandler extends VoiceToText implements HttpHandler {
     public MockWhisperRequestHandler() {
         super(new MockHttpConnection(200));
     }
@@ -24,5 +23,22 @@ public class MockWhisperRequestHandler extends VoiceToText {
         } else {
             return "Error text";
         }
+    }
+
+    @Override
+    public void handle(HttpExchange httpExchange) throws IOException {
+        String method = httpExchange.getRequestMethod();
+        String response = "Request received";
+        if (method.equals("GET")) {
+            response = "Breakfast";
+        } else if (method.equals("GET2")) {
+            response = "Chicken, eggs.";
+        }
+
+        // Sending back response to the client
+        httpExchange.sendResponseHeaders(200, response.length());
+        OutputStream outStream = httpExchange.getResponseBody();
+        outStream.write(response.getBytes());
+        outStream.close();
     }
 }

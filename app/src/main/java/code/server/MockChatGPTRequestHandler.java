@@ -25,6 +25,21 @@ public class MockChatGPTRequestHandler extends TextToRecipe implements HttpHandl
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
+        String method = httpExchange.getRequestMethod();
+        if (method.equals("GET2")) {
+            sampleRecipe = """
+                    Fried Chicken and Egg Fried Rice
+                    breakfast
+                    Ingredients:
+
+                    - 2 chicken breasts, diced
+                    - 2 large eggs
+                    - 2 cups cooked rice
+                    - 2 tablespoons vegetable oil
+                    - 2 tablespoons soy sauce
+                    - 1 teaspoon sesame oil
+                    - Salt and pepper to taste""";
+        }
         httpExchange.sendResponseHeaders(200, sampleRecipe.length());
         OutputStream outStream = httpExchange.getResponseBody();
         outStream.write(sampleRecipe.getBytes());
