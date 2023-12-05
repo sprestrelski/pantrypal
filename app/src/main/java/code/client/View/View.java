@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import code.server.Recipe;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 public class View {
@@ -24,6 +25,10 @@ public class View {
         detailedRecipe = new DetailsAppFrame();
         createAcc = new AccountCreationUI();
         loadingUI = new LoadingUI();
+    }
+
+    public Parent getMainScene() {
+        return mainScene.getRoot();
     }
 
     public void setScene(Scene scene) {
@@ -57,6 +62,10 @@ public class View {
 
     public void goToOfflineUI() {
         mainScene.setRoot(offlineScreen);
+    }
+
+    public OfflineUI getOfflineUI() {
+        return offlineScreen;
     }
 
     public RecipeListUI getRecipeButtons() {

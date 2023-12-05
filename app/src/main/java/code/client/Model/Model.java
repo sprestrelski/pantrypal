@@ -15,10 +15,12 @@ import java.net.URI;
 import java.nio.file.*;
 import java.net.URLEncoder;
 import com.mongodb.MongoException;
+import com.mongodb.MongoSocketReadException;
 import com.mongodb.MongoWriteException;
 
 public class Model {
     public String performAccountRequest(String method, String user, String password) {
+        String response = "Error";
         try {
             String urlString = AppConfig.SERVER_URL + AppConfig.ACCOUNT_PATH;
             urlString += "?=" + user + ":" + password;
@@ -40,23 +42,18 @@ public class Model {
             }
 
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String response = in.readLine();
+            response = in.readLine();
             in.close();
-            return response;
-        } catch (MongoWriteException ex) {
-            ex.printStackTrace();
-            return "Duplicate Key Error";
-        } catch (MongoException ex) {
-            ex.printStackTrace();
-            return "Server Offline";
         } catch (Exception ex) {
             ex.printStackTrace();
-            return "Error: " + ex.getMessage();
+            response = "Error: " + ex.getMessage();
         }
+        return response;
     }
 
     public String performRecipeRequest(String method, String recipe, String userId) {
         // Implement your HTTP request logic here and return the response
+        String response = "Error";
         try {
             String urlString = AppConfig.SERVER_URL + AppConfig.RECIPE_PATH;
             if (userId != null) {
@@ -76,23 +73,16 @@ public class Model {
             }
 
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String response = "";
             String line;
             while ((line = in.readLine()) != null) {
                 response += line + "\n";
             }
             in.close();
-            return response;
-        } catch (MongoWriteException ex) {
-            ex.printStackTrace();
-            return "Duplicate Key Error";
-        } catch (MongoException ex) {
-            ex.printStackTrace();
-            return "Server Offline";
         } catch (Exception ex) {
             ex.printStackTrace();
-            return "Error: " + ex.getMessage();
+            response = "Error: " + ex.getMessage();
         }
+        return response;
     }
 
     public String performChatGPTRequest(String method, String mealType, String ingredients) {

@@ -1,6 +1,8 @@
 package code.server;
 
+import com.mongodb.MongoSocketReadException;
 import com.mongodb.MongoTimeoutException;
+import com.mongodb.MongoWriteException;
 import com.sun.net.httpserver.*;
 
 import java.io.*;
@@ -30,7 +32,10 @@ public class AccountRequestHandler implements HttpHandler {
             } else {
                 throw new Exception("Not valid request method.");
             }
-        } catch (MongoTimeoutException e) {
+        } catch (MongoWriteException ex) {
+            ex.printStackTrace();
+            response = "Duplicate Key Error";
+        } catch (MongoSocketReadException | MongoTimeoutException e) {
             response = "Server Offline";
         } catch (Exception e) {
             response = "Error";

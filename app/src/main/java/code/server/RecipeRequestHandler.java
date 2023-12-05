@@ -1,5 +1,7 @@
 package code.server;
 
+import com.mongodb.MongoSocketReadException;
+import com.mongodb.MongoWriteException;
 import com.sun.net.httpserver.*;
 
 import code.client.Model.RecipeCSVWriter;
@@ -31,7 +33,14 @@ public class RecipeRequestHandler implements HttpHandler {
             } else {
                 throw new Exception("Not valid request method.");
             }
+        } catch (MongoWriteException ex) {
+            ex.printStackTrace();
+            response = "Duplicate Key Error";
+        } catch (MongoSocketReadException ex) {
+            ex.printStackTrace();
+            response = "Server Offline";
         } catch (Exception e) {
+            response = "Error";
             System.out.println("An erroneous request");
             e.printStackTrace();
         }

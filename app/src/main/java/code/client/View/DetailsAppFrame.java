@@ -27,9 +27,9 @@ public class DetailsAppFrame {
         detailedUI.setStyle("-fx-background-color: #F0F8FF;");
         setupGrowingUI();
 
-        defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF; -fx-font-weight: bold; -fx-font: 11 arial;";
-        onStyle = "-fx-font-style: italic; -fx-background-color: #90EE90; -fx-font-weight: bold; -fx-font: 11 arial;";
-        offStyle = "-fx-font-style: italic; -fx-background-color: #FF7377; -fx-font-weight: bold; -fx-font: 11 arial;";
+        defaultButtonStyle = "-fx-font: italic 11 arial; -fx-background-color: #FFFFFF; -fx-font-weight: bold;";
+        onStyle = "-fx-font: italic 11 arial; -fx-background-color: #90EE90; -fx-font-weight: bold;";
+        offStyle = "-fx-font: italic 11 arial; -fx-background-color: #FF7377; -fx-font-weight: bold;";
 
         backToHomeButton = new Button("Back to List");
         backToHomeButton.setStyle(defaultButtonStyle);

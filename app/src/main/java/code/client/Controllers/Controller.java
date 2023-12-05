@@ -13,6 +13,7 @@ import code.server.IRecipeDb;
 
 import java.net.URL;
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
@@ -116,14 +117,12 @@ public class Controller {
         recipeWriter.writeRecipe(postedRecipe);
 
         String recipe = writer.toString();
-        // Debugging
-        // System.out.println("Posting: " + recipe);
 
         String response = model.performRecipeRequest("POST", recipe, null);
         if (response.contains("Offline")) {
-
+            AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
         } else if (response.contains("Error")) {
-
+            AppAlert.show("Error", "Something went wrong. Please check your inputs and try again.");
         }
     }
 
@@ -359,7 +358,6 @@ public class Controller {
             try {
                 handleRefreshButton(event);
             } catch (URISyntaxException | IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         });
@@ -460,7 +458,6 @@ public class Controller {
                         new Runnable() {
                             @Override
                             public void run() {
-
                                 String responseText = model.performChatGPTRequest("GET", mealType,
                                         ingredients);
                                 Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
@@ -475,20 +472,6 @@ public class Controller {
                             }
                         });
                 thread.start();
-
-                // AppAlert.show("Loading", "Please wait for the recipe to regenerate.");
-                // Thread.sleep(2000);
-                // String responseText = model.performChatGPTRequest("GET", mealType,
-                // ingredients);
-                // Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
-                // chatGPTrecipe.setAccountId(account.getId());
-                // chatGPTrecipe.setImage(model.performDallERequest("GET",
-                // chatGPTrecipe.getTitle()));
-
-                // // Changes UI to Detailed Recipe Screen
-                // view.goToDetailedView(chatGPTrecipe, false);
-                // view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-                // handleDetailedViewListeners();
 
             } catch (Exception exception) {
                 AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
@@ -509,17 +492,42 @@ public class Controller {
         if (username.isEmpty() || password.isEmpty()) {
             // Display an error message if username or password is empty
             showErrorPane(grid, "Error. Please provide a username and password.");
-        } else if (isUsernameTaken(username, password)) {
-            // Display an error message if the username is already taken
-            showErrorPane(grid, "Error. This username is already taken. Please choose another one.");
         } else {
-            // Continue with account creation logic
-            System.out.println("Account Created!\nUsername: " + username + "\nPassword: " + password);
-            model.performAccountRequest("PUT", username, password);
-            // Show success message
-            showSuccessPane(grid);
-            view.goToLoginUI();
+            view.goToLoading();
+            Thread thread = new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isUsernameTaken(username, password)
+                                    && !view.getMainScene().equals(view.getOfflineUI())) {
+                                // Continue with account creation logic
+                                System.out.println(
+                                        "Username not taken!\nUsername: " + username + "\nPassword: " + password);
+                                String response = model.performAccountRequest("PUT", username, password);
+                                // Show success message
+                                if (response.contains("Offline")) {
+                                    view.goToOfflineUI();
+                                } else {
+                                    showSuccessPane(grid);
+                                    view.goToLoginUI();
+                                }
+
+                            } else {
+                                // Display an error message if the username is already taken
+                                view.goToCreateAcc();
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showErrorPane(grid,
+                                                "Error. This username is already taken. Please choose another one.");
+                                    }
+                                });
+                            }
+                        }
+                    });
+            thread.start();
         }
+
     }
 
     private void showErrorPane(GridPane grid, String errorMessage) {
@@ -552,13 +560,12 @@ public class Controller {
 
     private boolean isUsernameTaken(String username, String password) {
         // Check if the username is already taken
-        // temporary logic, no database yet
         String response = model.performAccountRequest("GET", username, password);
         if (response.contains("Offline")) {
             view.goToOfflineUI();
+            return true;
         }
-        // System.out.println("Response for usernameTaken : " + response);
-        return (response.equals("Username is taken"));
+        return (!response.equals("Username is not found"));
     }
     ////////////////////////////////////////
 
@@ -571,20 +578,39 @@ public class Controller {
             // Display an error message if username or password is empty
             showErrorPane(grid, "Error. Please provide a username and password.");
         } else {
-            boolean loginSuccessful = performLogin(username, password);
+            view.goToLoading();
+            Thread thread = new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            boolean loginSuccessful = performLogin(username, password);
+                            if (loginSuccessful) {
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        goToRecipeList();
+                                        if (!view.getLoginUI().getRememberLogin()) {
+                                            clearCredentials();
+                                        } else {
+                                            saveCredentials(account);
+                                        }
+                                    }
+                                });
 
-            if (loginSuccessful) {
-                showLoginSuccessPane(grid, true); // useless
-
-                goToRecipeList();
-                if (!view.getLoginUI().getRememberLogin()) {
-                    clearCredentials();
-                } else {
-                    saveCredentials(account);
-                }
-            } else {
-                showLoginSuccessPane(grid, false);
-            }
+                            } else {
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (!view.getMainScene().equals(view.getOfflineUI())) {
+                                            view.goToLoginUI();
+                                            showLoginSuccessPane(grid, false);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+            thread.start();
         }
     }
 
