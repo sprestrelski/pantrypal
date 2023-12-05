@@ -54,47 +54,20 @@ public class ShareRecipe {
     }
 
     private static String formatRecipe(Recipe recipe) {
-        Iterator<String> ingr = recipe.getIngredientIterator();
-        Iterator<String> instr = recipe.getInstructionIterator();
+        String title = recipe.getTitle() != null ? recipe.getTitle() : "Untitled Recipe";
+        String image = recipe.getImage() != null ? recipe.getImage() : ""; // Provide a default image or an empty string
+        String ingr = buildList(recipe.getIngredientIterator());
+        String instr = buildList(recipe.getInstructionIterator());
 
         return String.format("""
                 <html>
                     <head>
                         <title>%s</title>
                         <style>
-                        body {
-                            font-family: 'Comic Sans MS', cursive;
-                            background-color: #f4f4f4;
-                            color: #333;
-                            margin: 0;
-                            padding: 0;
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                        }
-                        h1, h2 {
-                            color: #007bff;
-                        }
-                        img {
-                            width: 100%;
-                            max-width: 600px;
-                            height: auto;
-                            margin-top: 10px;
-                        }
-                        ul {
-                            list-style-type: none;
-                            padding: 0;
-                            margin: 0;
-                        }
-                        li {
-                            background-color: #fff;
-                            border: 1px solid #ddd;
-                            margin: 5px 0;
-                            padding: 10px;
-                            border-radius: 5px;
-                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                        }
-                        </style>
+                        body { font-family: 'Comic Sans MS', cursive; }
+                        h1, h2 { font-family: 'Comic Sans MS', cursive; color: #333; }
+                        ul { list-style-type: square; }
+                    </style>
                     </head>
                     <body>
                         <h1>%s</h1>
@@ -110,11 +83,11 @@ public class ShareRecipe {
                     </body>
                 </html>
                 """,
-                recipe.getTitle(),
-                recipe.getTitle(),
-                recipe.getImage(),
-                buildList(ingr),
-                buildList(instr));
+                title,
+                title,
+                image,
+                ingr,
+                instr);
     }
 
     private static String buildList(Iterator<String> iterator) {
