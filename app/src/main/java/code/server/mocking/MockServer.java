@@ -1,4 +1,4 @@
-package code.server;
+package code.server.mocking;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -7,6 +7,13 @@ import com.mongodb.client.MongoDatabase;
 import com.sun.net.httpserver.*;
 
 import code.client.Model.AppConfig;
+import code.server.AccountMongoDB;
+import code.server.AccountRequestHandler;
+import code.server.BaseServer;
+import code.server.IRecipeDb;
+import code.server.RecipeMongoDb;
+import code.server.RecipeRequestHandler;
+import code.server.ShareRequestHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

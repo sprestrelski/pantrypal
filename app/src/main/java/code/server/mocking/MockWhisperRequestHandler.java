@@ -1,6 +1,10 @@
-package code.server;
+package code.server.mocking;
 
 import com.sun.net.httpserver.*;
+
+import code.server.IHttpConnection;
+import code.server.VoiceToText;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;

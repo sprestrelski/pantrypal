@@ -14,6 +14,7 @@ import code.client.Model.AppConfig;
 import code.client.View.*;
 import code.client.Controllers.*;
 import code.server.*;
+import code.server.mocking.MockServer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

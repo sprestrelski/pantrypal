@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import code.client.Model.AppConfig;
 import code.client.View.ServerConnection;
 import code.server.BaseServer;
-import code.server.MockServer;
+import code.server.mocking.MockServer;
 
 import java.io.IOException;
 import java.io.PrintStream;

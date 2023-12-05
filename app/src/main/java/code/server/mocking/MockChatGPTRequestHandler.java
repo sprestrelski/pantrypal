@@ -1,8 +1,10 @@
-package code.server;
+package code.server.mocking;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import com.sun.net.httpserver.*;
+
+import code.server.TextToRecipe;
 
 public class MockChatGPTRequestHandler extends TextToRecipe implements HttpHandler {
 

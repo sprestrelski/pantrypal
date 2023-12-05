@@ -3,8 +3,8 @@ package code;
 import org.junit.jupiter.api.Test;
 
 import code.server.BaseServer;
-import code.server.MockServer;
 import code.server.Recipe;
+import code.server.mocking.MockServer;
 import code.client.Model.AppConfig;
 import code.client.Model.Model;
 

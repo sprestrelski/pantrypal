@@ -8,10 +8,10 @@ import code.client.Model.*;
 import code.client.View.*;
 import code.server.BaseServer;
 import code.server.AppServer;
-import code.server.MockServer;
 import code.client.Controllers.*;
 import javafx.scene.Scene;
 import code.server.IRecipeDb;
+import code.server.mocking.MockServer;
 
 import java.io.FileReader;
 import java.io.IOException;

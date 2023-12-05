@@ -9,8 +9,8 @@ import code.client.Model.AppConfig;
 import code.client.Model.Model;
 import code.server.BaseServer;
 import code.server.IHttpConnection;
-import code.server.MockHttpConnection;
-import code.server.MockServer;
+import code.server.mocking.MockHttpConnection;
+import code.server.mocking.MockServer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

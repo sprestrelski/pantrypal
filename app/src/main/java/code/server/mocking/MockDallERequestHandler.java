@@ -1,6 +1,8 @@
-package code.server;
+package code.server.mocking;
 
 import code.client.Model.AppConfig;
+import code.server.RecipeToImage;
+
 import com.sun.net.httpserver.*;
 
 import java.io.*;
