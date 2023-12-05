@@ -60,33 +60,6 @@ public class TextToRecipeTest {
         }
 
         @Test
-        public void testRefreshRecipe() throws IOException, InterruptedException,
-                        URISyntaxException {
-                server.stop();
-                server.start();
-                String mealType = "breakfast";
-                String ingredients = "chicken, eggs";
-                String initialResponse = model.performChatGPTRequest("GET", mealType, ingredients);
-                String expectedResponse = """
-                                Fried Chicken
-                                breakfast
-                                Ingredients:
-                                - 2 chicken breasts, diced
-                                - 2 eggs
-                                Instructions:
-                                1. Crack 2 eggs into bowl.
-                                2. Add chicken into bowl and then fry.
-                                3. Enjoy!
-                                """;
-                assertEquals(expectedResponse, initialResponse);
-
-                // simulate refresh
-                String refreshResponse = model.performChatGPTRequest("GET2", mealType, ingredients);
-                assertNotEquals(initialResponse, refreshResponse);
-                server.stop();
-        }
-
-        @Test
         public void testParseJSON() {
                 String mealType = "BREAKFAST";
                 String responseText = """

@@ -15,7 +15,7 @@ public class MockWhisperRequestHandler extends VoiceToText implements HttpHandle
     }
 
     public String processAudio(String type) throws IOException, URISyntaxException {
-        if (type.equals("mealtype")) {
+        if (type.equals("mealType")) {
             // processed correctly
             return "Breakfast";
         } else if (type.equals("ingredients")) {

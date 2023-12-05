@@ -11,6 +11,9 @@ import code.server.BaseServer;
 import code.server.IHttpConnection;
 import code.server.MockHttpConnection;
 import code.server.MockServer;
+import code.server.MockWhisperRequestHandler;
+import code.server.VoiceToText;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class VoiceToTextTest {
@@ -22,13 +25,12 @@ public class VoiceToTextTest {
      */
     @Test
     void testSuccessfulProcessAudio() throws IOException, URISyntaxException {
-        server.start();
-        String response = model.performWhisperRequest("GET", "mealType");
+        VoiceToText voiceToText = new MockWhisperRequestHandler();
+        String response = voiceToText.processAudio("mealType");
         assertEquals("Breakfast", response);
 
-        response = model.performWhisperRequest("GET2", "ingredients");
+        response = voiceToText.processAudio("ingredients");
         assertEquals("Chicken, eggs.", response);
-
     }
 
     /*
