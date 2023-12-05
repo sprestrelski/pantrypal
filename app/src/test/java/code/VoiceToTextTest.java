@@ -1,6 +1,7 @@
 package code;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import code.server.BaseServer;
 import code.server.IHttpConnection;
 import code.server.mocking.MockHttpConnection;
 import code.server.mocking.MockServer;
+import java.net.ConnectException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -32,9 +34,18 @@ public class VoiceToTextTest {
         server.stop();
     }
 
-    /*
-     * Unit test
-     */
+    @Test
+    void testUnsuccessfulProcessAudio() throws MalformedURLException, IOException {
+        server.start();
+        try {
+            String response = model.performWhisperRequest("GET", "error");
+            assertEquals("Error", response);
+        } catch (ConnectException e) {
+            assert (false);
+        }
+        server.stop();
+    }
+
     @Test
     void testMockHttpCreation() throws IOException {
         IHttpConnection connection = new MockHttpConnection(

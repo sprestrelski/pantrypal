@@ -24,7 +24,7 @@ public class MockWhisperRequestHandler extends VoiceToText implements HttpHandle
         String query = uri.getRawQuery();
         String type = query.substring(query.indexOf("=") + 1);
 
-        String response = "";
+        String response = "Error";
         if (type.equals("mealType")) {
             response = "Breakfast";
         } else if (type.equals("ingredients")) {
