@@ -206,6 +206,7 @@ public class EndToEndScenario2_2 {
         assertEquals(r1.getTitle(), initialRecipeList.get(1).getTitle());
         assertEquals(r3.getTitle(), initialRecipeList.get(2).getTitle());
         assertEquals(r2.getTitle(), initialRecipeList.get(3).getTitle());
+        server.stop();
     }
 
     /**
@@ -230,6 +231,7 @@ public class EndToEndScenario2_2 {
         assertEquals(expected, initialRecipeList);
         // Recipe list size should be 2 after filtering
         assertTrue(initialRecipeList.size() == 2);
+        server.stop();
     }
 
     @Test
