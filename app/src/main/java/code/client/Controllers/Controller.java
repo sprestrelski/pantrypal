@@ -2,69 +2,51 @@ package code.client.Controllers;
 
 import java.io.*;
 import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
+import java.util.*;
 import code.client.View.RecipeListUI;
 import code.client.View.RecipeUI;
 import code.client.View.View;
 import code.server.AccountRequestHandler;
 import code.server.IRecipeDb;
-
 import java.net.URL;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.PauseTransition;
-import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.util.Duration;
 import code.client.Model.*;
 import code.client.View.AppAlert;
-import code.client.View.AppFrameHome;
+import code.client.View.AppFrameMic;
 import code.client.View.DetailsAppFrame;
 import code.server.Recipe;
 
 public class Controller {
-    // Index of newest to oldest in sorting drop down menu, index of breakfast in filtering drop down menu
-    private final int NEWEST_TO_OLDEST_INDEX = 0, BREAKFAST_INDEX = 0;
-    // Index of oldest to newest in sorting drop down menu, index of lunch in filtering drop down menu
-    private final int OLDEST_TO_NEWEST_INDEX = 1, LUNCH_INDEX = 1;
-    // Index of A to Z in sorting drop down menu, index of dinner in filtering drop down menu
-    private final int A_TO_Z_INDEX = 2, DINNER_INDEX = 2;
-    // Index of Z to A in sorting drop down menu, index of none in filtering drop down menu
+    // indices in sorting drop-down menu
+    private final int NEWEST_TO_OLDEST_INDEX = 0;
+    private final int OLDEST_TO_NEWEST_INDEX = 1;
+    private final int A_TO_Z_INDEX = 2;
     private final int Z_TO_A_INDEX = 3, NONE_INDEX = 3;
-    
+
     private Account account;
     private Model model;
     private View view;
+    private Format format = new Format();
     private IRecipeDb recipeDb;
     private RecipeCSVWriter recipeWriter;
     private RecipeCSVReader recipeReader;
-    private String title;
-    private String defaultButtonStyle, onStyle, offStyle, blinkStyle;
     private String filter;
+
+    // Audio Stuff
+    private boolean recording; // keeps track if the app is currently recording
+    private final AppAudioRecorder recorder = new AppAudioRecorder();
+    private String mealType; // stores the meal type specified by the user
+    private String ingredients; // stores the ingredients listed out by the user
 
     public Controller(View view, Model model) {
 
         this.view = view;
         this.model = model;
         filter = "none";
-        defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF; -fx-font-weight: bold; -fx-font: 11 arial;";
-        onStyle = "-fx-font-style: italic; -fx-background-color: #90EE90; -fx-font-weight: bold; -fx-font: 11 arial;";
-        offStyle = "-fx-font-style: italic; -fx-background-color: #FF7377; -fx-font-weight: bold; -fx-font: 11 arial;";
-        blinkStyle = "-fx-background-color: #00FFFF; -fx-border-width: 0;";
 
         this.view.getAppFrameHome().setNewRecipeButtonAction(event -> {
             try {
@@ -74,71 +56,93 @@ public class Controller {
             }
         });
 
-        // this.view.getAppFrameHome().setSortMenuButtonAction(event -> {
-        //     try {
-        //         handleSortMenuButton(event);
-        //     } catch (Exception e) {
-        //         e.printStackTrace();
-        //     }
-        // });
-
-        // this.view.getAppFrameHome().setFilterMenuButtonAction(event -> {
-        //     try {
-        //         handleFilterMenuButton(event);
-        //     } catch (Exception e) {
-        //         e.printStackTrace();
-        //     }
-        // });
-
         this.view.getAppFrameHome().setLogOutButtonAction(event -> {
             handleLogOutOutButton(event);
         });
 
         this.view.getAccountCreationUI().setCreateAccountButtonAction(this::handleCreateAcc);
+        this.view.getAccountCreationUI().setGoToLoginAction(this::handleGoToLogin);
         this.view.getLoginUI().setGoToCreateAction(this::handleGoToCreateLogin);
         this.view.getLoginUI().setLoginButtonAction(this::handleLoginButton);
         loadCredentials();
         if (account != null) {
             this.view.getLoginUI().setLoginCreds(account);
-            goToRecipeList();
+            goToRecipeList(true);
         }
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    private void handleNewButton(ActionEvent event) throws URISyntaxException, IOException {
+        view.goToAudioCapture();
+        AppFrameMic mic = this.view.getAppFrameMic();
+        mic.setGoToDetailedButtonAction(this::handleDetailedViewFromNewRecipeButton);
+        mic.setGoToHomeButtonAction(this::handleHomeButton);
+        mic.setRecordIngredientsButtonAction(this::handleRecordIngredients);
+        mic.setRecordMealTypeButtonAction(event1 -> {
+            try {
+                handleRecordMealType(event1);
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
+            }
+        });
+
     }
 
     private void handleRecipePostButton(ActionEvent event) throws IOException {
+        view.getDetailedView().getRefreshButton().setVisible(false);
         Recipe postedRecipe = view.getDetailedView().getDisplayedRecipe();
-        Date currTime = new Date();
-        postedRecipe.setDate(currTime.getTime());
 
-        Button saveButtonFromDetailed = view.getDetailedView().getSaveButton();
-        saveButtonFromDetailed.setStyle(blinkStyle);
-        PauseTransition pause = new PauseTransition(Duration.seconds(1));
-        pause.setOnFinished(f -> saveButtonFromDetailed.setStyle(defaultButtonStyle));
-        pause.play();
+        view.callSaveAnimation();
 
         Writer writer = new StringWriter();
         recipeWriter = new RecipeCSVWriter(writer);
         recipeWriter.writeRecipe(postedRecipe);
 
         String recipe = writer.toString();
-        // Debugging
-        // System.out.println("Posting: " + recipe);
-
-        model.performRecipeRequest("POST", recipe, null);
+        Thread thread = new Thread(() -> {
+                    String response = model.performRecipeRequest("POST", recipe, null);
+                    // Changes UI to Detailed Recipe Screen
+                    Platform.runLater(
+                        () ->  {
+                            
+                            if (response.contains("Offline")) {
+                                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+                            } else if (response.contains("Error")) {
+                                AppAlert.show("Error", "Something went wrong. Please check your inputs and try again.");
+                            }
+                            getUserRecipeList();
+                            displayUserRecipes();
+                        });
+                });
+                thread.start();
     }
 
-    private void goToRecipeList() {
-        getUserRecipeList();
-        displayUserRecipes();
+    private void handleLogOutOutButton(ActionEvent event) {
+        clearCredentials();
+        view.goToLoginUI();
+        view.getLoginUI().getUsernameTextField().clear();
+        view.getLoginUI().getPasswordField().clear();
+    }
+
+    private void handleHomeButton(ActionEvent event) {
+        goToRecipeList(false);
+    }
+
+    private void goToRecipeList(boolean afterChanges) {
+        if(afterChanges) {
+            getUserRecipeList();
+            displayUserRecipes();
+        }
         view.goToRecipeList();
         addListenersToList();
         MenuButton filterMenuButton = this.view.getAppFrameHome().getFilterMenuButton();
         MenuButton sortMenuButton = this.view.getAppFrameHome().getSortMenuButton();
-        setActiveState(filterMenuButton, 9);
-        setActiveState(sortMenuButton, 9);
+        view.setActiveState(filterMenuButton, 9);
+        view.setActiveState(sortMenuButton, 9);
+
+        RecipeListUI recipeListUI = this.view.getAppFrameHome().getRecipeList();
+        RecipeSorter recipeSorter = new RecipeSorter(recipeListUI.getRecipeDB().getList());
+        recipeSorter.sortNewestToOldest();
+        sortList(sortMenuButton, NEWEST_TO_OLDEST_INDEX);
         // 9 is beyond the scope of menuItem indexes
     }
 
@@ -162,110 +166,49 @@ public class Controller {
         recipeListUI.update(filter);
     }
 
-    private void handleNewButton(ActionEvent event) throws URISyntaxException, IOException {
-        view.goToAudioCapture();
-        this.view.getAppFrameMic().setGoToDetailedButtonAction(this::handleDetailedViewFromNewRecipeButton);
-        this.view.getAppFrameMic().setGoToHomeButtonAction(this::handleHomeButton);
-    }
-
-    // private void handleSortButton(ActionEvent event) {
-    //     ChoiceBox<String> sortChoiceBox = view.getAppFrameHome().getSortChoiceBox();
-    //     RecipeListUI list = view.getAppFrameHome().getRecipeList();
-    //     view.getAppFrameHome().getSortButton().setOnAction(e -> {
-    //         sortChoiceBox.show();
-    //     });
-    // }
-
     private void addFilterListeners() {
         MenuButton filterMenuButton = this.view.getAppFrameHome().getFilterMenuButton();
         ObservableList<MenuItem> filterMenuItems = filterMenuButton.getItems();
 
-        // Filter to show only breakfast recipes when criteria is selected
-        filterMenuItems.get(BREAKFAST_INDEX).setOnAction(e -> {
-            filter = "breakfast";
-            setActiveState(filterMenuButton,BREAKFAST_INDEX);
-            this.view.getAppFrameHome().updateDisplay("breakfast");
-            addListenersToList();
-        });
-        // Filter to show only lunch recipes when criteria is selected
-        filterMenuItems.get(LUNCH_INDEX).setOnAction(e -> {
-            filter = "lunch";
-            setActiveState(filterMenuButton,LUNCH_INDEX);
-            this.view.getAppFrameHome().updateDisplay("lunch");
-            addListenersToList();
-        });
-        // Filter to show only dinner recipes when criteria is selected
-        filterMenuItems.get(DINNER_INDEX).setOnAction(e -> {
-            filter = "dinner";
-            setActiveState(filterMenuButton,DINNER_INDEX);
-            this.view.getAppFrameHome().updateDisplay("dinner");
-            addListenersToList();
-        });
-        // Remove selected filter to show all recipes
-        filterMenuItems.get(NONE_INDEX).setOnAction(e -> {
-            filter = "none";
-            setActiveState(filterMenuButton,NONE_INDEX);
-            this.view.getAppFrameHome().updateDisplay("none");
-            addListenersToList();
-        });
+        String[] filterTypes = { "breakfast", "lunch", "dinner", "none" };
+
+        for (int i = 0; i < filterTypes.length; i++) {
+            int index = i;
+            filterMenuItems.get(index).setOnAction(e -> {
+                filter = filterTypes[index];
+                view.setActiveState(filterMenuButton, index);
+                this.view.getAppFrameHome().updateDisplay(filterTypes[index]);
+                addListenersToList();
+            });
+        }
     }
 
     private void addSortingListener() {
         RecipeListUI list = this.view.getAppFrameHome().getRecipeList();
         MenuButton sortMenuButton = view.getAppFrameHome().getSortMenuButton();
         ObservableList<MenuItem> sortMenuItems = sortMenuButton.getItems();
-        RecipeSorter recipeSorter = new RecipeSorter(list.getRecipeDB().getList());
-        
-        // Setting action for newest to oldest sorting criteria
-        sortMenuItems.get(NEWEST_TO_OLDEST_INDEX).setOnAction(e -> {
-            recipeSorter.sortNewestToOldest();
-            setActiveState(sortMenuButton, NEWEST_TO_OLDEST_INDEX);
-            this.view.getAppFrameHome().updateDisplay(filter);
-            addListenersToList();
-        });
-        // Setting action for oldest to newest sorting criteria
-        sortMenuItems.get(OLDEST_TO_NEWEST_INDEX).setOnAction(e -> {
-            recipeSorter.sortOldestToNewest();
-            setActiveState(sortMenuButton, OLDEST_TO_NEWEST_INDEX);
-            this.view.getAppFrameHome().updateDisplay(filter);
-            addListenersToList();
-        });
-        // Setting action for A to Z sorting criteria
-        sortMenuItems.get(A_TO_Z_INDEX).setOnAction(e -> {
-            recipeSorter.sortAToZ();
-            setActiveState(sortMenuButton, A_TO_Z_INDEX);
-            this.view.getAppFrameHome().updateDisplay(filter);
-            addListenersToList();
-        });
-        // Setting action for Z to A sorting criteria
-        sortMenuItems.get(Z_TO_A_INDEX).setOnAction(e -> {
-            recipeSorter.sortZToA();
-            setActiveState(sortMenuButton, Z_TO_A_INDEX);
-            this.view.getAppFrameHome().updateDisplay(filter);
-            addListenersToList();
-        });
-    }
-
-    private void setActiveState(MenuButton items, int index) {
-        for(int i =0; i < NONE_INDEX + 1; i++) {
-            if(i == index) {
-                items.getItems().get(i).setStyle("-fx-background-color: #90EE90");
-            }
-            else {
-                items.getItems().get(i).setStyle("-fx-background-color: transparent;");
-            }
+        if (list.getRecipeDB() == null) {
+            return;
         }
-    }
-    
-    private void handleLogOutOutButton(ActionEvent event) {
-        clearCredentials();
-        view.goToLoginUI();
-        view.getLoginUI().getUsernameTextField().clear();
-        view.getLoginUI().getPasswordField().clear();
+        RecipeSorter recipeSorter = new RecipeSorter(list.getRecipeDB().getList());
+
+        setSortAction(sortMenuItems, NEWEST_TO_OLDEST_INDEX, recipeSorter::sortNewestToOldest);
+        setSortAction(sortMenuItems, OLDEST_TO_NEWEST_INDEX, recipeSorter::sortOldestToNewest);
+        setSortAction(sortMenuItems, A_TO_Z_INDEX, recipeSorter::sortAToZ);
+        setSortAction(sortMenuItems, Z_TO_A_INDEX, recipeSorter::sortZToA);
     }
 
-    private void handleHomeButton(ActionEvent event) {
-        goToRecipeList();
+    private void setSortAction(ObservableList<MenuItem> sortMenuItems, int index, Runnable sortAction) {
+        sortMenuItems.get(index).setOnAction(e -> {
+            sortAction.run();
+            sortList(view.getAppFrameHome().getSortMenuButton(), index);
+        });
+    }
+
+    private void sortList(MenuButton sortMenuButton, int index) {
+        view.setActiveState(sortMenuButton, index);
+        this.view.getAppFrameHome().updateDisplay(filter);
+        addListenersToList();
     }
 
     public void addListenersToList() {
@@ -278,14 +221,15 @@ public class Controller {
                 try {
                     deleteGivenRecipe(currRecipe.getRecipe());
                 } catch (IOException e1) {
-                    System.out.println("Could not delete recipe with id:title of " + currRecipe.getRecipe().getId() + ":" + currRecipe.getRecipe().getTitle() );
+                    System.out.println("Could not delete recipe with id:title of " + currRecipe.getRecipe().getId()
+                            + ":" + currRecipe.getRecipe().getTitle());
                     e1.printStackTrace();
                 }
             });
             currRecipe.getDetailsButton().setOnAction(e -> {
                 view.goToDetailedView(currRecipe.getRecipe(), true);
                 view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-                changeEditButtonColor(view.getDetailedView().getEditButton());
+                view.changeEditButtonColor(view.getDetailedView().getEditButton());
                 handleDetailedViewListeners();
             });
         }
@@ -293,32 +237,32 @@ public class Controller {
 
     private void handleDetailedViewFromNewRecipeButton(ActionEvent event) {
         // Get ChatGPT response from the Model
-        List<String> inputs = view.getAppFrameMic().getVoiceResponse();
-
-        String mealType = inputs.get(0);
-        String ingredients = inputs.get(1);
         if (mealType != null && ingredients != null) {
-            TextToRecipe caller = new MockGPTService();// new ChatGPTService();
-            RecipeToImage imageCaller = new MockDallEService(); // new DallEService();
-
+            view.goToLoading();
             try {
-                String audioOutput1 = mealType;
-                String audioOutput2 = ingredients;// audio.processAudio();
-                String responseText = caller.getResponse(audioOutput1, audioOutput2);
-                Recipe chatGPTrecipe = caller.mapResponseToRecipe(mealType, responseText);
-                chatGPTrecipe.setAccountId(account.getId());
-                chatGPTrecipe.setImage(imageCaller.getResponse(chatGPTrecipe.getTitle()));
+                Thread thread = new Thread(() -> {
+                    String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
+                    Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
+                    chatGPTrecipe.setAccountId(account.getId());
+                    chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
 
-                // Changes UI to Detailed Recipe Screen
-                view.goToDetailedView(chatGPTrecipe, false);
-                view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-                handleDetailedViewListeners();
-
-            } catch (IOException | URISyntaxException | InterruptedException exception) {
+                    // Changes UI to Detailed Recipe Screen
+                    Platform.runLater(
+                        () ->  {
+                            view.goToDetailedView(chatGPTrecipe, false);
+                            view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+                            handleDetailedViewListeners();
+                        });
+                    
+                });
+                thread.start();
+            } catch (Exception exception) {
                 AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
                 exception.printStackTrace();
             }
-        } else {
+        } else
+
+        {
             AppAlert.show("Input Error", "Invalid meal type or ingredients, please try again!");
         }
     }
@@ -339,28 +283,34 @@ public class Controller {
         detailedView.setDeleteButtonAction(event -> {
             try {
                 handleDeleteButton(event);
-                goToRecipeList();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
         detailedView.setHomeButtonAction(this::handleHomeButton);
         detailedView.setShareButtonAction(this::handleShareButton);
-        detailedView.setRefreshButtonAction(this::handleRefreshButton);
+        detailedView.setRefreshButtonAction(event -> {
+            try {
+                handleRefreshButton(event);
+            } catch (URISyntaxException | IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void handleEditButton(ActionEvent event) {
         Button edit = view.getDetailedView().getEditButton();
         view.getDetailedView().getRecipeDetailsUI().setEditable();
-        changeEditButtonColor(edit);
+        view.changeEditButtonColor(edit);
     }
 
     private void handleDeleteButton(ActionEvent event) throws IOException {
         DetailsAppFrame detailsAppFrame = this.view.getDetailedView();
         Recipe displayed = detailsAppFrame.getDisplayedRecipe();
         deleteGivenRecipe(displayed);
-        
+
     }
+
     private void deleteGivenRecipe(Recipe recipe) throws IOException {
         Writer writer = new StringWriter();
         recipeWriter = new RecipeCSVWriter(writer);
@@ -369,15 +319,22 @@ public class Controller {
         String recipeStr = writer.toString();
 
         System.out.println("Deleting id: " + recipe.getId());
-        model.performRecipeRequest("DELETE", recipeStr, null);
-        this.view.getAppFrameHome().updateDisplay(filter);
+        Thread thread = new Thread(() -> {
+                    model.performRecipeRequest("DELETE", recipeStr, null);
+                    Platform.runLater(
+                        () ->  {
+                            goToRecipeList(true);
+                            this.view.getAppFrameHome().updateDisplay(filter); 
+                            addListenersToList();
+                        });
+            });
+            
+        thread.start();
     }
 
     private void handleShareButton(ActionEvent event) {
         Recipe shownRecipe = this.view.getDetailedView().getDisplayedRecipe();
         String id = shownRecipe.getId();
-
-        String styleAlert = "-fx-background-color: #F1FFCB; -fx-font-weight: bold;";
         Hyperlink textArea = new Hyperlink(AppConfig.SHARE_LINK + account.getUsername() + "/" + id);
         textArea.setOnAction(action -> {
             try {
@@ -390,116 +347,94 @@ public class Controller {
             }
         });
         textArea.setWrapText(true);
-        GridPane gridPane = new GridPane();
-        gridPane.setMaxWidth(Double.MAX_VALUE);
-        gridPane.add(textArea, 0, 0);
-        gridPane.setStyle(styleAlert);
-        gridPane.setPrefSize(220, 220);
-
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Share this recipe!");
-        alert.setHeaderText("Share this recipe with a friend!");
-        alert.getDialogPane().setContent(gridPane);
-        alert.showAndWait();
+        showShareRecipe(textArea);
     }
 
-    private void changeEditButtonColor(Button edit) {
-        if (view.getDetailedView().getRecipeDetailsUI().isEditable()) {
-            edit.setStyle(onStyle);
-        } else {
-            edit.setStyle(offStyle);
-        }
+    private void showShareRecipe(Hyperlink textArea) {
+        view.displaySharedRecipeUI(textArea);
     }
 
     private void handleGoToCreateLogin(ActionEvent event) {
         view.goToCreateAcc();
     }
 
-    private void handleRefreshButton(ActionEvent event) {
+    private void handleGoToLogin(ActionEvent event) {
+        view.goToLoginUI();
+    }
+
+    private void handleRefreshButton(ActionEvent event) throws URISyntaxException, IOException {
         // Get ChatGPT response from the Model
-        List<String> inputs = view.getAppFrameMic().getVoiceResponse();
+        if (mealType != null && ingredients != null) {
+            view.goToLoading();
+            try {
+                Thread thread = new Thread(() -> {
+                    String responseText = model.performChatGPTRequest("GET", mealType,
+                            ingredients);
+                    Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
+                    chatGPTrecipe.setAccountId(account.getId());
+                    chatGPTrecipe.setImage(model.performDallERequest("GET",
+                            chatGPTrecipe.getTitle()));
 
-        String mealType = inputs.get(0);
-        String ingredients = inputs.get(1);
-
-        TextToRecipe caller = new MockGPTService();// new ChatGPTService();
-        RecipeToImage imageCaller = new MockDallEService(); // new DallEService();
-
-        try {
-            String audioOutput1 = mealType;
-            String audioOutput2 = ingredients;// audio.processAudio();
-            String responseText = caller.getResponse(audioOutput1, audioOutput2);
-            Recipe chatGPTrecipe = caller.mapResponseToRecipe(mealType, responseText);
-            chatGPTrecipe.setAccountId(account.getId());
-            chatGPTrecipe.setImage(imageCaller.getResponse(chatGPTrecipe.getTitle()));
-
-            // Changes UI to Detailed Recipe Screen
-            view.getDetailedView().setRecipe(chatGPTrecipe);
-        } catch (IOException | URISyntaxException | InterruptedException exception) {
-            AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
-            exception.printStackTrace();
+                    // Changes UI to Detailed Recipe Screen
+                    Platform.runLater(
+                        () ->  {
+                            view.goToDetailedView(chatGPTrecipe, false);
+                            view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+                            handleDetailedViewListeners();
+                        });
+                });
+                thread.start();
+            } catch (Exception exception) {
+                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+                exception.printStackTrace();
+            }
+        } else {
+            AppAlert.show("Input Error", "Invalid meal type or ingredients, please try again!");
         }
     }
 
-    ////////////////////////////////////////
+/////////////////////////////// ACCOUNT MANAGEMENT ///////////////////////////////////
     private void handleCreateAcc(ActionEvent event) {
-        // Simulating existing usernames
         GridPane grid = view.getAccountCreationUI().getRoot();
         String username = view.getAccountCreationUI().getUsernameTextField().getText();
         String password = view.getAccountCreationUI().getPasswordField().getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-            // Display an error message if username or password is empty
-            showErrorPane(grid, "Error. Please provide a username and password.");
-        } else if (isUsernameTaken(username)) {
-            // Display an error message if the username is already taken
-            showErrorPane(grid, "Error. This username is already taken. Please choose another one.");
-        } else {
-            // Continue with account creation logic
-            System.out.println("Account Created!\nUsername: " + username + "\nPassword: " + password);
-            model.performAccountRequest("PUT", username, password);
-            // Show success message
-            showSuccessPane(grid);
-            view.goToLoginUI();
+            view.showErrorPane(grid, "Error. Please provide a username and password.");
+            return;
         }
+
+        view.goToLoading();
+
+        Thread thread = new Thread(() -> {
+            boolean isUsernameTaken = isUsernameTaken(username, password);
+            if (view.getMainScene().equals(view.getOfflineUI())) {
+            } else if (!isUsernameTaken) {
+                String response = model.performAccountRequest("PUT", username, password);
+                if (response.contains("Offline")) {
+                    view.goToOfflineUI();
+                } else {
+                    view.showSuccessPane(grid);
+                    view.goToLoginUI();
+                }
+            } else {
+                view.goToCreateAcc();
+                Platform.runLater(
+                        () -> view.showErrorPane(grid, "Error. This username is already taken. Please choose another one."));
+            }
+        });
+        thread.start();
     }
 
-    private void showErrorPane(GridPane grid, String errorMessage) {
-        Text errorText = new Text(errorMessage);
-        errorText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        errorText.setFill(Color.RED);
-
-        grid.add(errorText, 1, 6);
-
-        // Fade away after 5 seconds
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(0), new KeyValue(errorText.opacityProperty(), 1.0)),
-                new KeyFrame(Duration.seconds(5), new KeyValue(errorText.opacityProperty(), 0.0)));
-        timeline.play();
-    }
-
-    private void showSuccessPane(GridPane grid) {
-        Text successText = new Text("Successfully created an account!\nPlease login to access it.");
-        successText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        successText.setFill(Color.GREEN);
-
-        grid.add(successText, 1, 6);
-
-        // Fade away after 5 seconds
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(0), new KeyValue(successText.opacityProperty(), 1.0)),
-                new KeyFrame(Duration.seconds(5), new KeyValue(successText.opacityProperty(), 0.0)));
-        timeline.play();
-    }
-
-    private boolean isUsernameTaken(String username) {
+    private boolean isUsernameTaken(String username, String password) {
         // Check if the username is already taken
-        // temporary logic, no database yet
-        String response = model.performAccountRequest("GET", username, "");
-        // System.out.println("Response for usernameTaken : " + response);
-        return (response.equals("Username is taken"));
+        String response = model.performAccountRequest("GET", username, password);
+        if (response.contains("Offline")) {
+            view.goToOfflineUI();
+            return false;
+        }
+        return (!response.equals("Username is not found"));
     }
-    ////////////////////////////////////////
 
     private void handleLoginButton(ActionEvent event) {
         String username = view.getLoginUI().getUsernameTextField().getText();
@@ -508,23 +443,29 @@ public class Controller {
         // Perform login logic here
         if (username.isEmpty() || password.isEmpty()) {
             // Display an error message if username or password is empty
-            showErrorPane(grid, "Error. Please provide a username and password.");
-        } else {
+            view.showErrorPane(grid, "Error. Please provide a username and password.");
+            return;
+        }
+
+        view.goToLoading();
+        Thread thread = new Thread(() -> {
             boolean loginSuccessful = performLogin(username, password);
-
-            if (loginSuccessful) {
-                showLoginSuccessPane(grid, true); // useless
-
-                goToRecipeList();
+            if (view.getMainScene().equals(view.getOfflineUI())) {
+            } else if (loginSuccessful) {
+                Platform.runLater(
+                        () -> goToRecipeList(true));
                 if (!view.getLoginUI().getRememberLogin()) {
                     clearCredentials();
                 } else {
                     saveCredentials(account);
                 }
             } else {
-                showLoginSuccessPane(grid, false);
+                view.goToLoginUI();
+                Platform.runLater(
+                        () -> view.showLoginSuccessPane(grid, false));
             }
-        }
+        });
+        thread.start();
     }
 
     private void clearCredentials() {
@@ -568,29 +509,15 @@ public class Controller {
         }
     }
 
-    private void showLoginSuccessPane(GridPane grid, boolean loginSuccessful) {
-        Text successText;
-        if (loginSuccessful) {
-            successText = new Text("Login successful! Welcome to Pantry Pal.");
-            successText.setFill(Color.GREEN);
-        } else {
-            successText = new Text("Account does not exist. Please try again.");
-            successText.setFill(Color.RED);
-        }
-
-        successText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        grid.add(successText, 1, 6);
-
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(0), new KeyValue(successText.opacityProperty(), 1.0)),
-                new KeyFrame(Duration.seconds(5), new KeyValue(successText.opacityProperty(), 0.0)));
-        timeline.play();
-    }
-
     private boolean performLogin(String username, String password) {
         // Will add logic for failed login later
         String response = model.performAccountRequest("GET", username, password);
-        if (response.equals(AccountRequestHandler.USERNAME_NOT_FOUND) ||
+        if (response.contains("Offline")) {
+            view.goToOfflineUI();
+            return false;
+        } else if (response.contains("Error")) {
+            return false;
+        } else if (response.equals(AccountRequestHandler.USERNAME_NOT_FOUND) ||
                 response.equals(AccountRequestHandler.INCORRECT_PASSWORD) ||
                 response.equals(AccountRequestHandler.TAKEN_USERNAME)) {
             return false;
@@ -601,5 +528,74 @@ public class Controller {
         account = new Account(accountId, username, password);
         return true;
     }
-    ///////////////////////////////
+    /////////////////////////////// ACCOUNT MANAGEMENT ///////////////////////////////////
+
+    /////////////////////////////// AUDIO MANAGEMENT///////////////////////////////////
+    public void handleRecordMealType(ActionEvent event) throws IOException, URISyntaxException {
+        recordMealType();
+    }
+
+    public void handleRecordIngredients(ActionEvent event) {
+        recordIngredients();
+    };
+
+    private void recordMealType() {
+        AppFrameMic mic = this.view.getAppFrameMic();
+        if (!recording) {
+            recorder.startRecording();
+            recording = true;
+            mic.getRecordMealTypeButton().setStyle("-fx-background-color: #FF0000;");
+            mic.getRecordingMealTypeLabel().setVisible(true);
+        } else {
+            recorder.stopRecording();
+            recording = false;
+            mic.getRecordMealTypeButton().setStyle("");
+            mic.getRecordingMealTypeLabel().setVisible(false);
+
+            try {
+                mealType = model.performWhisperRequest("GET", "mealType");
+                if (mealType.contains("Error")) {
+                    AppAlert.show("Input Error", "Please say a valid meal type!");
+                }
+                mic.getMealBox().getMealType().setText(mealType);
+            } catch (IOException exception) {
+                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+                exception.printStackTrace();
+            }
+        }
+    }
+
+    private void recordIngredients() {
+        AppFrameMic mic = this.view.getAppFrameMic();
+        if (!recording) {
+            recorder.startRecording();
+            recording = true;
+            mic.getRecordIngredientsButton().setStyle("-fx-background-color: #FF0000;");
+            mic.getRecordingIngredientsLabel().setVisible(true);
+        } else {
+            recorder.stopRecording();
+            recording = false;
+            mic.getRecordIngredientsButton().setStyle("");
+            mic.getRecordingIngredientsLabel().setVisible(false);
+
+            try {
+                ingredients = model.performWhisperRequest("GET", "ingredients");
+                String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
+
+                if (ingredients.matches(".*" + nonAsciiCharactersRegex + ".*") ||
+                        ingredients.trim().isEmpty() ||
+                        ingredients.contains("you")) {
+                    AppAlert.show("Input Error", "Please provide valid ingredients!");
+                    ingredients = null;
+                } else {
+                    mic.getIngrBox().getIngredients().setText(ingredients);
+                }
+            } catch (IOException exception) {
+                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+                exception.printStackTrace();
+            }
+        }
+    }
+    /////////////////////////////// AUDIOMANAGEMENT//////////////////////////////////
+
 }

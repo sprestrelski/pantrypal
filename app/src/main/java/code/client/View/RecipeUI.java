@@ -37,32 +37,11 @@ public class RecipeUI extends HBox {
         marginMaker.setDisable(true);
         style.getChildren().addAll(marginMaker, mealType, detailsButton, deleteButton);
         style.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
-        styleTags(mealType);
-        //
+        MealTagStyler.styleTags(recipe, mealType);
         this.getChildren().add(style);
         this.setPrefSize(50, 50);
-    }
-
-    private void styleTags(Button mealType) {
-        switch (recipe.getMealTag().toLowerCase()) {
-            case "breakfast":
-                mealType.setStyle(
-                        "-fx-text-fill: black; -fx-font: 12 arial; -fx-font-weight: bold; -fx-background-color: #FF7276; -fx-border-width: 0; -fx-background-radius: 150;  -fx-pref-width: 100;  -fx-pref-height: 50;");
-                mealType.setText("Breakfast");
-                break;
-
-            case "lunch":
-                mealType.setStyle(
-                        "-fx-text-fill: black; -fx-font: 12 arial; -fx-font-weight: bold; -fx-background-color: #00FFFF; -fx-border-width: 0; -fx-background-radius: 150;  -fx-pref-width: 100;  -fx-pref-height: 50;");
-                mealType.setText("Lunch");
-                break;
-
-            case "dinner":
-                mealType.setStyle(
-                        "-fx-text-fill: black; -fx-font: 12 arial; -fx-font-weight: bold; -fx-background-color: #00FF00; -fx-border-width: 0; -fx-background-radius: 150;  -fx-pref-width: 100;  -fx-pref-height: 50;");
-                mealType.setText("Dinner");
-                break;
-        }
+        this.setMinSize(50, 50);
+        this.setAlignment(Pos.CENTER);
     }
 
     public Recipe getRecipe() {

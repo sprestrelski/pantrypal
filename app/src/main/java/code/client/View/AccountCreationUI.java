@@ -4,9 +4,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -17,6 +19,7 @@ public class AccountCreationUI {
     private TextField usernameField;
     private PasswordField passwordField;
     private GridPane grid;
+    private Hyperlink goToLogin;
 
     AccountCreationUI() {
         grid = new GridPane();
@@ -43,7 +46,16 @@ public class AccountCreationUI {
         grid.add(passwordField, 1, 2);
 
         createAccountButton = new Button("Create Account");
+        createAccountButton.setDefaultButton(true);
         grid.add(createAccountButton, 1, 3);
+
+        goToLogin = new Hyperlink("Click to return to login.");
+
+        FlowPane flow = new FlowPane();
+        flow.getChildren().addAll(
+                new Text("Already have an account? "), goToLogin);
+        grid.add(flow, 1, 5);
+        GridPane.setFillWidth(grid, true);
     }
 
     public GridPane getRoot() {
@@ -60,5 +72,9 @@ public class AccountCreationUI {
 
     public void setCreateAccountButtonAction(EventHandler<ActionEvent> eventHandler) {
         createAccountButton.setOnAction(eventHandler);
+    }
+
+    public void setGoToLoginAction(EventHandler<ActionEvent> eventHandler) {
+        goToLogin.setOnAction(eventHandler);
     }
 }

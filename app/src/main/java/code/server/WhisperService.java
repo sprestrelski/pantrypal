@@ -1,7 +1,9 @@
-package code.client.Model;
+package code.server;
+
+import code.client.Model.AppConfig;
 
 import java.io.*;
-import java.net.URISyntaxException;
+import java.net.*;
 
 public class WhisperService extends VoiceToText {
     public static final String API_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
@@ -11,7 +13,7 @@ public class WhisperService extends VoiceToText {
         super(new AppHttpConnection(API_ENDPOINT));
     }
 
-    // https://stackoverflow.com/questions/25334139/how-to-mock-a-url-connection
+	// https://stackoverflow.com/questions/25334139/how-to-mock-a-url-connection
     public String processAudio(String type) throws IOException, URISyntaxException {
         // Send HTTP request
         sendHttpRequest();
@@ -26,38 +28,15 @@ public class WhisperService extends VoiceToText {
         connection.setRequestProperty("Authorization", "Bearer " + AppConfig.API_KEY);
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
+
         // Set up output stream to write request body
         OutputStream outputStream = connection.getOutputStream();
         // Write model parameter to request body
-        writeParameterToOutputStream(outputStream, "model", MODEL, boundary);
-        // Write file parameter to request body
-        writeFileToOutputStream(outputStream, file, boundary);
-        // Write closing boundary to request body
-        outputStream.write(("\r\n--" + boundary + "--\r\n").getBytes());
-        // Flush and close output stream
-        outputStream.flush();
-        outputStream.close();
-    }
-
-    // Helper method to write a parameter to the output stream in multipart form
-    // data format
-    private static void writeParameterToOutputStream(
-            OutputStream outputStream,
-            String parameterName,
-            String parameterValue,
-            String boundary) throws IOException {
         outputStream.write(("--" + boundary + "\r\n").getBytes());
         outputStream.write(
-                ("Content-Disposition: form-data; name=\"" + parameterName + "\"\r\n\r\n").getBytes());
-        outputStream.write((parameterValue + "\r\n").getBytes());
-    }
-
-    // Helper method to write a file to the output stream in multipart form data
-    // format
-    private static void writeFileToOutputStream(
-            OutputStream outputStream,
-            File file,
-            String boundary) throws IOException {
+                ("Content-Disposition: form-data; name=\"model\"\r\n\r\n").getBytes());
+        outputStream.write((MODEL + "\r\n").getBytes());
+        // Write file parameter to request body
         outputStream.write(("--" + boundary + "\r\n").getBytes());
         outputStream.write(("Content-Disposition: form-data; name=\"file\"; filename=\"" +
                 file.getName() +
@@ -73,5 +52,10 @@ public class WhisperService extends VoiceToText {
         }
 
         fileInputStream.close();
+        // Write closing boundary to request body
+        outputStream.write(("\r\n--" + boundary + "--\r\n").getBytes());
+        // Flush and close output stream
+        outputStream.flush();
+        outputStream.close();
     }
 }

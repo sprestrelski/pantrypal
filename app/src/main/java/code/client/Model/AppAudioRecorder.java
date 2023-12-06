@@ -3,12 +3,11 @@ package code.client.Model;
 import java.io.*;
 import javax.sound.sampled.*;
 
-public class AudioRecorder {
+public class AppAudioRecorder extends BaseAudioRecorder {
     private AudioFormat audioFormat;
     private TargetDataLine targetDataLine;
-    private boolean recording;
 
-    public AudioRecorder() {
+    public AppAudioRecorder() {
         this.audioFormat = getAudioFormat();
     }
 
@@ -45,6 +44,7 @@ public class AudioRecorder {
         }
     }
 
+    @Override
     public void startRecording() {
         Thread thread = new Thread(
                 new Runnable() {
@@ -56,19 +56,9 @@ public class AudioRecorder {
         thread.start();
     }
 
+    @Override
     public void stopRecording() {
         targetDataLine.stop();
         targetDataLine.close();
-    }
-
-    public boolean toggleRecording() {
-        if (recording) {
-            stopRecording();
-        } else {
-            startRecording();
-        }
-
-        recording = !recording;
-        return recording;
     }
 }

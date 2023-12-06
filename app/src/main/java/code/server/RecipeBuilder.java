@@ -13,11 +13,11 @@ public class RecipeBuilder {
 
     public RecipeBuilder(String userID, String title) {
         recipe = new Recipe(new ObjectId().toHexString(),
-                            userID,
-                            title, 
-                            "",
-                            0,
-                            getDefaultImage());
+                userID,
+                title,
+                "breakfast",
+                0,
+                getDefaultImage());
     }
 
     public RecipeBuilder setId(String id) {
@@ -53,14 +53,14 @@ public class RecipeBuilder {
     private String getDefaultImage() {
         String image = "";
         File file = new File(AppConfig.RECIPE_IMG_FILE);
-        
+
         try {
             byte[] imageBytes = Files.readAllBytes(file.toPath());
             image = Base64.getEncoder().encodeToString(imageBytes);
         } catch (Exception fileError) {
             fileError.printStackTrace();
         }
-        
+
         return image;
     }
 

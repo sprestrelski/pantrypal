@@ -1,5 +1,6 @@
 package code.client.View;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -56,6 +57,7 @@ public class RecipeDetailsUI extends HBox {
         // getChildren().add(titleTextField);
         getChildren().add(ingredientTextArea);
         getChildren().add(instructionTextArea);
+        this.setAlignment(Pos.CENTER);
     }
 
     public TextField getTitleField() {

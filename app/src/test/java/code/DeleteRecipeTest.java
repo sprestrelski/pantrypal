@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 
 import code.client.Model.*;
-import code.server.IRecipeDb;
 import code.server.Recipe;
 
 /**

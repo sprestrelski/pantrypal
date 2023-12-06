@@ -1,8 +1,10 @@
-package code.client.Model;
+package code.server.mocking;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import code.server.IHttpConnection;
 
 public class MockHttpConnection implements IHttpConnection {
     private int responseCode;

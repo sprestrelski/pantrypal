@@ -1,4 +1,4 @@
-package code.client.Model;
+package code.server;
 
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;

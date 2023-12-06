@@ -1,20 +1,19 @@
-package code.client.Model;
+package code.server;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.net.URI;
+import code.client.Model.AppConfig;
+import com.sun.net.httpserver.*;
+
+import java.io.*;
+import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import org.json.JSONObject;
 import java.util.Base64;
 
-public class DallEService extends RecipeToImage {
+public class DallERequestHandler extends RecipeToImage implements HttpHandler {
     private static final String API_ENDPOINT = "https://api.openai.com/v1/images/generations";
     private static final String MODEL = "dall-e-2";
     private static final int NUM_IMAGES = 1;
@@ -22,7 +21,27 @@ public class DallEService extends RecipeToImage {
     private static final String RESPONSE_FORMAT = "b64_json";
 
     @Override
-    public String getResponse(String prompt) throws IOException, InterruptedException {
+    public void handle(HttpExchange httpExchange) throws IOException {
+        String response = "Request received";
+        URI uri = httpExchange.getRequestURI();
+        String query = uri.getRawQuery();
+        try {
+            String recipeTitle = query.substring(query.indexOf("=") + 1);
+            recipeTitle = URLEncoder.encode(recipeTitle, "UTF-8");
+            response = getResponse(recipeTitle);
+        } catch (InterruptedException e) {
+            response = "Error";
+            e.printStackTrace();
+        }
+
+        // Sending back response to the client
+        httpExchange.sendResponseHeaders(200, response.length());
+        OutputStream outStream = httpExchange.getResponseBody();
+        outStream.write(response.getBytes());
+        outStream.close();
+    }
+
+    private String getResponse(String prompt) throws IOException, InterruptedException {
         // Create a request body which you will pass into request object
         JSONObject requestBody = new JSONObject();
         requestBody.put("model", MODEL);
@@ -71,23 +90,6 @@ public class DallEService extends RecipeToImage {
             chatError.printStackTrace();
         }
         return generatedImageData;
-    }
-
-    @Override
-    public byte[] downloadImage(String generatedImageData, String id) {
-        // convert base64 string to binary data
-        byte[] generatedImageBytes = Base64.getDecoder().decode(generatedImageData);
-        try (InputStream in = new ByteArrayInputStream(generatedImageBytes)) {
-            String path = id + ".jpg";
-            Files.copy(in, Paths.get(path));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return generatedImageBytes;
-    }
-
-    @Override
-    public void setError(boolean error) {
     }
 
 }

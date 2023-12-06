@@ -1,5 +1,6 @@
 package code.client.View;
 
+import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import java.io.*;
 import java.util.List;
@@ -9,13 +10,13 @@ import code.server.IRecipeDb;
 
 public class RecipeListUI extends VBox {
     private IRecipeDb recipeDb;
-    private String name;
 
     RecipeListUI() throws IOException {
         this.setSpacing(5);
-        this.setPrefSize(700, 600);
         this.setStyle("-fx-background-color: #F0F8FF;");
-        VBox.setVgrow(this, Priority.ALWAYS);
+        this.setPrefSize(700, 455);
+        //VBox.setVgrow(this, Priority.ALWAYS);
+        this.setAlignment(Pos.CENTER);
     }
 
     public IRecipeDb getRecipeDB() {

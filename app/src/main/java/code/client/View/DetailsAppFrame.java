@@ -1,7 +1,6 @@
 package code.client.View;
 
 import java.util.Date;
-import code.client.Model.*;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -27,9 +26,9 @@ public class DetailsAppFrame {
         detailedUI.setStyle("-fx-background-color: #F0F8FF;");
         setupGrowingUI();
 
-        defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF; -fx-font-weight: bold; -fx-font: 11 arial;";
-        onStyle = "-fx-font-style: italic; -fx-background-color: #90EE90; -fx-font-weight: bold; -fx-font: 11 arial;";
-        offStyle = "-fx-font-style: italic; -fx-background-color: #FF7377; -fx-font-weight: bold; -fx-font: 11 arial;";
+        defaultButtonStyle = "-fx-font: italic 11 arial; -fx-background-color: #FFFFFF; -fx-font-weight: bold;";
+        onStyle = "-fx-font: italic 11 arial; -fx-background-color: #90EE90; -fx-font-weight: bold;";
+        offStyle = "-fx-font: italic 11 arial; -fx-background-color: #FF7377; -fx-font-weight: bold;";
 
         backToHomeButton = new Button("Back to List");
         backToHomeButton.setStyle(defaultButtonStyle);
@@ -72,20 +71,20 @@ public class DetailsAppFrame {
         String instructions = recipeInfo.getInstructionsField().getText();
         String image = recipeInfo.getImageString();
 
-        /// Use Trung's deformatting here.
+        // remove format
         String[] ingr = ingredients.split("\n");
         String[] instr = instructions.split("\n");
 
         RecipeBuilder builder = new RecipeBuilder(currentRecipe.getAccountId(), title);
         builder.setMealTag(currentRecipe.getMealTag());
         builder.setId(currentRecipe.getId());
-
-        if (isOldRecipe) {
-            builder.setDate(currentRecipe.getDate());
-        } else {
-            Date currDate = new Date();
-            builder.setDate(currDate.getTime());
-        }
+        builder.setDate(currentRecipe.getDate());
+        // if (isOldRecipe) {
+            
+        // } else {
+        //     Date currDate = new Date();
+        //     builder.setDate(currDate.getTime());
+        // }
 
         Recipe edit = builder.buildRecipe();
         for (String ingredient : ingr) {
@@ -118,7 +117,7 @@ public class DetailsAppFrame {
     }
 
     public void updateDisplay() {
-        // Resets the UI everytime
+        // Resets the UI every time
         detailedUI.getChildren().clear();
 
         VBox setupContainer = new VBox();
@@ -136,7 +135,9 @@ public class DetailsAppFrame {
         HBox topButtons = new HBox();
         topButtons.setSpacing(100);
         topButtons.setAlignment(Pos.CENTER);
-        topButtons.getChildren().addAll(backToHomeButton, refreshButton);
+        Button mealTag = new Button();
+        MealTagStyler.styleTags(currentRecipe, mealTag);
+        topButtons.getChildren().addAll(backToHomeButton, mealTag, refreshButton);
         HBox.setHgrow(topButtons, Priority.ALWAYS);
 
         detailedUI.getChildren().addAll(topButtons, title, recipeImgView);

@@ -1,4 +1,4 @@
-package code.server;
+package code.server.mocking;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -7,6 +7,13 @@ import com.mongodb.client.MongoDatabase;
 import com.sun.net.httpserver.*;
 
 import code.client.Model.AppConfig;
+import code.server.AccountMongoDB;
+import code.server.AccountRequestHandler;
+import code.server.BaseServer;
+import code.server.IRecipeDb;
+import code.server.RecipeMongoDb;
+import code.server.RecipeRequestHandler;
+import code.server.ShareRequestHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -14,14 +21,14 @@ import java.util.concurrent.*;
 
 import org.bson.Document;
 
-public class AppServer extends BaseServer {
+public class MockServer extends BaseServer {
     private IRecipeDb recipeDb;
     private AccountMongoDB accountMongoDB;
 
     private final static int NUM_THREADS = 10;
     private HttpServer httpServer;
 
-    public AppServer(String hostName, int port) {
+    public MockServer(String hostName, int port) {
         super(hostName, port);
         MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN);
         MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
@@ -38,15 +45,15 @@ public class AppServer extends BaseServer {
         // create a map to store data
         // create a server
         httpServer = HttpServer.create(
-                new InetSocketAddress("0.0.0.0", port),
+                new InetSocketAddress(hostName, port),
                 0);
         // create the context to map urls
         httpServer.createContext(AppConfig.RECIPE_PATH, new RecipeRequestHandler(recipeDb));
         httpServer.createContext(AppConfig.ACCOUNT_PATH, new AccountRequestHandler(accountMongoDB));
         httpServer.createContext(AppConfig.SHARE_PATH, new ShareRequestHandler(accountMongoDB, recipeDb));
-        httpServer.createContext(AppConfig.CHATGPT_PATH, new ChatGPTRequestHandler());
-        httpServer.createContext(AppConfig.DALLE_PATH, new DallERequestHandler());
-        httpServer.createContext(AppConfig.WHISPER_PATH, new WhisperRequestHandler());
+        httpServer.createContext(AppConfig.CHATGPT_PATH, new MockChatGPTRequestHandler());
+        httpServer.createContext(AppConfig.DALLE_PATH, new MockDallERequestHandler());
+        httpServer.createContext(AppConfig.WHISPER_PATH, new MockWhisperRequestHandler());
         // set the executor
         httpServer.setExecutor(threadPoolExecutor);
         // start the server

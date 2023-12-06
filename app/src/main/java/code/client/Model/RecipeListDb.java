@@ -75,7 +75,6 @@ public class RecipeListDb implements IRecipeDb {
 
     @Override
     public List<Recipe> getList(String accountId) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getList'");
     }
 }

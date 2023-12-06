@@ -56,7 +56,9 @@ gradle-app.setting
 
 # End of https://www.toptal.com/developers/gitignore/api/java,gradle
 *.wav
+!app/recording.wav
 *.properties
 .vscode/launch.json
 !gradle/wrapper/gradle-wrapper.jar
 !gradle/wrapper/gradle-wrapper.properties
+*.csv

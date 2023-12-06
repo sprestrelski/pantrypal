@@ -1,18 +1,22 @@
 package code.client.Model;
 
 import java.io.IOException;
-import java.io.Writer;
+import java.io.FileWriter;
 
 public class AccountCSVWriter {
-    private final Writer writer;
+    private final FileWriter writer;
 
-    public AccountCSVWriter(Writer writer) {
+    public AccountCSVWriter(FileWriter writer) {
         this.writer = writer;
     }
 
     public void writeAccount(String username, String password) throws IOException {
-        writer.append(username)
-                .append("|")
-                .append(password);
+        writer.write(username);
+        writer.write("|");
+        writer.write(password);
+    }
+
+    public void close() throws IOException {
+        writer.close();
     }
 }

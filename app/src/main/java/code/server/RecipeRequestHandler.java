@@ -1,5 +1,7 @@
 package code.server;
 
+import com.mongodb.MongoSocketReadException;
+import com.mongodb.MongoWriteException;
 import com.sun.net.httpserver.*;
 
 import code.client.Model.RecipeCSVWriter;
@@ -31,7 +33,14 @@ public class RecipeRequestHandler implements HttpHandler {
             } else {
                 throw new Exception("Not valid request method.");
             }
+        } catch (MongoWriteException ex) {
+            ex.printStackTrace();
+            response = "Duplicate Key Error";
+        } catch (MongoSocketReadException ex) {
+            ex.printStackTrace();
+            response = "Server Offline";
         } catch (Exception e) {
+            response = "Error";
             System.out.println("An erroneous request");
             e.printStackTrace();
         }
@@ -41,38 +50,6 @@ public class RecipeRequestHandler implements HttpHandler {
         OutputStream outStream = httpExchange.getResponseBody();
         outStream.write(response.getBytes());
         outStream.close();
-    }
-
-    private String buildResponseFromRecipe(Recipe recipe) {
-        return recipe.toString();
-    }
-
-    private String getRecipeById(String id) {
-        String response;
-        Recipe recipe = recipeDb.find(id);
-
-        if (recipe != null) {
-            response = buildResponseFromRecipe(recipe);
-            System.out.println("Queried for " + id + " and found " + recipe.getTitle());
-        } else {
-            response = "Recipe not found.";
-        }
-
-        return response;
-    }
-
-    private String getAllRecipes() {
-        List<Recipe> recipeList = recipeDb.getList();
-        StringBuilder responseBuilder = new StringBuilder();
-        String recipeResponse;
-
-        for (Recipe recipe : recipeList) {
-            recipeResponse = buildResponseFromRecipe(recipe);
-            responseBuilder.append(recipeResponse).append("\n");
-        }
-
-        String response = responseBuilder.toString();
-        return response;
     }
 
     private String handleGet(HttpExchange httpExchange) throws IOException {

@@ -6,10 +6,12 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import code.client.Model.*;
 import code.client.View.*;
+import code.server.BaseServer;
 import code.server.AppServer;
 import code.client.Controllers.*;
 import javafx.scene.Scene;
 import code.server.IRecipeDb;
+import code.server.mocking.MockServer;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -17,13 +19,13 @@ import java.net.URISyntaxException;
 
 public class App extends Application {
     private IRecipeDb recipeDb;
-    private AppServer server;
+    private BaseServer server;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         // initDb(); To use CSV file
-        initServer();
-        server.start();
+        // initServer();
+        // server.start();
         drawUI(primaryStage);
     }
 
@@ -36,18 +38,18 @@ public class App extends Application {
         Model model = new Model();
         Scene login = new Scene(view.getLoginUI().getRoot());
         view.setScene(login);
-        Controller controller = new Controller(view, model);
-
-        ServerConnection connection = new ServerConnection(server);
+        Controller controller;
+        //123
+        ServerConnection connection = new ServerConnection(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
 
         if (connection.isOnline()) {
+            controller = new Controller(view, model);
             // System.out.println("Server is online");
             controller.addListenersToList();
         } else {
             // System.out.println("Server is offline");
             view.goToOfflineUI();
         }
-
         primaryStage.setScene(login);
         primaryStage.setTitle(AppConfig.APP_NAME);
         primaryStage.setResizable(true);
@@ -75,6 +77,10 @@ public class App extends Application {
     }
 
     private void initServer() throws IOException {
-        server = new AppServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+        if (AppConfig.MOCKING_ON) {
+            server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+        } else {
+            server = new AppServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+        }
     }
 }

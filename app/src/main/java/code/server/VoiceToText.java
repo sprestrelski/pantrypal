@@ -1,4 +1,4 @@
-package code.client.Model;
+package code.server;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -15,7 +15,20 @@ public abstract class VoiceToText {
     }
 
     public String processAudio(String type) throws IOException, URISyntaxException {
-        return handleResponse();
+        String response = handleResponse();
+        if (type.equals("mealtype")) {
+            response = response.toUpperCase();
+            if (response.contains("BREAKFAST")) {
+                response = "Breakfast";
+            } else if (response.contains("LUNCH")) {
+                response = "Lunch";
+            } else if (response.contains("DINNER")) {
+                response = "Dinner";
+            } else {
+                response = null;
+            }
+        }
+        return response;
     }
 
     private String handleResponse() throws IOException {

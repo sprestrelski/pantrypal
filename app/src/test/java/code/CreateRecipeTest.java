@@ -31,5 +31,4 @@ public class CreateRecipeTest {
                 """;
         assertEquals(parsedResponse, recipeString);
     }
-
 }

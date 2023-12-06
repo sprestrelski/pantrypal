@@ -1,16 +1,12 @@
-package code.client.Model;
+package code.client.Controllers;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import code.server.Recipe;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import code.server.Recipe;
+import java.util.Date;
 
-public abstract class TextToRecipe {
-    public abstract String getResponse(String mealType, String ingredients)
-            throws IOException, InterruptedException, URISyntaxException;
-
+public class Format {
     public String buildPrompt(String mealType, String ingredients) {
         StringBuilder prompt = new StringBuilder();
         prompt.append("I am a student on a budget with a busy schedule and I need to quickly cook a ")
@@ -18,7 +14,7 @@ public abstract class TextToRecipe {
                 .append(". ")
                 .append(ingredients)
                 .append(" Make a recipe using only these ingredients plus condiments. ")
-                .append("Remember to first include a title, then a list of ingredients, and then a list of instructions.");
+                .append("Please give me a recipe in the following format with no comments after the instructions. Title: Ingredients: Instructions:");
         return prompt.toString();
     }
 
@@ -38,8 +34,13 @@ public abstract class TextToRecipe {
         }
 
         // Create a new recipe with a title
-        Recipe recipe = new Recipe(tokenList.get(0), mealType);
-
+        String title = tokenList.get(0);
+        if (title.contains("Title:")) {
+            title = title.replaceAll("Title:", ""); 
+        } 
+        Recipe recipe = new Recipe(title.trim(), mealType);
+        Date now = new Date();
+        recipe.setDate(now.getTime());
         // Parse recipe's ingredients
         String ingredient;
         boolean parse = false;
@@ -86,6 +87,4 @@ public abstract class TextToRecipe {
 
         return strBuilder.toString();
     }
-
-    public abstract void setSampleRecipe(String recipe);
 }

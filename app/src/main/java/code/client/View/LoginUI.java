@@ -19,8 +19,7 @@ import code.client.Model.Account;
 
 public class LoginUI {
 
-    private boolean rememberLogin, accountSaved = false;
-    private Account savedAccount;
+    private boolean rememberLogin;
     private Hyperlink goToCreate;
     private Button loginButton;
     private TextField usernameField;
@@ -35,6 +34,7 @@ public class LoginUI {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
         grid.setStyle("-fx-background-color: #F0F8FF;");
+        GridPane.setFillWidth(grid, true);
 
         Text titleText = new Text("Pantry Pal - Login");
         titleText.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -75,7 +75,6 @@ public class LoginUI {
     public void setLoginCreds(Account account) {
         usernameField.setText(account.getUsername());
         passwordField.setText(account.getPassword());
-        savedAccount = account;
     }
 
     public GridPane getRoot() {
