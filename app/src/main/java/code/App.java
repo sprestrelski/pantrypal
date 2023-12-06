@@ -39,8 +39,8 @@ public class App extends Application {
         Scene login = new Scene(view.getLoginUI().getRoot());
         view.setScene(login);
         Controller controller;
-
-        ServerConnection connection = new ServerConnection("localhost", 8100);
+        //123
+        ServerConnection connection = new ServerConnection(AppConfig.SERVER_HOST, 8100);
 
         if (connection.isOnline()) {
             controller = new Controller(view, model);

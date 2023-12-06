@@ -30,7 +30,7 @@ class Footer extends HBox {
         grid.add(newButton, 11, 0);
         grid.setHgap(20);
         this.getChildren().add(grid);
-        this.setAlignment(Pos.CENTER_LEFT);
+        this.setAlignment(Pos.CENTER);
     }
 
     public Button getNewButton() {

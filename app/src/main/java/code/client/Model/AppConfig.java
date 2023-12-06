@@ -32,5 +32,5 @@ public class AppConfig {
     public static final String WHISPER_PATH = "/whisper";
     // sharing
     public static final String SHARE_PATH = "/recipes/";
-    public static final String SHARE_LINK = "http://localhost:8100/recipes/";
+    public static final String SHARE_LINK = "http://" + SERVER_HOST + ":8100/recipes/";
 }
