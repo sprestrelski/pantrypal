@@ -7,7 +7,7 @@ import javafx.scene.layout.*;
 import javafx.geometry.Insets;
 import java.io.File;
 
-import code.client.Model.AppConfig;
+import code.AppConfig;
 
 public class OfflineUI extends VBox {
     private final Label offlineLabel;

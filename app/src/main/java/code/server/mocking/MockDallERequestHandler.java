@@ -1,6 +1,6 @@
 package code.server.mocking;
 
-import code.client.Model.AppConfig;
+import code.AppConfig;
 import code.server.RecipeToImage;
 
 import com.sun.net.httpserver.*;

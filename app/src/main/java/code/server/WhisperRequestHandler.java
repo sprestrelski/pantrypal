@@ -2,7 +2,7 @@ package code.server;
 
 import com.sun.net.httpserver.*;
 
-import code.client.Model.AppConfig;
+import code.AppConfig;
 
 import java.io.*;
 import java.net.URI;

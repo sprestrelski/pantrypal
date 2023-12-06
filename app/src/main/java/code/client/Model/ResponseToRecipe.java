@@ -1,23 +1,12 @@
-package code.client.Controllers;
+package code.client.Model;
 
 import code.server.Recipe;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Format {
-    public String buildPrompt(String mealType, String ingredients) {
-        StringBuilder prompt = new StringBuilder();
-        prompt.append("I am a student on a budget with a busy schedule and I need to quickly cook a ")
-                .append(mealType)
-                .append(". ")
-                .append(ingredients)
-                .append(" Make a recipe using only these ingredients plus condiments. ")
-                .append("Please give me a recipe in the following format with no comments after the instructions. Title: Ingredients: Instructions:");
-        return prompt.toString();
-    }
-
-    public Recipe mapResponseToRecipe(String mealType, String responseText) {
+public class ResponseToRecipe {
+    public Recipe getRecipe(String responseText) {
         // Split the tokens into lines
         String[] tokenArr = responseText.split("\n");
         List<String> tokenList = new ArrayList<>(Arrays.asList(tokenArr));
@@ -28,25 +17,24 @@ public class Format {
             if (tokenList.get(i).isBlank()) {
                 tokenList.remove(i);
             } else {
+                tokenList.set(i, tokenList.get(i).trim());
                 ++i;
             }
         }
 
-        // Create a new recipe with a title
+        // Parse recipe's title and create a new recipe
         String title = tokenList.get(0);
-        if (title.contains("Title:")) {
-            title = title.replaceAll("Title:", ""); 
-        } 
-        Recipe recipe = new Recipe(title.trim(), mealType);
+        Recipe recipe = new Recipe(title, null);
         // Parse recipe's ingredients
         String ingredient;
         boolean parse = false;
+
         for (i = 0; !tokenList.get(i).contains("Instructions"); ++i) {
-            ingredient = tokenList.get(i).trim();
+            ingredient = tokenList.get(i);
             if (ingredient.contains("Ingredients")) {
                 parse = true;
             } else if (parse) {
-                ingredient = removeDashFromIngredient(tokenList.get(i).trim());
+                ingredient = removeDashFromIngredient(tokenList.get(i));
                 recipe.addIngredient(ingredient);
             }
         }
@@ -54,7 +42,7 @@ public class Format {
         // Parse recipe's instructions
         String instruction;
         for (i += 1; i < tokenList.size(); ++i) {
-            instruction = removeNumberFromInstruction(tokenList.get(i).trim());
+            instruction = removeNumberFromInstruction(tokenList.get(i));
             recipe.addInstruction(instruction);
         }
 

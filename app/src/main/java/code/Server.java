@@ -2,7 +2,6 @@ package code;
 
 import java.io.IOException;
 
-import code.client.Model.AppConfig;
 import code.server.AppServer;
 import code.server.BaseServer;
 import code.server.mocking.MockServer;

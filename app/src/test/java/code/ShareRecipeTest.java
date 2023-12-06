@@ -8,7 +8,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import static org.junit.jupiter.api.Assertions.*;
-import code.client.Model.AppConfig;
+
 import code.server.AccountMongoDB;
 import code.server.RecipeMongoDb;
 import code.server.ShareRecipe;

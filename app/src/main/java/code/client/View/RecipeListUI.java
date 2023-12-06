@@ -1,6 +1,5 @@
 package code.client.View;
 
-import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import java.io.*;
 import java.util.List;

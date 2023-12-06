@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 
 import org.junit.jupiter.api.Test;
 
-import code.client.Model.AppConfig;
 import code.client.Model.Model;
 import code.server.BaseServer;
 import code.server.IHttpConnection;
@@ -17,8 +16,8 @@ import java.net.ConnectException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class VoiceToTextTest {
-    BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
-    Model model = new Model();
+    private final BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+    private final Model model = new Model();
 
     /*
      * Integration Test for processing both audios

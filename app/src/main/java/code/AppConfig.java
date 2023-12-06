@@ -1,4 +1,4 @@
-package code.client.Model;
+package code;
 
 import javax.sound.sampled.AudioFileFormat;
 
@@ -25,12 +25,11 @@ public class AppConfig {
     public static final String SERVER_HOST = "localhost";
     public static final int SERVER_PORT = 8100;
     public static final String SERVER_URL = "http://" + SERVER_HOST + ":" + SERVER_PORT;
-    public static final String RECIPE_PATH = "/recipe";
+    public static final String RECIPE_PATH = "/recipes";
     public static final String ACCOUNT_PATH = "/accounts";
     public static final String CHATGPT_PATH = "/chatgpt";
     public static final String DALLE_PATH = "/dalle";
     public static final String WHISPER_PATH = "/whisper";
     // sharing
-    public static final String SHARE_PATH = "/recipes/";
-    public static final String SHARE_LINK = "http://localhost:8100/recipes/";
+    public static final String SHARE_PATH = "/share";
 }

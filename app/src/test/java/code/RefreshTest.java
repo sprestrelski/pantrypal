@@ -2,7 +2,7 @@ package code;
 
 import code.client.Model.Model;
 import org.junit.jupiter.api.Test;
-import code.client.Model.AppConfig;
+
 import code.server.*;
 import code.server.mocking.MockServer;
 
@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class RefreshTest {
-    BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
-    Model model = new Model();
+    private final BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+    private final Model model = new Model();
 
     @Test
     public void testRefreshRecipe() throws IOException, InterruptedException,

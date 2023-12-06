@@ -1,7 +1,6 @@
 package code;
 
 import code.server.Account;
-import code.client.Model.AppConfig;
 import code.server.AccountMongoDB;
 import code.server.IAccountDb;
 import static org.junit.jupiter.api.Assertions.*;

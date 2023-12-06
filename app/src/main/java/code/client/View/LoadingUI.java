@@ -8,7 +8,7 @@ import javafx.scene.text.Font;
 import javafx.geometry.Insets;
 import java.io.File;
 
-import code.client.Model.AppConfig;
+import code.AppConfig;
 
 public class LoadingUI extends VBox {
     private final Label loadingLabel;

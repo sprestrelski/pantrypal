@@ -20,7 +20,6 @@ import java.util.List;
 import code.server.Account;
 import code.client.Model.AccountCSVReader;
 import code.client.Model.AccountCSVWriter;
-import code.client.Model.AppConfig;
 import code.client.View.*;
 import code.client.Controllers.*;
 import code.server.*;

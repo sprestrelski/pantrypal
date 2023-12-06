@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import code.client.Model.AppConfig;
 import code.client.View.ServerConnection;
 import code.server.BaseServer;
 import code.server.mocking.MockServer;

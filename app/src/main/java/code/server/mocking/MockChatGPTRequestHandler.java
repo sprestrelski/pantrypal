@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import com.sun.net.httpserver.*;
 
-import code.server.TextToRecipe;
-
-public class MockChatGPTRequestHandler extends TextToRecipe implements HttpHandler {
-
+public class MockChatGPTRequestHandler implements HttpHandler {
     private String sampleRecipe = """
             Fried Chicken
             breakfast
@@ -19,11 +16,6 @@ public class MockChatGPTRequestHandler extends TextToRecipe implements HttpHandl
             2. Add chicken into bowl and then fry.
             3. Enjoy!
             """;
-
-    @Override
-    public void setSampleRecipe(String recipeText) {
-        sampleRecipe = recipeText;
-    }
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -42,10 +34,10 @@ public class MockChatGPTRequestHandler extends TextToRecipe implements HttpHandl
                     - 1 teaspoon sesame oil
                     - Salt and pepper to taste""";
         }
+        
         httpExchange.sendResponseHeaders(200, sampleRecipe.length());
         OutputStream outStream = httpExchange.getResponseBody();
         outStream.write(sampleRecipe.getBytes());
         outStream.close();
-
     }
 }

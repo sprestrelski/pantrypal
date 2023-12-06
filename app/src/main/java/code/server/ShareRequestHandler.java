@@ -3,7 +3,8 @@ package code.server;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import code.client.Model.*;
+
+import code.AppConfig;
 import com.sun.net.httpserver.*;
 
 public class ShareRequestHandler implements HttpHandler {

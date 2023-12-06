@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import code.server.BaseServer;
 import code.server.Recipe;
 import code.server.mocking.MockServer;
-import code.client.Model.AppConfig;
 import code.client.Model.Model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,8 +13,8 @@ import java.io.IOException;
 import java.util.Base64;
 
 public class RecipeToImageTest {
-    BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
-    Model model = new Model();
+    private final BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+    private final Model model = new Model();
 
     /*
      * Image creation unit tests

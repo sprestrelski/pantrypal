@@ -1,6 +1,6 @@
 package code.client.View;
 
-import code.client.Model.*;
+import code.AppConfig;
 import java.io.File;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;

@@ -1,9 +1,9 @@
 package code.server;
 
-import code.client.Model.AppConfig;
-
 import java.io.*;
 import java.net.*;
+
+import code.AppConfig;
 
 public class WhisperService extends VoiceToText {
     public static final String API_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";

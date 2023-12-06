@@ -6,7 +6,7 @@ import java.util.Base64;
 
 import org.bson.types.ObjectId;
 
-import code.client.Model.AppConfig;
+import code.AppConfig;
 
 public class RecipeBuilder {
     private Recipe recipe;

@@ -21,7 +21,7 @@ import java.net.MalformedURLException;
 public class EndToEndScenario2_2 {
     BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
     Model model = new Model();
-    Format format = new Format();
+    ResponseToRecipe format = new ResponseToRecipe();
 
     @Test
     public void serverUnavailableTest() throws MalformedURLException, IOException {

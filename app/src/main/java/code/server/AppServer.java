@@ -6,7 +6,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.sun.net.httpserver.*;
 
-import code.client.Model.AppConfig;
+import code.AppConfig;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -17,13 +17,13 @@ import org.bson.Document;
 public class AppServer extends BaseServer {
     private IRecipeDb recipeDb;
     private AccountMongoDB accountMongoDB;
-
     private final static int NUM_THREADS = 10;
     private HttpServer httpServer;
+    private MongoClient mongoClient;
 
     public AppServer(String hostName, int port) {
         super(hostName, port);
-        MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN);
+        mongoClient = MongoClients.create(AppConfig.MONGODB_CONN);
         MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
         MongoCollection<Document> userCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
         MongoCollection<Document> recipeCollection = mongoDb.getCollection(AppConfig.MONGO_RECIPE_COLLECTION);
@@ -44,7 +44,8 @@ public class AppServer extends BaseServer {
         httpServer.createContext(AppConfig.RECIPE_PATH, new RecipeRequestHandler(recipeDb));
         httpServer.createContext(AppConfig.ACCOUNT_PATH, new AccountRequestHandler(accountMongoDB));
         httpServer.createContext(AppConfig.SHARE_PATH, new ShareRequestHandler(accountMongoDB, recipeDb));
-        httpServer.createContext(AppConfig.CHATGPT_PATH, new ChatGPTRequestHandler());
+        TextToRecipe textToRecipe = new ChatGPTService();
+        httpServer.createContext(AppConfig.CHATGPT_PATH, new ChatGPTRequestHandler(textToRecipe));
         httpServer.createContext(AppConfig.DALLE_PATH, new DallERequestHandler());
         httpServer.createContext(AppConfig.WHISPER_PATH, new WhisperRequestHandler());
         // set the executor
@@ -57,7 +58,10 @@ public class AppServer extends BaseServer {
     @Override
     public void stop() {
         if (httpServer != null) {
-            httpServer.stop(0); // Stop the server gracefully
+            // Close the mongo db connection
+            mongoClient.close();
+            // Stop the server gracefully
+            httpServer.stop(0);
             System.out.println("Server stopped");
         }
     }

@@ -2,8 +2,7 @@ package code;
 
 import org.junit.jupiter.api.Test;
 
-import code.client.Controllers.Format;
-import code.client.Model.AppConfig;
+import code.client.Model.ResponseToRecipe;
 import code.client.Model.Model;
 import code.server.*;
 import code.server.mocking.MockServer;
@@ -15,9 +14,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class TextToRecipeTest {
-        BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
-        Model model = new Model();
-        Format format = new Format();
+        private final BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+        private final Model model = new Model();
+        private final ResponseToRecipe responseToRecipe = new ResponseToRecipe();
+        private PromptBuilder promptBuilder;
 
         @Test
         /**
@@ -35,19 +35,19 @@ public class TextToRecipeTest {
 
                 // build prompt for chatGPT
                 String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Breakfast. Chicken, eggs. Make a recipe using only these ingredients plus condiments. Please give me a recipe in the following format with no comments after the instructions. Title: Ingredients: Instructions:";
-                String response = format.buildPrompt(mealType, ingredients);
+                promptBuilder = new PromptBuilder(mealType, ingredients);
+                String response = promptBuilder.getPrompt();
                 assertEquals(prompt, response);
 
                 // create Recipe object from response
                 String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
-                Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType,
-                                responseText);
+                Recipe recipe = responseToRecipe.getRecipe(responseText);
+                recipe.setMealTag(mealType);
+                recipe.setImage(model.performDallERequest("GET", recipe.getTitle()));
 
-                chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
-
-                assertEquals("Fried Chicken", chatGPTrecipe.getTitle());
-                assertEquals("Breakfast", chatGPTrecipe.getMealTag());
-                assertNotNull(chatGPTrecipe.getImage());
+                assertEquals("Fried Chicken", recipe.getTitle());
+                assertEquals("Breakfast", recipe.getMealTag());
+                assertNotNull(recipe.getImage());
                 server.stop();
         }
 
@@ -57,7 +57,8 @@ public class TextToRecipeTest {
         @Test
         public void testPromptBuild() {
                 String prompt = "I am a student on a budget with a busy schedule and I need to quickly cook a Lunch. I have rice, shrimp, chicken, and eggs. Make a recipe using only these ingredients plus condiments. Please give me a recipe in the following format with no comments after the instructions. Title: Ingredients: Instructions:";
-                String response = format.buildPrompt("Lunch", "I have rice, shrimp, chicken, and eggs.");
+                promptBuilder = new PromptBuilder("Lunch", "I have rice, shrimp, chicken, and eggs.");
+                String response = promptBuilder.getPrompt();
                 assertEquals(prompt, response);
         }
 
@@ -116,7 +117,8 @@ public class TextToRecipeTest {
                                 Cook the fried rice until everything is heated through, about 5 minutes.
                                 Drizzle with sesame oil, season with more salt and pepper if desired, and serve. Enjoy!
                                 """;
-                Recipe recipe = format.mapResponseToRecipe(mealType, responseText);
+                Recipe recipe = responseToRecipe.getRecipe(responseText);
+                recipe.setMealTag(mealType);
                 assertEquals(parsedResponse, recipe.toString());
         }
 
@@ -177,7 +179,8 @@ public class TextToRecipeTest {
                                 Top with shredded cheese and bake in preheated oven for 25-30 minutes, or until the cheese is melted and bubbly.
                                 Serve the cheesy pasta bake with garlic bread. Enjoy!
                                 """;
-                Recipe recipe = format.mapResponseToRecipe(mealType, responseText);
+                Recipe recipe = responseToRecipe.getRecipe(responseText);
+                recipe.setMealTag(mealType);
                 assertEquals(parsedResponse, recipe.toString());
         }
 
@@ -248,7 +251,8 @@ public class TextToRecipeTest {
                                 Remove from oven and discard the garlic bread or serve alongside the beef pasta bake.
                                 Enjoy!
                                 """;
-                Recipe recipe = format.mapResponseToRecipe(mealType, responseText);
+                Recipe recipe = responseToRecipe.getRecipe(responseText);
+                recipe.setMealTag(mealType);
                 assertEquals(parsedResponse, recipe.toString());
         }
 
@@ -319,7 +323,8 @@ public class TextToRecipeTest {
                                 Remove from oven and discard the garlic bread or serve alongside the beef pasta bake.
                                 Enjoy!
                                 """;
-                Recipe recipe = format.mapResponseToRecipe(mealType, responseText);
+                Recipe recipe = responseToRecipe.getRecipe(responseText);
+                recipe.setMealTag(mealType);
                 assertEquals(parsedResponse, recipe.toString());
         }
 }

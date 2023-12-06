@@ -6,7 +6,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.sun.net.httpserver.*;
 
-import code.client.Model.AppConfig;
+import code.AppConfig;
 import code.server.AccountMongoDB;
 import code.server.AccountRequestHandler;
 import code.server.BaseServer;

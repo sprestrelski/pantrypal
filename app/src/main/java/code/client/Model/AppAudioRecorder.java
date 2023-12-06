@@ -3,6 +3,8 @@ package code.client.Model;
 import java.io.*;
 import javax.sound.sampled.*;
 
+import code.AppConfig;
+
 public class AppAudioRecorder extends BaseAudioRecorder {
     private AudioFormat audioFormat;
     private TargetDataLine targetDataLine;

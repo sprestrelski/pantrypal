@@ -40,7 +40,7 @@ public class App extends Application {
         view.setScene(login);
         Controller controller = new Controller(view, model);
 
-        ServerConnection connection = new ServerConnection("localhost", 8100);
+        ServerConnection connection = new ServerConnection(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
 
         if (connection.isOnline()) {
             // System.out.println("Server is online");

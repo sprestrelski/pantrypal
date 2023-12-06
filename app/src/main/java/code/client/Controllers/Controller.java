@@ -23,6 +23,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.util.Duration;
+import code.AppConfig;
 import code.client.Model.*;
 import code.client.View.AppAlert;
 import code.client.View.AppFrameMic;
@@ -39,7 +40,7 @@ public class Controller {
     private Account account;
     private Model model;
     private View view;
-    private Format format = new Format();
+    private final ResponseToRecipe responseToRecipe = new ResponseToRecipe();
     private IRecipeDb recipeDb;
     private RecipeCSVWriter recipeWriter;
     private RecipeCSVReader recipeReader;
@@ -261,12 +262,12 @@ public class Controller {
             try {
                 Thread thread = new Thread(() -> {
                     String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
-                    Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
-                    chatGPTrecipe.setAccountId(account.getId());
-                    chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
-
+                    Recipe recipe = responseToRecipe.getRecipe(responseText);
+                    recipe.setMealTag(mealType);
+                    recipe.setAccountId(account.getId());
+                    recipe.setImage(model.performDallERequest("GET", recipe.getTitle()));
                     // Changes UI to Detailed Recipe Screen
-                    view.goToDetailedView(chatGPTrecipe, false);
+                    view.goToDetailedView(recipe, false);
                     view.getDetailedView().getRecipeDetailsUI().setEditable(false);
                     handleDetailedViewListeners();
                 });
@@ -349,11 +350,18 @@ public class Controller {
     private void handleShareButton(ActionEvent event) {
         Recipe shownRecipe = this.view.getDetailedView().getDisplayedRecipe();
         String id = shownRecipe.getId();
-        Hyperlink textArea = new Hyperlink(AppConfig.SHARE_LINK + account.getUsername() + "/" + id);
+        String shareLink = new StringBuilder(AppConfig.SERVER_URL)
+                .append(AppConfig.SHARE_PATH)
+                .append("/")
+                .append(account.getUsername())
+                .append("/")
+                .append(id)
+                .toString();
+        Hyperlink textArea = new Hyperlink(shareLink);
         textArea.setOnAction(action -> {
             try {
-                java.awt.Desktop.getDesktop() // Format: localhost:8100/recipes/username/recipeID
-                        .browse(new URL(AppConfig.SHARE_LINK + account.getUsername() + "/" + id).toURI());
+                // Format: localhost:8100/recipes/username/recipeID
+                java.awt.Desktop.getDesktop().browse(new URL(shareLink).toURI());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (URISyntaxException e) {
@@ -412,15 +420,13 @@ public class Controller {
             view.goToLoading();
             try {
                 Thread thread = new Thread(() -> {
-                    String responseText = model.performChatGPTRequest("GET", mealType,
-                            ingredients);
-                    Recipe chatGPTrecipe = format.mapResponseToRecipe(mealType, responseText);
-                    chatGPTrecipe.setAccountId(account.getId());
-                    chatGPTrecipe.setImage(model.performDallERequest("GET",
-                            chatGPTrecipe.getTitle()));
-
+                    String responseText = model.performChatGPTRequest("GET", mealType, ingredients);
+                    Recipe recipe = responseToRecipe.getRecipe(responseText);
+                    recipe.setMealTag(mealType);
+                    recipe.setAccountId(account.getId());
+                    recipe.setImage(model.performDallERequest("GET", recipe.getTitle()));
                     // Changes UI to Detailed Recipe Screen
-                    view.goToDetailedView(chatGPTrecipe, false);
+                    view.goToDetailedView(recipe, false);
                     view.getDetailedView().getRecipeDetailsUI().setEditable(false);
                     handleDetailedViewListeners();
                 });

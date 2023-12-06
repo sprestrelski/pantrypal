@@ -1,7 +1,8 @@
 package code.server;
 
-import code.client.Model.AppConfig;
 import com.sun.net.httpserver.*;
+
+import code.AppConfig;
 
 import java.io.*;
 import java.net.*;

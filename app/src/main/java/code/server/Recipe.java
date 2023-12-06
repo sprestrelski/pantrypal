@@ -10,7 +10,8 @@ import java.util.Iterator;
 import org.bson.types.ObjectId;
 
 import java.util.*;
-import code.client.Model.*;
+
+import code.AppConfig;
 
 public class Recipe implements Comparable<Recipe> {
     private String id;
