@@ -13,10 +13,10 @@ public class RecipeListUI extends VBox {
 
     RecipeListUI() throws IOException {
         this.setSpacing(5);
-        // this.setPrefSize(700, 600);
+        this.setPrefSize(700, 500);
         this.setStyle("-fx-background-color: #F0F8FF;");
         //VBox.setVgrow(this, Priority.ALWAYS);
-        // this.setAlignment(Pos.CENTER);
+        this.setAlignment(Pos.CENTER);
     }
 
     public IRecipeDb getRecipeDB() {

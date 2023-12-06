@@ -93,37 +93,40 @@ class Header extends HBox {
     }
 }
 
-public class AppFrameHome extends BorderPane {
+public class AppFrameHome extends VBox {
     private Header header;
     private Footer footer;
     private RecipeListUI recipeList;
+    private ScrollPane scroller;
     private Button newButton, logOutButton;
 
     AppFrameHome() throws IOException {
-
         header = new Header();
         recipeList = new RecipeListUI();
         footer = new Footer();
-        ScrollPane scroller = new ScrollPane(recipeList);
-        scroller.setMaxSize(400,400);
-        scroller.setVbarPolicy(ScrollBarPolicy.ALWAYS);
-        this.setTop(header);
-        this.setCenter(scroller);
-        this.setBottom(footer);
+        scroller = new ScrollPane(recipeList);
+        scroller.setFitToWidth(true);
+        scroller.setFitToHeight(true);
+
+        this.getChildren().addAll(header,scroller,footer);
+        // this.setTop(header);
+        // this.setCenter(scroller);
+        // this.setBottom(footer);
         newButton = footer.getNewButton();
         logOutButton = footer.getLogOutButton();
-        BorderPane.setAlignment(this, Pos.CENTER);
-        
     }
 
-    public BorderPane getRoot() {
+    public VBox getRoot() {
+        // stack.getChildren().clear();
+        // stack.getChildren().add(this);
         this.updateDisplay("none");
         return this;
     }
 
     public void updateDisplay(String filter) {
         recipeList.update(filter);
-        this.setCenter(recipeList);
+        this.getChildren().clear();
+        this.getChildren().addAll(header,scroller,footer);
     }
 
     public void setNewRecipeButtonAction(EventHandler<ActionEvent> eventHandler) {
