@@ -45,7 +45,7 @@ public class MockServer extends BaseServer {
         // create a map to store data
         // create a server
         httpServer = HttpServer.create(
-                new InetSocketAddress(hostName, port),
+                new InetSocketAddress("0.0.0.0", port),
                 0);
         // create the context to map urls
         httpServer.createContext(AppConfig.RECIPE_PATH, new RecipeRequestHandler(recipeDb));

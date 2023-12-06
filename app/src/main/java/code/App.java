@@ -38,18 +38,18 @@ public class App extends Application {
         Model model = new Model();
         Scene login = new Scene(view.getLoginUI().getRoot());
         view.setScene(login);
-        Controller controller = new Controller(view, model);
+        Controller controller;
 
         ServerConnection connection = new ServerConnection("localhost", 8100);
 
         if (connection.isOnline()) {
+            controller = new Controller(view, model);
             // System.out.println("Server is online");
             controller.addListenersToList();
         } else {
             // System.out.println("Server is offline");
             view.goToOfflineUI();
         }
-
         primaryStage.setScene(login);
         primaryStage.setTitle(AppConfig.APP_NAME);
         primaryStage.setResizable(true);

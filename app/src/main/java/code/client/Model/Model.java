@@ -70,9 +70,13 @@ public class Model {
             }
 
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String tempResponse = "";
             String line;
             while ((line = in.readLine()) != null) {
-                response += line + "\n";
+                tempResponse += line + "\n";
+            }
+            if( !(tempResponse.toLowerCase().contains("error")) ) {
+                response = tempResponse;
             }
             in.close();
         } catch (Exception ex) {

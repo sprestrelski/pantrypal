@@ -15,8 +15,7 @@ public class RecipeListUI extends VBox {
         this.setSpacing(5);
         // this.setPrefSize(700, 600);
         this.setStyle("-fx-background-color: #F0F8FF;");
-        VBox.setVgrow(this, Priority.ALWAYS);
-        this.setFillWidth(true);
+        //VBox.setVgrow(this, Priority.ALWAYS);
         // this.setAlignment(Pos.CENTER);
     }
 

@@ -40,6 +40,7 @@ public class RecipeUI extends HBox {
         MealTagStyler.styleTags(recipe, mealType);
         this.getChildren().add(style);
         this.setPrefSize(50, 50);
+        this.setMinSize(50, 50);
     }
 
     public Recipe getRecipe() {

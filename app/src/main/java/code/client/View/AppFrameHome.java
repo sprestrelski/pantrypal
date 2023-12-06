@@ -2,7 +2,7 @@
 package code.client.View;
 
 import javafx.scene.control.*;
-
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import java.io.*;
@@ -18,7 +18,7 @@ class Footer extends HBox {
         this.setPrefSize(620, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
         this.setSpacing(15);
-
+        this.setAlignment(Pos.CENTER);
         String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF; -fx-font-weight: bold; -fx-font: 11 arial;";
 
         newButton = new Button("New Recipe");
@@ -74,15 +74,6 @@ class Header extends HBox {
 
         sortMenuButton.getItems().addAll(sortNewToOld, sortOldToNew, sortAToZ, sortZToA);
 
-        // EventHandler<ActionEvent> event1 = new EventHandler<ActionEvent>() {
-        // public void handle(ActionEvent e) {
-        // System.out.println(((MenuItem) e.getSource()).getText() + " selected");
-        // }
-        // };
-
-        // sortMenuButton.getItems().get(2).setOnAction(event1);
-        // sortMenuButton.getItems().get(3).setOnAction(event1);
-
         this.setPrefSize(620, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
 
@@ -107,32 +98,27 @@ public class AppFrameHome extends BorderPane {
     private Footer footer;
     private RecipeListUI recipeList;
     private Button newButton, logOutButton;
-    private StackPane stack;
 
     AppFrameHome() throws IOException {
-        stack = new StackPane();
 
         header = new Header();
         recipeList = new RecipeListUI();
         footer = new Footer();
         ScrollPane scroller = new ScrollPane(recipeList);
-        scroller.setFitToWidth(true);
-        scroller.setFitToHeight(true);
-
+        scroller.setMaxSize(400,400);
+        scroller.setVbarPolicy(ScrollBarPolicy.ALWAYS);
         this.setTop(header);
         this.setCenter(scroller);
         this.setBottom(footer);
-        scroller.setFitToWidth(true);
         newButton = footer.getNewButton();
         logOutButton = footer.getLogOutButton();
         BorderPane.setAlignment(this, Pos.CENTER);
+        
     }
 
-    public StackPane getRoot() {
-        stack.getChildren().clear();
-        stack.getChildren().add(this);
+    public BorderPane getRoot() {
         this.updateDisplay("none");
-        return stack;
+        return this;
     }
 
     public void updateDisplay(String filter) {

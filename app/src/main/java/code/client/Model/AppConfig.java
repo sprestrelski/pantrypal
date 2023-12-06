@@ -7,7 +7,7 @@ public class AppConfig {
     public static final String RECIPE_CSV_FILE = "recipes.csv";
     public static final String CREDENTIALS_CSV_FILE = "userCredentials.csv";
     // API
-    public static final boolean MOCKING_ON = false;
+    public static final boolean MOCKING_ON = true;
     public static final String AUDIO_FILE = "recording.wav";
     public static final AudioFileFormat.Type AUDIO_TYPE = AudioFileFormat.Type.WAVE;
     public static final String API_KEY = "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";

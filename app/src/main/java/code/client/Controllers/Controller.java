@@ -3,26 +3,17 @@ package code.client.Controllers;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
-
 import code.client.View.RecipeListUI;
 import code.client.View.RecipeUI;
 import code.client.View.View;
 import code.server.AccountRequestHandler;
 import code.server.IRecipeDb;
-
 import java.net.URL;
-import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.*;
-import javafx.util.Duration;
 import code.client.Model.*;
 import code.client.View.AppAlert;
 import code.client.View.AppFrameMic;
@@ -43,7 +34,6 @@ public class Controller {
     private IRecipeDb recipeDb;
     private RecipeCSVWriter recipeWriter;
     private RecipeCSVReader recipeReader;
-    private String defaultButtonStyle, onStyle, offStyle, blinkStyle;
     private String filter;
 
     // Audio Stuff
@@ -57,10 +47,6 @@ public class Controller {
         this.view = view;
         this.model = model;
         filter = "none";
-        defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF; -fx-font-weight: bold; -fx-font: 11 arial;";
-        onStyle = "-fx-font-style: italic; -fx-background-color: #90EE90; -fx-font-weight: bold; -fx-font: 11 arial;";
-        offStyle = "-fx-font-style: italic; -fx-background-color: #FF7377; -fx-font-weight: bold; -fx-font: 11 arial;";
-        blinkStyle = "-fx-background-color: #00FFFF; -fx-border-width: 0;";
 
         this.view.getAppFrameHome().setNewRecipeButtonAction(event -> {
             try {
@@ -85,17 +71,28 @@ public class Controller {
         }
     }
 
+    private void handleNewButton(ActionEvent event) throws URISyntaxException, IOException {
+        view.goToAudioCapture();
+        AppFrameMic mic = this.view.getAppFrameMic();
+        mic.setGoToDetailedButtonAction(this::handleDetailedViewFromNewRecipeButton);
+        mic.setGoToHomeButtonAction(this::handleHomeButton);
+        mic.setRecordIngredientsButtonAction(this::handleRecordIngredients);
+        mic.setRecordMealTypeButtonAction(event1 -> {
+            try {
+                handleRecordMealType(event1);
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
     private void handleRecipePostButton(ActionEvent event) throws IOException {
         view.getDetailedView().getRefreshButton().setVisible(false);
         Recipe postedRecipe = view.getDetailedView().getDisplayedRecipe();
         Date currTime = new Date();
         postedRecipe.setDate(currTime.getTime());
-
-        Button saveButtonFromDetailed = view.getDetailedView().getSaveButton();
-        saveButtonFromDetailed.setStyle(blinkStyle);
-        PauseTransition pause = new PauseTransition(Duration.seconds(2.5));
-        pause.setOnFinished(f -> saveButtonFromDetailed.setStyle(defaultButtonStyle));
-        pause.play();
+        view.callSaveAnimation();
 
         Writer writer = new StringWriter();
         recipeWriter = new RecipeCSVWriter(writer);
@@ -111,6 +108,17 @@ public class Controller {
         }
     }
 
+    private void handleLogOutOutButton(ActionEvent event) {
+        clearCredentials();
+        view.goToLoginUI();
+        view.getLoginUI().getUsernameTextField().clear();
+        view.getLoginUI().getPasswordField().clear();
+    }
+
+    private void handleHomeButton(ActionEvent event) {
+        goToRecipeList();
+    }
+
     private void goToRecipeList() {
         getUserRecipeList();
         displayUserRecipes();
@@ -118,8 +126,8 @@ public class Controller {
         addListenersToList();
         MenuButton filterMenuButton = this.view.getAppFrameHome().getFilterMenuButton();
         MenuButton sortMenuButton = this.view.getAppFrameHome().getSortMenuButton();
-        setActiveState(filterMenuButton, 9);
-        setActiveState(sortMenuButton, 9);
+        view.setActiveState(filterMenuButton, 9);
+        view.setActiveState(sortMenuButton, 9);
 
         RecipeListUI recipeListUI = this.view.getAppFrameHome().getRecipeList();
         RecipeSorter recipeSorter = new RecipeSorter(recipeListUI.getRecipeDB().getList());
@@ -148,22 +156,6 @@ public class Controller {
         recipeListUI.update(filter);
     }
 
-    private void handleNewButton(ActionEvent event) throws URISyntaxException, IOException {
-        view.goToAudioCapture();
-        AppFrameMic mic = this.view.getAppFrameMic();
-        mic.setGoToDetailedButtonAction(this::handleDetailedViewFromNewRecipeButton);
-        mic.setGoToHomeButtonAction(this::handleHomeButton);
-        mic.setRecordIngredientsButtonAction(this::handleRecordIngredients);
-        mic.setRecordMealTypeButtonAction(event1 -> {
-            try {
-                handleRecordMealType(event1);
-            } catch (IOException | URISyntaxException e) {
-                e.printStackTrace();
-            }
-        });
-
-    }
-
     private void addFilterListeners() {
         MenuButton filterMenuButton = this.view.getAppFrameHome().getFilterMenuButton();
         ObservableList<MenuItem> filterMenuItems = filterMenuButton.getItems();
@@ -174,7 +166,7 @@ public class Controller {
             int index = i;
             filterMenuItems.get(index).setOnAction(e -> {
                 filter = filterTypes[index];
-                setActiveState(filterMenuButton, index);
+                view.setActiveState(filterMenuButton, index);
                 this.view.getAppFrameHome().updateDisplay(filterTypes[index]);
                 addListenersToList();
             });
@@ -204,30 +196,9 @@ public class Controller {
     }
 
     private void sortList(MenuButton sortMenuButton, int index) {
-        setActiveState(sortMenuButton, index);
+        view.setActiveState(sortMenuButton, index);
         this.view.getAppFrameHome().updateDisplay(filter);
         addListenersToList();
-    }
-
-    private void setActiveState(MenuButton items, int index) {
-        for (int i = 0; i < NONE_INDEX + 1; i++) {
-            if (i == index) {
-                items.getItems().get(i).setStyle("-fx-background-color: #90EE90");
-            } else {
-                items.getItems().get(i).setStyle("-fx-background-color: transparent;");
-            }
-        }
-    }
-
-    private void handleLogOutOutButton(ActionEvent event) {
-        clearCredentials();
-        view.goToLoginUI();
-        view.getLoginUI().getUsernameTextField().clear();
-        view.getLoginUI().getPasswordField().clear();
-    }
-
-    private void handleHomeButton(ActionEvent event) {
-        goToRecipeList();
     }
 
     public void addListenersToList() {
@@ -248,7 +219,7 @@ public class Controller {
             currRecipe.getDetailsButton().setOnAction(e -> {
                 view.goToDetailedView(currRecipe.getRecipe(), true);
                 view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-                changeEditButtonColor(view.getDetailedView().getEditButton());
+                view.changeEditButtonColor(view.getDetailedView().getEditButton());
                 handleDetailedViewListeners();
             });
         }
@@ -271,12 +242,6 @@ public class Controller {
                     handleDetailedViewListeners();
                 });
                 thread.start();
-                AppFrameMic mic = view.getAppFrameMic();
-                mic.getRecordingIngredientsLabel()
-                        .setText("Processing mealType and ingredients. Please wait.");
-                mic.getRecordingIngredientsLabel()
-                        .setStyle("-fx-font-weight: bold; -fx-font: 20 arial;");
-                mic.getRecordingIngredientsLabel().setVisible(true);
             } catch (Exception exception) {
                 AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
                 exception.printStackTrace();
@@ -323,7 +288,7 @@ public class Controller {
     private void handleEditButton(ActionEvent event) {
         Button edit = view.getDetailedView().getEditButton();
         view.getDetailedView().getRecipeDetailsUI().setEditable();
-        changeEditButtonColor(edit);
+        view.changeEditButtonColor(edit);
     }
 
     private void handleDeleteButton(ActionEvent event) throws IOException {
@@ -365,37 +330,7 @@ public class Controller {
     }
 
     private void showShareRecipe(Hyperlink textArea) {
-        String styleAlert = "-fx-background-color: #F1FFCB; -fx-font-weight: bold; -fx-font: 14 arial";
-
-        GridPane gridPane = new GridPane();
-        gridPane.setMaxWidth(Double.MAX_VALUE);
-        gridPane.add(textArea, 0, 0);
-        gridPane.setStyle(styleAlert);
-        gridPane.setPrefSize(220, 220);
-        gridPane.setAlignment(Pos.TOP_CENTER);
-        textArea.setTextAlignment(TextAlignment.CENTER);
-        Button copyButton = new Button("Copy to Clipboard");
-        copyButton.setOnAction(event -> {
-            Clipboard clipboard = Clipboard.getSystemClipboard();
-            ClipboardContent content = new ClipboardContent();
-            content.putString(textArea.getText());
-            clipboard.setContent(content);
-        });
-        gridPane.add(copyButton, 0, 3);
-
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Share this recipe!");
-        alert.setHeaderText("Share this recipe with a friend!");
-        alert.getDialogPane().setContent(gridPane);
-        alert.showAndWait();
-    }
-
-    private void changeEditButtonColor(Button edit) {
-        if (view.getDetailedView().getRecipeDetailsUI().isEditable()) {
-            edit.setStyle(onStyle);
-        } else {
-            edit.setStyle(offStyle);
-        }
+        view.displaySharedRecipeUI(textArea);
     }
 
     private void handleGoToCreateLogin(ActionEvent event) {
@@ -434,14 +369,14 @@ public class Controller {
         }
     }
 
-    ////////////////////////////////////////
+/////////////////////////////// ACCOUNT MANAGEMENT ///////////////////////////////////
     private void handleCreateAcc(ActionEvent event) {
         GridPane grid = view.getAccountCreationUI().getRoot();
         String username = view.getAccountCreationUI().getUsernameTextField().getText();
         String password = view.getAccountCreationUI().getPasswordField().getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-            showErrorPane(grid, "Error. Please provide a username and password.");
+            view.showErrorPane(grid, "Error. Please provide a username and password.");
             return;
         }
 
@@ -455,44 +390,16 @@ public class Controller {
                 if (response.contains("Offline")) {
                     view.goToOfflineUI();
                 } else {
-                    showSuccessPane(grid);
+                    view.showSuccessPane(grid);
                     view.goToLoginUI();
                 }
             } else {
                 view.goToCreateAcc();
                 Platform.runLater(
-                        () -> showErrorPane(grid, "Error. This username is already taken. Please choose another one."));
+                        () -> view.showErrorPane(grid, "Error. This username is already taken. Please choose another one."));
             }
         });
         thread.start();
-    }
-
-    private void showErrorPane(GridPane grid, String errorMessage) {
-        Text errorText = new Text(errorMessage);
-        errorText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        errorText.setFill(Color.RED);
-
-        grid.add(errorText, 1, 6);
-
-        // Fade away after 5 seconds
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(0), new KeyValue(errorText.opacityProperty(), 1.0)),
-                new KeyFrame(Duration.seconds(5), new KeyValue(errorText.opacityProperty(), 0.0)));
-        timeline.play();
-    }
-
-    private void showSuccessPane(GridPane grid) {
-        Text successText = new Text("Successfully created an account!\nPlease login to access it.");
-        successText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        successText.setFill(Color.GREEN);
-
-        grid.add(successText, 1, 6);
-
-        // Fade away after 5 seconds
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(0), new KeyValue(successText.opacityProperty(), 1.0)),
-                new KeyFrame(Duration.seconds(5), new KeyValue(successText.opacityProperty(), 0.0)));
-        timeline.play();
     }
 
     private boolean isUsernameTaken(String username, String password) {
@@ -505,7 +412,6 @@ public class Controller {
         return (!response.equals("Username is not found"));
     }
 
-    ////////////////////////////////////////
     private void handleLoginButton(ActionEvent event) {
         String username = view.getLoginUI().getUsernameTextField().getText();
         String password = view.getLoginUI().getPasswordField().getText();
@@ -513,7 +419,7 @@ public class Controller {
         // Perform login logic here
         if (username.isEmpty() || password.isEmpty()) {
             // Display an error message if username or password is empty
-            showErrorPane(grid, "Error. Please provide a username and password.");
+            view.showErrorPane(grid, "Error. Please provide a username and password.");
             return;
         }
 
@@ -532,7 +438,7 @@ public class Controller {
             } else {
                 view.goToLoginUI();
                 Platform.runLater(
-                        () -> showLoginSuccessPane(grid, false));
+                        () -> view.showLoginSuccessPane(grid, false));
             }
         });
         thread.start();
@@ -579,25 +485,6 @@ public class Controller {
         }
     }
 
-    private void showLoginSuccessPane(GridPane grid, boolean loginSuccessful) {
-        Text successText;
-        if (loginSuccessful) {
-            successText = new Text("Login successful! Welcome to Pantry Pal.");
-            successText.setFill(Color.GREEN);
-        } else {
-            successText = new Text("Account does not exist. Please try again.");
-            successText.setFill(Color.RED);
-        }
-
-        successText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        grid.add(successText, 1, 6);
-
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(0), new KeyValue(successText.opacityProperty(), 1.0)),
-                new KeyFrame(Duration.seconds(5), new KeyValue(successText.opacityProperty(), 0.0)));
-        timeline.play();
-    }
-
     private boolean performLogin(String username, String password) {
         // Will add logic for failed login later
         String response = model.performAccountRequest("GET", username, password);
@@ -617,8 +504,9 @@ public class Controller {
         account = new Account(accountId, username, password);
         return true;
     }
+    /////////////////////////////// ACCOUNT MANAGEMENT ///////////////////////////////////
 
-    /////////////////////////////// AUDIOMANAGEMENT///////////////////////////////////
+    /////////////////////////////// AUDIO MANAGEMENT///////////////////////////////////
     public void handleRecordMealType(ActionEvent event) throws IOException, URISyntaxException {
         recordMealType();
     }
