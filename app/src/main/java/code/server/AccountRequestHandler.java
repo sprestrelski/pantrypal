@@ -35,7 +35,7 @@ public class AccountRequestHandler implements HttpHandler {
         } catch (MongoWriteException ex) {
             ex.printStackTrace();
             response = "Duplicate Key Error";
-        } catch (MongoSocketReadException | MongoTimeoutException e) {
+        } catch (ConnectException e) {
             response = "Server Offline";
         } catch (Exception e) {
             response = "Error";

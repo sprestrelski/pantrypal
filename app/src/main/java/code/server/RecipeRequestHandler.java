@@ -36,9 +36,9 @@ public class RecipeRequestHandler implements HttpHandler {
         } catch (MongoWriteException ex) {
             ex.printStackTrace();
             response = "Duplicate Key Error";
-        } catch (MongoSocketReadException ex) {
-            ex.printStackTrace();
-            response = "Server Offline";
+        } catch (ConnectException ex) {
+            // ex.printStackTrace();
+            response = "Error Server Offline";
         } catch (Exception e) {
             response = "Error";
             System.out.println("An erroneous request");

@@ -5,6 +5,7 @@ import code.client.Controllers.Format;
 import com.sun.net.httpserver.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -34,7 +35,7 @@ public class ChatGPTRequestHandler extends TextToRecipe implements HttpHandler {
         } catch (IndexOutOfBoundsException e) {
             response = "Provide valid meal type or ingredients";
             e.printStackTrace();
-        } catch (InterruptedException | URISyntaxException e) {
+        } catch (InterruptedException | URISyntaxException | ConnectException e) {
             response = "An error occurred.";
             e.printStackTrace();
         }

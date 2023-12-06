@@ -29,7 +29,7 @@ public class DallERequestHandler extends RecipeToImage implements HttpHandler {
             String recipeTitle = query.substring(query.indexOf("=") + 1);
             recipeTitle = URLEncoder.encode(recipeTitle, "UTF-8");
             response = getResponse(recipeTitle);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ConnectException e) {
             response = "Error";
             e.printStackTrace();
         }

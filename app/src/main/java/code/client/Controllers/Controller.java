@@ -99,21 +99,23 @@ public class Controller {
 
         String recipe = writer.toString();
         Thread thread = new Thread(() -> {
-                    String response = model.performRecipeRequest("POST", recipe, null);
-                    // Changes UI to Detailed Recipe Screen
-                    Platform.runLater(
-                        () ->  {
-                            
-                            if (response.contains("Offline")) {
-                                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
-                            } else if (response.contains("Error")) {
-                                AppAlert.show("Error", "Something went wrong. Please check your inputs and try again.");
-                            }
+            String response = model.performRecipeRequest("POST", recipe, null);
+            // Changes UI to Detailed Recipe Screen
+            Platform.runLater(
+                    () -> {
+
+                        if (response.contains("Offline")) {
+                            AppAlert.show("Connection Error",
+                                    "Something went wrong. Please check your connection and try again.");
+                        } else if (response.contains("Error")) {
+                            AppAlert.show("Error", "Something went wrong. Please check your inputs and try again.");
+                        } else {
                             getUserRecipeList();
                             displayUserRecipes();
-                        });
-                });
-                thread.start();
+                        }
+                    });
+        });
+        thread.start();
     }
 
     private void handleLogOutOutButton(ActionEvent event) {
@@ -128,7 +130,7 @@ public class Controller {
     }
 
     private void goToRecipeList(boolean afterChanges) {
-        if(afterChanges) {
+        if (afterChanges) {
             getUserRecipeList();
             displayUserRecipes();
         }
@@ -148,16 +150,30 @@ public class Controller {
 
     private void getUserRecipeList() {
         String userID = account.getId();
-        String response = model.performRecipeRequest("GET", null, userID);
-        Reader reader = new StringReader(response);
-        recipeReader = new RecipeCSVReader(reader);
+        Thread thread = new Thread(() -> {
+            String response = model.performRecipeRequest("GET", null, userID);
+            if (response.contains("Offline")) {
+                Platform.runLater(() -> {
+                    view.goToOfflineUI();
+                });
+            } else if (response.contains("Error")) {
+                Platform.runLater(() -> {
+                    AppAlert.show("Error", "Something went wrong. Please check your inputs and try again.");
+                });
+            } else {
+                Reader reader = new StringReader(response);
+                recipeReader = new RecipeCSVReader(reader);
 
-        try {
-            recipeDb = new RecipeListDb();
-            recipeReader.readRecipeDb(recipeDb);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                try {
+                    recipeDb = new RecipeListDb();
+                    recipeReader.readRecipeDb(recipeDb);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+
     }
 
     private void displayUserRecipes() {
@@ -248,12 +264,12 @@ public class Controller {
 
                     // Changes UI to Detailed Recipe Screen
                     Platform.runLater(
-                        () ->  {
-                            view.goToDetailedView(chatGPTrecipe, false);
-                            view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-                            handleDetailedViewListeners();
-                        });
-                    
+                            () -> {
+                                view.goToDetailedView(chatGPTrecipe, false);
+                                view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+                                handleDetailedViewListeners();
+                            });
+
                 });
                 thread.start();
             } catch (Exception exception) {
@@ -320,15 +336,15 @@ public class Controller {
 
         System.out.println("Deleting id: " + recipe.getId());
         Thread thread = new Thread(() -> {
-                    model.performRecipeRequest("DELETE", recipeStr, null);
-                    Platform.runLater(
-                        () ->  {
-                            goToRecipeList(true);
-                            this.view.getAppFrameHome().updateDisplay(filter); 
-                            addListenersToList();
-                        });
-            });
-            
+            model.performRecipeRequest("DELETE", recipeStr, null);
+            Platform.runLater(
+                    () -> {
+                        goToRecipeList(true);
+                        this.view.getAppFrameHome().updateDisplay(filter);
+                        addListenersToList();
+                    });
+        });
+
         thread.start();
     }
 
@@ -377,11 +393,11 @@ public class Controller {
 
                     // Changes UI to Detailed Recipe Screen
                     Platform.runLater(
-                        () ->  {
-                            view.goToDetailedView(chatGPTrecipe, false);
-                            view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-                            handleDetailedViewListeners();
-                        });
+                            () -> {
+                                view.goToDetailedView(chatGPTrecipe, false);
+                                view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+                                handleDetailedViewListeners();
+                            });
                 });
                 thread.start();
             } catch (Exception exception) {
@@ -393,7 +409,8 @@ public class Controller {
         }
     }
 
-/////////////////////////////// ACCOUNT MANAGEMENT ///////////////////////////////////
+    /////////////////////////////// ACCOUNT MANAGEMENT
+    /////////////////////////////// ///////////////////////////////////
     private void handleCreateAcc(ActionEvent event) {
         GridPane grid = view.getAccountCreationUI().getRoot();
         String username = view.getAccountCreationUI().getUsernameTextField().getText();
@@ -420,7 +437,8 @@ public class Controller {
             } else {
                 view.goToCreateAcc();
                 Platform.runLater(
-                        () -> view.showErrorPane(grid, "Error. This username is already taken. Please choose another one."));
+                        () -> view.showErrorPane(grid,
+                                "Error. This username is already taken. Please choose another one."));
             }
         });
         thread.start();
@@ -512,7 +530,7 @@ public class Controller {
     private boolean performLogin(String username, String password) {
         // Will add logic for failed login later
         String response = model.performAccountRequest("GET", username, password);
-        if (response.contains("Offline")) {
+        if (response.contains("Offline") || response.contains("Connection")) {
             view.goToOfflineUI();
             return false;
         } else if (response.contains("Error")) {
@@ -528,9 +546,11 @@ public class Controller {
         account = new Account(accountId, username, password);
         return true;
     }
-    /////////////////////////////// ACCOUNT MANAGEMENT ///////////////////////////////////
+    /////////////////////////////// ACCOUNT MANAGEMENT
+    /////////////////////////////// ///////////////////////////////////
 
-    /////////////////////////////// AUDIO MANAGEMENT///////////////////////////////////
+    /////////////////////////////// AUDIO
+    /////////////////////////////// MANAGEMENT///////////////////////////////////
     public void handleRecordMealType(ActionEvent event) throws IOException, URISyntaxException {
         recordMealType();
     }
