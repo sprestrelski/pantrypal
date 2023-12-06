@@ -78,7 +78,8 @@ public class RecipeMongoDb implements IRecipeDb {
         Bson updateInstr = set("instructions", Lists.newArrayList(recipe.getInstructionIterator()));
         Bson updateDate = set("date", recipe.getDate());
         Bson updateImage = set("image", recipe.getImage());
-        updates.addAll(Arrays.asList(updateUserId,
+        updates.addAll(Arrays.asList(
+                updateUserId,
                 updateTitle,
                 updateMealTag,
                 updateIngr,
@@ -128,5 +129,7 @@ public class RecipeMongoDb implements IRecipeDb {
     public int size() {
         return (int) recipeDocumentCollection.countDocuments();
     }
+
+    
 
 }

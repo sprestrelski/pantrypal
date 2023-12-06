@@ -7,5 +7,4 @@ public abstract class TextToRecipe {
     public abstract void handle(HttpExchange httpExchange) throws IOException;
 
     public abstract void setSampleRecipe(String recipe);
-
 }

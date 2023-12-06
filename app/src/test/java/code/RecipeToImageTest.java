@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Base64;
 
 public class RecipeToImageTest {
-    BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+    BaseServer server = new MockServer("localhost", AppConfig.SERVER_PORT);
     Model model = new Model();
 
     /*

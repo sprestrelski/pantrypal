@@ -5,7 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import code.client.Model.AppConfig;
-import code.client.View.ServerConnection;
+import code.client.Model.ServerConnection;
 import code.server.BaseServer;
 import code.server.mocking.MockServer;
 
@@ -30,7 +30,7 @@ public class ServerConnectionTest {
 
     @Test
     void testServerOffline() throws IOException {
-        BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+        BaseServer server = new MockServer("localhost", AppConfig.SERVER_PORT);
         ServerConnection connection = new ServerConnection(server);
         assertFalse(connection.isOnline());
         assertEquals("Server is offline", outData.toString());
@@ -38,7 +38,7 @@ public class ServerConnectionTest {
 
     @Test
     void testServerOnline() throws IOException {
-        BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+        BaseServer server = new MockServer("localhost", AppConfig.SERVER_PORT);
         ServerConnection connection = new ServerConnection(server);
         server.start();
         assertTrue(connection.isOnline());

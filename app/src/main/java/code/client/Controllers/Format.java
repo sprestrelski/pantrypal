@@ -4,6 +4,7 @@ import code.server.Recipe;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 public class Format {
     public String buildPrompt(String mealType, String ingredients) {
@@ -38,6 +39,8 @@ public class Format {
             title = title.replaceAll("Title:", ""); 
         } 
         Recipe recipe = new Recipe(title.trim(), mealType);
+        Date now = new Date();
+        recipe.setDate(now.getTime());
         // Parse recipe's ingredients
         String ingredient;
         boolean parse = false;

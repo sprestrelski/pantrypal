@@ -15,8 +15,8 @@ class Footer extends HBox {
 
     Footer() {
         GridPane grid = new GridPane();
-        this.setPrefSize(620, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
+        this.setPrefSize(620, 60);
         this.setSpacing(15);
         this.setAlignment(Pos.CENTER);
         String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF; -fx-font-weight: bold; -fx-font: 11 arial;";
@@ -74,8 +74,9 @@ class Header extends HBox {
 
         sortMenuButton.getItems().addAll(sortNewToOld, sortOldToNew, sortAToZ, sortZToA);
 
-        this.setPrefSize(620, 60);
+        
         this.setStyle("-fx-background-color: #F0F8FF;");
+        this.setPrefSize(620, 60);
 
         Text titleText = new Text("Recipe List");
         titleText.setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
@@ -107,11 +108,15 @@ public class AppFrameHome extends VBox {
         scroller = new ScrollPane(recipeList);
         scroller.setFitToWidth(true);
         scroller.setFitToHeight(true);
-
+        this.setStyle("-fx-background-color: #F0F8FF;");
+        this.setAlignment(Pos.CENTER);
         this.getChildren().addAll(header,scroller,footer);
+        this.setSpacing(30);
         // this.setTop(header);
         // this.setCenter(scroller);
         // this.setBottom(footer);
+        header.setAlignment(Pos.TOP_CENTER);
+        footer.setAlignment(Pos.BOTTOM_CENTER);
         newButton = footer.getNewButton();
         logOutButton = footer.getLogOutButton();
     }

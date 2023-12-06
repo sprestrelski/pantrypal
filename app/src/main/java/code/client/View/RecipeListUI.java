@@ -13,8 +13,8 @@ public class RecipeListUI extends VBox {
 
     RecipeListUI() throws IOException {
         this.setSpacing(5);
-        this.setPrefSize(700, 500);
         this.setStyle("-fx-background-color: #F0F8FF;");
+        this.setPrefSize(700, 455);
         //VBox.setVgrow(this, Priority.ALWAYS);
         this.setAlignment(Pos.CENTER);
     }

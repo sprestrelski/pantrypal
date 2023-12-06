@@ -21,7 +21,11 @@ public class MockDallERequestHandler extends RecipeToImage implements HttpHandle
         try {
             String recipeTitle = query.substring(query.indexOf("=") + 1);
             response = getResponse(recipeTitle);
+            if (recipeTitle.equals("recipeTitle")) {
+                response = "Error";
+            }
         } catch (Exception e) {
+            response = "Error";
             System.out.println("An erroneous request");
             e.printStackTrace();
         }

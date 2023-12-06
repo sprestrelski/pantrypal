@@ -1,4 +1,4 @@
-package code.client.View;
+package code.client.Model;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;

@@ -40,7 +40,7 @@ public class App extends Application {
         view.setScene(login);
         Controller controller;
         //123
-        ServerConnection connection = new ServerConnection(AppConfig.SERVER_HOST, 8100);
+        ServerConnection connection = new ServerConnection(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
 
         if (connection.isOnline()) {
             controller = new Controller(view, model);

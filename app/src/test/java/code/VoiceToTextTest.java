@@ -17,7 +17,7 @@ import java.net.ConnectException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class VoiceToTextTest {
-    BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+    BaseServer server = new MockServer("localhost", AppConfig.SERVER_PORT);
     Model model = new Model();
 
     /*

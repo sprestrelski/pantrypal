@@ -67,7 +67,7 @@ public class Controller {
         loadCredentials();
         if (account != null) {
             this.view.getLoginUI().setLoginCreds(account);
-            goToRecipeList();
+            goToRecipeList(true);
         }
     }
 
@@ -90,8 +90,7 @@ public class Controller {
     private void handleRecipePostButton(ActionEvent event) throws IOException {
         view.getDetailedView().getRefreshButton().setVisible(false);
         Recipe postedRecipe = view.getDetailedView().getDisplayedRecipe();
-        Date currTime = new Date();
-        postedRecipe.setDate(currTime.getTime());
+
         view.callSaveAnimation();
 
         Writer writer = new StringWriter();
@@ -99,13 +98,22 @@ public class Controller {
         recipeWriter.writeRecipe(postedRecipe);
 
         String recipe = writer.toString();
-
-        String response = model.performRecipeRequest("POST", recipe, null);
-        if (response.contains("Offline")) {
-            AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
-        } else if (response.contains("Error")) {
-            AppAlert.show("Error", "Something went wrong. Please check your inputs and try again.");
-        }
+        Thread thread = new Thread(() -> {
+                    String response = model.performRecipeRequest("POST", recipe, null);
+                    // Changes UI to Detailed Recipe Screen
+                    Platform.runLater(
+                        () ->  {
+                            
+                            if (response.contains("Offline")) {
+                                AppAlert.show("Connection Error", "Something went wrong. Please check your connection and try again.");
+                            } else if (response.contains("Error")) {
+                                AppAlert.show("Error", "Something went wrong. Please check your inputs and try again.");
+                            }
+                            getUserRecipeList();
+                            displayUserRecipes();
+                        });
+                });
+                thread.start();
     }
 
     private void handleLogOutOutButton(ActionEvent event) {
@@ -116,12 +124,14 @@ public class Controller {
     }
 
     private void handleHomeButton(ActionEvent event) {
-        goToRecipeList();
+        goToRecipeList(false);
     }
 
-    private void goToRecipeList() {
-        getUserRecipeList();
-        displayUserRecipes();
+    private void goToRecipeList(boolean afterChanges) {
+        if(afterChanges) {
+            getUserRecipeList();
+            displayUserRecipes();
+        }
         view.goToRecipeList();
         addListenersToList();
         MenuButton filterMenuButton = this.view.getAppFrameHome().getFilterMenuButton();
@@ -237,9 +247,13 @@ public class Controller {
                     chatGPTrecipe.setImage(model.performDallERequest("GET", chatGPTrecipe.getTitle()));
 
                     // Changes UI to Detailed Recipe Screen
-                    view.goToDetailedView(chatGPTrecipe, false);
-                    view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-                    handleDetailedViewListeners();
+                    Platform.runLater(
+                        () ->  {
+                            view.goToDetailedView(chatGPTrecipe, false);
+                            view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+                            handleDetailedViewListeners();
+                        });
+                    
                 });
                 thread.start();
             } catch (Exception exception) {
@@ -269,7 +283,6 @@ public class Controller {
         detailedView.setDeleteButtonAction(event -> {
             try {
                 handleDeleteButton(event);
-                goToRecipeList();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -306,9 +319,17 @@ public class Controller {
         String recipeStr = writer.toString();
 
         System.out.println("Deleting id: " + recipe.getId());
-        model.performRecipeRequest("DELETE", recipeStr, null);
-        this.view.getAppFrameHome().updateDisplay(filter);
-        goToRecipeList();
+        Thread thread = new Thread(() -> {
+                    model.performRecipeRequest("DELETE", recipeStr, null);
+                    Platform.runLater(
+                        () ->  {
+                            goToRecipeList(true);
+                            this.view.getAppFrameHome().updateDisplay(filter); 
+                            addListenersToList();
+                        });
+            });
+            
+        thread.start();
     }
 
     private void handleShareButton(ActionEvent event) {
@@ -355,9 +376,12 @@ public class Controller {
                             chatGPTrecipe.getTitle()));
 
                     // Changes UI to Detailed Recipe Screen
-                    view.goToDetailedView(chatGPTrecipe, false);
-                    view.getDetailedView().getRecipeDetailsUI().setEditable(false);
-                    handleDetailedViewListeners();
+                    Platform.runLater(
+                        () ->  {
+                            view.goToDetailedView(chatGPTrecipe, false);
+                            view.getDetailedView().getRecipeDetailsUI().setEditable(false);
+                            handleDetailedViewListeners();
+                        });
                 });
                 thread.start();
             } catch (Exception exception) {
@@ -429,7 +453,7 @@ public class Controller {
             if (view.getMainScene().equals(view.getOfflineUI())) {
             } else if (loginSuccessful) {
                 Platform.runLater(
-                        () -> goToRecipeList());
+                        () -> goToRecipeList(true));
                 if (!view.getLoginUI().getRememberLogin()) {
                     clearCredentials();
                 } else {

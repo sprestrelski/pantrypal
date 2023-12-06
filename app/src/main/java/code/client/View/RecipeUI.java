@@ -41,6 +41,7 @@ public class RecipeUI extends HBox {
         this.getChildren().add(style);
         this.setPrefSize(50, 50);
         this.setMinSize(50, 50);
+        this.setAlignment(Pos.CENTER);
     }
 
     public Recipe getRecipe() {

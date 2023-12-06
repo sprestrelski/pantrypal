@@ -8,22 +8,25 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 import org.bson.Document;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.net.URISyntaxException;
+import java.io.IOException;
 import java.io.FileWriter;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
 
-import code.server.Account;
-import code.client.Model.AccountCSVReader;
+import code.client.Model.*;
 import code.client.Model.AccountCSVWriter;
 import code.client.Model.AppConfig;
-import code.client.View.*;
-import code.client.Controllers.*;
+import code.client.Model.Model;
 import code.server.*;
+import code.server.Account;
+import code.server.mocking.MockServer;
+import code.server.mocking.MockChatGPTRequestHandler;
 
 /**
  * This test file covers the End-to-End Scenario in which Chef Caitlyn:
@@ -35,14 +38,23 @@ import code.server.*;
  */
 public class EndToEndScenario2_1 {
     private static Account account; // Account used in the following tests
+    private static BaseServer server; // Mock server used in the following tests
+    private static Model model; // Model used in the following tests
 
     @BeforeAll
-    public static void setUp() {
+    public static void setUp() throws IOException {
+        // Initialize an account for Chef Caitlyn
         account = new Account("Chef", "Caitlyn");
+        // Initialize a mocked server that PantryPal will "use"
+        server = new MockServer("localhost", AppConfig.SERVER_PORT);
+        // Initialize a helper model object
+        model = new Model();
+        // Start up the server before Chef Caitlyn opens up the app
+        server.start();
     }
 
     /**
-     * Test that Chef Caitlyn was able to successfully create an account on MongoDB
+     * Test that Chef Caitlyn was able to successfully create an account on MongoDB.
      */
     @Test
     public void createAccountTest() {
@@ -60,7 +72,7 @@ public class EndToEndScenario2_1 {
 
     /**
      * Test that Chef Caitlyn's user credentials were successfully saved onto her
-     * device
+     * device.
      */
     @Test
     public void automaticLoginTest() throws IOException {
@@ -80,13 +92,27 @@ public class EndToEndScenario2_1 {
     }
 
     /**
-     * Test that Chef Caitlyn can successfully create a recipe
+     * Test that Chef Caitlyn can successfully generate a recipe after logging in.
      */
     @Test
     public void createRecipeTest() {
-
-        // RecipeBuilder builder = new RecipeBuilder();
-
+        // Perform a mock ChatGPT request for Chef Caitlyn's fried chicken recipe
+        String mealType = "breakfast";
+        String ingredients = "chicken, eggs";
+        String initialResponse = model.performChatGPTRequest("GET", mealType, ingredients);
+        String expectedResponse = """
+                Fried Chicken
+                breakfast
+                Ingredients:
+                - 2 chicken breasts, diced
+                - 2 eggs
+                Instructions:
+                1. Crack 2 eggs into bowl.
+                2. Add chicken into bowl and then fry.
+                3. Enjoy!
+                """;
+        // Check that the recipe was created successfully from the ChatGPT response
+        assertEquals(expectedResponse, initialResponse);
     }
 
     /**
@@ -96,28 +122,68 @@ public class EndToEndScenario2_1 {
     @Test
     public void refreshRecipeTest() {
 
+        /* START OF COPIED TEST CONTENT */
+
+        String mealType = "breakfast";
+        String ingredients = "chicken, eggs";
+        String initialResponse = model.performChatGPTRequest("GET", mealType, ingredients);
+        String expectedResponse = """
+                Fried Chicken
+                breakfast
+                Ingredients:
+                - 2 chicken breasts, diced
+                - 2 eggs
+                Instructions:
+                1. Crack 2 eggs into bowl.
+                2. Add chicken into bowl and then fry.
+                3. Enjoy!
+                """;
+        assertEquals(expectedResponse, initialResponse);
+
+        /* END OF COPIED TEST CONTENT */
+
+        // Mock a recipe refresh on the recipe created in the previous test
+        String refreshResponse = model.performChatGPTRequest("PUT", mealType, ingredients);
+        // Check that the recipe body is no longer the same
+        assertNotEquals(initialResponse, refreshResponse);
     }
 
     /**
-     * Test that Chef Caitlyn can successfully save a recipe
+     * Test that Chef Caitlyn can successfully save a recipe to MongoDB.
      */
     @Test
     public void saveRecipeTest() {
-        RecipeBuilder builder = new RecipeBuilder(account.getId(), "Caitlyn's Lunch");
-        builder.setMealTag("lunch");
+        // Build a recipe based on the mocked refreshed recipe from the previous test
+        RecipeBuilder builder = new RecipeBuilder(account.getId(), "Fried Chicken and Egg Fried Rice");
+        builder.setMealTag("breakfast");
         Recipe recipe = builder.buildRecipe();
+        // Add the ingredients of the "refreshed" recipe
+        recipe.addIngredient("- 2 chicken breasts, diced");
+        recipe.addIngredient("- 2 large eggs");
+        recipe.addIngredient("- 2 cups cooked rice");
+        recipe.addIngredient("- 2 tablespoons vegetable oil");
+        recipe.addIngredient("- 2 tablespoons soy sauce");
+        recipe.addIngredient("- 1 teaspoon sesame oil");
+        recipe.addIngredient("- Salt and pepper to taste");
+        // Add the instructions of the "refreshed" recipe
+        recipe.addInstruction("1. Crack 2 eggs into bowl.");
+        recipe.addInstruction("2. Have a shrimp fry the rice.");
+        recipe.addInstruction("3. Enjoy!");
         try (MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN)) {
             MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
             MongoCollection<Document> recipeCollection = mongoDb.getCollection(AppConfig.MONGO_RECIPE_COLLECTION);
             RecipeMongoDb recipeDB = new RecipeMongoDb(recipeCollection);
             recipeDB.add(recipe);
             Recipe receivedRecipe = recipeDB.find(recipe.getId());
+            // Check that the recipe was saved to the MongoDB
             assertTrue(receivedRecipe != null);
+            // Check that the recipe was saved to Chef Caitlyn's account
             assertTrue(receivedRecipe.getAccountId().contains(account.getId()));
             recipeDB.remove(recipe.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // Stop the server once Chef Caitlyn is done using the app
+        server.stop();
     }
-
 }

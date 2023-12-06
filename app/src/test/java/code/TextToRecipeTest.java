@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class TextToRecipeTest {
-        BaseServer server = new MockServer(AppConfig.SERVER_HOST, AppConfig.SERVER_PORT);
+        BaseServer server = new MockServer("localhost", AppConfig.SERVER_PORT);
         Model model = new Model();
         Format format = new Format();
 

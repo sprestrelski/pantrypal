@@ -69,6 +69,7 @@ public class WhisperRequestHandler implements HttpHandler {
                 response = "Error";
             }
         }
+        
         // Sending back response to the client
         httpExchange.sendResponseHeaders(200, response.length());
         OutputStream outStream = httpExchange.getResponseBody();
@@ -83,6 +84,7 @@ public class WhisperRequestHandler implements HttpHandler {
 
         while (multipartInStream.available() > 0) {
             int nextByte = multipartInStream.read();
+            
             if (nextByte < -1) {
                 throw new IOException("Reached end of stream while reading the current line!");
             }

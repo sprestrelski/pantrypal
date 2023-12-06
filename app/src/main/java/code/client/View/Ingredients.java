@@ -20,7 +20,6 @@ public class Ingredients extends GridPane {
         // Set the preferred vertical and horizontal gaps
         this.setVgap(20);
         this.setHgap(20);
-
         // Get a picture of a microphone for the voice recording button
         File file = new File(AppConfig.MICROPHONE_IMG_FILE);
         microphone = new ImageView(new Image(file.toURI().toString()));

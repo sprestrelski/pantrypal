@@ -28,9 +28,9 @@ public class ShareRequestHandler implements HttpHandler {
 
         // Format: localhost:8100/recipes/username/recipeID
 
-        System.out.println("\n" + uri.toString());
-        System.out.println(username);
-        System.out.println(recipeID);
+        // System.out.println("\n" + uri.toString());
+        // System.out.println(username);
+        // System.out.println(recipeID);
         response = ShareRecipe.getSharedRecipe(accountMongoDB, recipeMongoDb, username, recipeID);
         // Sending back response to the client
         httpExchange.sendResponseHeaders(200, response.length());

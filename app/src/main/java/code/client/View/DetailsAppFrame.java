@@ -78,13 +78,13 @@ public class DetailsAppFrame {
         RecipeBuilder builder = new RecipeBuilder(currentRecipe.getAccountId(), title);
         builder.setMealTag(currentRecipe.getMealTag());
         builder.setId(currentRecipe.getId());
-
-        if (isOldRecipe) {
-            builder.setDate(currentRecipe.getDate());
-        } else {
-            Date currDate = new Date();
-            builder.setDate(currDate.getTime());
-        }
+        builder.setDate(currentRecipe.getDate());
+        // if (isOldRecipe) {
+            
+        // } else {
+        //     Date currDate = new Date();
+        //     builder.setDate(currDate.getTime());
+        // }
 
         Recipe edit = builder.buildRecipe();
         for (String ingredient : ingr) {
