@@ -39,7 +39,7 @@ public class MockChatGPTRequestHandler extends TextToRecipe implements HttpHandl
             String mealType = typeIngredients[0];
             String ingredients = typeIngredients[1];
 
-            if (mealType.equals("Breakfast")) {
+            if (mealType.toLowerCase().equals("breakfast")) {
                 response = sampleRecipe;
             }
         } catch (IndexOutOfBoundsException e) {

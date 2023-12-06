@@ -22,7 +22,7 @@ public class AppConfig {
     public static final String MONGO_RECIPE_COLLECTION = "recipes";
     public static final String MONGO_USER_COLLECTION = "users";
     // server
-    public static final String SERVER_HOST = "192.168.1.123";
+    public static final String SERVER_HOST = "localhost";
     public static final int SERVER_PORT = 8100;
     public static final String SERVER_URL = "http://" + SERVER_HOST + ":" + SERVER_PORT;
     public static final String RECIPE_PATH = "/recipe";

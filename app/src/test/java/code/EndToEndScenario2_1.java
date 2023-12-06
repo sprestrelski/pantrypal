@@ -50,7 +50,6 @@ public class EndToEndScenario2_1 {
         // Initialize a helper model object
         model = new Model();
         // Start up the server before Chef Caitlyn opens up the app
-        server.start();
     }
 
     /**
@@ -58,6 +57,12 @@ public class EndToEndScenario2_1 {
      */
     @Test
     public void createAccountTest() {
+        try {
+            server.start();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         try (MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN)) {
             MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
             MongoCollection<Document> accountCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
@@ -68,6 +73,7 @@ public class EndToEndScenario2_1 {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        server.stop();
     }
 
     /**
@@ -76,6 +82,12 @@ public class EndToEndScenario2_1 {
      */
     @Test
     public void automaticLoginTest() throws IOException {
+        try {
+            server.start();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         // Save the username and password to a file called "UserCredentialsTest.csv"
         AccountCSVWriter writer = new AccountCSVWriter(new FileWriter("UserCredentialsTest.csv"));
         writer.writeAccount(account.getUsername(), account.getPassword());
@@ -89,6 +101,7 @@ public class EndToEndScenario2_1 {
         String expectedPassword = "Caitlyn";
         assertEquals(expectedUsername, userCredentials.get(0));
         assertEquals(expectedPassword, userCredentials.get(1));
+        server.stop();
     }
 
     /**
@@ -96,6 +109,12 @@ public class EndToEndScenario2_1 {
      */
     @Test
     public void createRecipeTest() {
+        try {
+            server.start();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         // Perform a mock ChatGPT request for Chef Caitlyn's fried chicken recipe
         String mealType = "breakfast";
         String ingredients = "chicken, eggs";
@@ -113,6 +132,7 @@ public class EndToEndScenario2_1 {
                 """;
         // Check that the recipe was created successfully from the ChatGPT response
         assertEquals(expectedResponse, initialResponse);
+        server.stop();
     }
 
     /**
@@ -121,7 +141,12 @@ public class EndToEndScenario2_1 {
      */
     @Test
     public void refreshRecipeTest() {
-
+        try {
+            server.start();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         /* START OF COPIED TEST CONTENT */
 
         String mealType = "breakfast";
@@ -146,6 +171,7 @@ public class EndToEndScenario2_1 {
         String refreshResponse = model.performChatGPTRequest("PUT", mealType, ingredients);
         // Check that the recipe body is no longer the same
         assertNotEquals(initialResponse, refreshResponse);
+        server.stop();
     }
 
     /**
@@ -153,6 +179,12 @@ public class EndToEndScenario2_1 {
      */
     @Test
     public void saveRecipeTest() {
+        try {
+            server.start();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         // Build a recipe based on the mocked refreshed recipe from the previous test
         RecipeBuilder builder = new RecipeBuilder(account.getId(), "Fried Chicken and Egg Fried Rice");
         builder.setMealTag("breakfast");

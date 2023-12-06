@@ -75,7 +75,7 @@ public class Model {
             while ((line = in.readLine()) != null) {
                 tempResponse += line + "\n";
             }
-            if( !(tempResponse.toLowerCase().contains("error")) ) {
+            if (!(tempResponse.toLowerCase().contains("error"))) {
                 response = tempResponse;
             }
             in.close();
@@ -170,6 +170,9 @@ public class Model {
             }
 
             in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            response = "Error: " + e;
         }
 
         System.out.println("Whisper response: " + response);

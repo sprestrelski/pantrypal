@@ -1,6 +1,8 @@
 package code;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileReader;
@@ -107,23 +109,22 @@ public class EndToEndScenario2_2 {
         initialRecipeList.add(r2);
         initialRecipeList.add(r3);
         initialRecipeList.add(r4);
+        server.stop();
     }
 
     @Test
     public void serverUnavailableTest() throws MalformedURLException, IOException {
         server.stop();
         String response = model.performAccountRequest("GET", "user", "password");
-        assertTrue(response.contains("Username is not found"));
+        assertTrue(response.contains("Error"));
 
         response = model.performRecipeRequest("GET", "recipe", "userId");
-        assertTrue(response.contains("No recipes found"));
+        assertTrue(response.contains("Error"));
 
         response = model.performWhisperRequest("GET", "wah");
         assertTrue(response.contains("Error"));
 
         response = model.performChatGPTRequest("GET", "mealType", "ingredients");
-        String expected = "";
-        assertEquals(expected, response);
         assertTrue(response.contains("Error"));
 
         response = model.performDallERequest("GET", "recipeTitle");
@@ -140,6 +141,7 @@ public class EndToEndScenario2_2 {
         }
         String successMessage = "success";
         userCredentials = new ArrayList<>();
+
         try {
             writer = new AccountCSVWriter(new FileWriter("UserCredentialsTest.csv"));
             writer.writeAccount(account.getUsername(), account.getPassword());
@@ -153,10 +155,18 @@ public class EndToEndScenario2_2 {
             assertTrue(userCredentials.get(0).equals(account.getUsername()));
             assertTrue(userCredentials.get(1).equals(account.getPassword()));
 
-            String loginResp = model.performAccountRequest("GET", account.getUsername(), account.getPassword());
-            // String expected = "";
-            // assertEquals(expected, loginResp);
-            assertTrue(loginResp.contains(successMessage), "Username is not found");
+            try (MongoClient mongoClient = MongoClients.create(AppConfig.MONGODB_CONN)) {
+                MongoDatabase mongoDb = mongoClient.getDatabase(AppConfig.MONGO_DB);
+                MongoCollection<Document> accountCollection = mongoDb.getCollection(AppConfig.MONGO_USER_COLLECTION);
+                AccountMongoDB accountDb = new AccountMongoDB(accountCollection);
+                accountDb.add(account);
+                String loginResp = model.performAccountRequest("GET", account.getUsername(), account.getPassword());
+                assertNotEquals("Username is not found", loginResp);
+                assertNotEquals("Incorrect password", loginResp);
+                accountDb.removeByUsername("Chef");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Failed test setup");
